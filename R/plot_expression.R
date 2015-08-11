@@ -1,0 +1,86 @@
+## plot expression
+
+# use get_expression to retrieve data
+# take data either from last aba_func()-call or specify genes and dataset explicitly
+
+
+plot_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE, dendro=TRUE, age_category=1){
+
+	# take data from last aba_enrich()-call or retrieve them from pre_input?
+	if(is.na(dataset)){
+		aba_env=as.environment("package:ABAEnrichment")
+		if(!exists("remember",where=aba_env)) {
+			stop("This function requires previous execution of aba_enrich(). Alternatively define dataset and gene_ids.")
+		}
+		dataset_type=aba_env$remember$test[2]
+		test=aba_env$remember$test[1]
+		genes=aba_env$remember$genes
+	} else {
+		dataset_type=dataset
+		test=""
+	}	
+	
+	# check that at least 2 genes are requested (one structure is ok, it may have several sampled substructures)
+	if(!(is.na(gene_ids)) && length(gene_ids)<2){
+		stop("Please enter at least two genes.")
+	}
+		
+	# check age_category (remaining checks performed in get_expression())
+	age_category = as.numeric(age_category)
+	if (dataset_type=="5_stages" & (length(age_category)!=1 || !(age_category %in% 1:5))){
+		stop("Please specify an age_category between 1 and 5.")
+	}
+	
+	# get expression data
+	expr=get_expression(structure_ids, gene_ids, dataset, background)
+	if (dataset_type=="5_stages") {
+		expr=expr[[age_category]]
+		main_append=paste("age_category: ",age_category,sep="")
+	} else { main_append="" }
+	
+	# ensure there are at least 2 columns and rows (heatmap won't accept less)
+	if(nrow(expr)<2){
+		stop("At least two brain structures are needed for plotting.")
+	}
+	if(ncol(expr)<2){
+		stop("At least two genes are needed for plotting.")
+	}
+	
+	# add acronym
+	full_names=c()
+	for (id in rownames(expr)){ 
+		full_names=c(full_names ,get_name(id))
+	}
+	acronyms=sapply(strsplit(full_names,"_"),"[[",1)
+	rownames(expr)=paste(rownames(expr), " (",acronyms,")",sep="")	
+			
+	# create plot	
+	cexRow = min(1.5,0.2 + 1/log10(nrow(expr)))
+    cexCol = min(1.5,0.2 + 1/log10(ncol(expr)))
+#   colramp=colorRamps::matlab.like(100)
+    colramp=rev(heat.colors(100))
+  
+	if (dendro==TRUE){
+		gplots::heatmap.2(expr,scale="none",col=colramp,margins=c(13.5,15), main=paste(test,dataset_type,main_append,sep=" "),density.info="none",trace="none",keysize=1.2,cexRow=cexRow,cexCol=cexCol)
+	} else {			
+		# define colors of sidebar (test/background, wilcox-scores or none (if no test performed))
+		if(test=="hyper"){
+			coly=c("black","red")
+			sidebar=coly[genes[match(colnames(expr),names(genes))]+1]
+		} else if (test=="wilcoxon"){
+			coly=rev(rainbow(50,start=0,end=0.5))
+			genes=genes-min(genes)
+			genes=round(genes/ max(genes) * 49)	
+			sidebar=coly[genes[match(colnames(expr),names(genes))]+1]	
+		} else { 
+			sidebar=rep("white",ncol(expr))
+		}
+		gplots::heatmap.2(expr,scale="none",col=colramp,margins=c(13.5,15),Colv=NA,Rowv=NA,dendrogram="none",ColSideColors=sidebar, main=paste(test,dataset_type,main_append,sep=" "),density.info="none",trace="none",keysize=1.2,cexRow=cexRow,cexCol=cexCol)
+	}
+}
+
+		
+           
+           
+           
+           
