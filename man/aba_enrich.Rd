@@ -4,7 +4,7 @@
 Test genes for expression enrichment in human brain regions
 }
 \description{
-Tests for enrichment of user defined candidate genes in the set of expressed protein coding genes in different human brain regions. It integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allan Brain Atlas project [1-4]. The statistical analysis is performed by interfacing the ontology enrichment software FUNC [5]. 
+Tests for enrichment of user defined candidate genes in the set of expressed protein coding genes in different human brain regions. It integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allen Brain Atlas project [1-4]. The statistical analysis is performed by interfacing the ontology enrichment software FUNC [5]. 
 }
 \usage{
 aba_enrich(genes, dataset = 'adult', test = 'hyper', 

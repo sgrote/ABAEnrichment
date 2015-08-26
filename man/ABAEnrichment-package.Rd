@@ -6,13 +6,13 @@
 Gene expression enrichment in human brain regions
 }
 \description{
-The package ABAEnrichment is designed to test for enrichment of user defined candidate genes in the set of expressed genes in different human brain regions. The package integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allan Brain Atlas project [1-4]. The statistical analysis is performed by the core function \code{\link{aba_enrich}} which interfaces the ontology enrichment software FUNC [5]. Additional functions provided in this package like \code{\link{get_expression}} and \code{\link{plot_expression}} facilitate exploring the expression data.
+The package ABAEnrichment is designed to test for enrichment of user defined candidate genes in the set of expressed genes in different human brain regions. The package integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allen Brain Atlas project [1-4]. The statistical analysis is performed by the core function \code{\link{aba_enrich}} which interfaces the ontology enrichment software FUNC [5]. Additional functions provided in this package like \code{\link{get_expression}} and \code{\link{plot_expression}} facilitate exploring the expression data.
 }
 \details{
 \tabular{ll}{
 Package: \tab ABAEnrichment\cr
 Type: \tab Package\cr
-Version: \tab 0.99.5\cr
+Version: \tab 0.99.6\cr
 Date: \tab 2015-08-26\cr
 License: \tab GPL (>= 2)\cr
 }

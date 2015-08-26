@@ -1,7 +1,7 @@
 Package: ABAEnrichment
 Type: Package
 Title: Gene expression enrichment in human brain regions
-Version: 0.99.5
+Version: 0.99.6
 Date: 2015-08-26
 Author: Steffi Grote
 Maintainer: Steffi Grote <steffi_grote@eva.mpg.de>
@@ -11,7 +11,7 @@ Description: The package ABAEnrichment is designed to test for
         function 'aba_enrich' integrates the expression of the
         candidate gene set (averaged across donors) and the structural
         information of the brain using an ontology, both provided by
-        the Allan Brain Atlas project. 'aba_enrich' interfaces the
+        the Allen Brain Atlas project. 'aba_enrich' interfaces the
         ontology enrichment software FUNC to perform the statistical
         analyses. Additional functions provided in this package like
         'get_expression' and 'plot_expression' facilitate exploring the
