@@ -7,7 +7,8 @@ Plot expression data for given genes and brain structure ids
 The function produces a heatmap (\code{\link{heatmap.2}} from package \code{gplots}) of gene expression in defined brain regions from adult or developing humans, or a developmental effect score for the developing human brain. Expression data is obtained from the Allen Brain Atlas project [1-4], averaged across donors, and for the developing human brain divided into five major age categories. If \code{gene_ids} and \code{dataset} are not specified, the genes and dataset from the last enrichment analysis with \code{\link{aba_enrich}} are used, since it may be a common case to first run the enrichment analysis and then look at the expression data. If a requested brain region has no expression data annotated, data from sampled substructures of this region is returned.
 }
 \usage{
-plot_expression(structure_ids, gene_ids = NA, dataset = NA, background = FALSE, dendro = TRUE, age_category = 1)
+plot_expression(structure_ids, gene_ids = NA, dataset = NA, background = FALSE, 
+  dendro = TRUE, age_category = 1)
 }
 \arguments{
   \item{structure_ids}{
@@ -72,9 +73,12 @@ Steffi Grote
 
 \examples{
 ## plot expression data for six genes in the brain structure 'Allen:4010' with dendrogram
-plot_expression(structure_ids=c("Allen:4010"),gene_ids=c(324,8312,673,1029,64764,1499),dataset="adult")
-## plot expression data of six genes in two brain regions from children (3-11 yrs, age_category 3) without dendrogram
-plot_expression(structure_ids=c("Allen:10657","Allen:10208"), gene_ids=c("ENSG00000168036", "ENSG00000157764", "ENSG00000182158", "ENSG00000147889"),dataset="5_stages",dendro=FALSE, age_category=3)
-
+plot_expression(structure_ids=c("Allen:4010"),gene_ids=c(324,8312,673,1029,64764,1499),
+  dataset="adult")
+## plot expression data of six genes in two brain regions from children (age_category 3) 
+## without dendrogram
+plot_expression(structure_ids=c("Allen:10657","Allen:10208"), 
+  gene_ids=c("ENSG00000168036", "ENSG00000157764", "ENSG00000182158", "ENSG00000147889"),
+  dataset="5_stages",dendro=FALSE, age_category=3)
 }
 

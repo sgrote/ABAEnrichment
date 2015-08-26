@@ -39,9 +39,10 @@ The ontologies for the adult and the developing human brain are different.
 
 }
 \examples{
-## Get the ids of the superstructures of the precentral gyrus ('Allen:4010', adult brain ontology)
+## Get the ids of the superstructures of the precentral gyrus (adult brain ontology)
 get_superstructures('Allen:4010')
-## Get the ids and the names of the superstructures of the dorsolateral prefrontal cortex ('Allen:10173', developing brain ontology) 
+## Get the ids and the names of the superstructures of the dorsolateral prefrontal cortex 
+## (developing brain ontology) 
 data.frame(hierarchy=get_name(get_superstructures("Allen:10173")))
 }
 

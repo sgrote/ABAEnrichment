@@ -37,7 +37,7 @@ The acronym is added because the names alone are not unique.
 \code{\link{get_superstructures}}\cr
 }
 \examples{
-## get the full names of the brain structures 'Allen:10657' and 'Allen:10225'. 
+## get the full names of the brain structures 'Allen:10657' and 'Allen:10225'
 get_name(c('Allen:10657','Allen:10225'))
 }
 

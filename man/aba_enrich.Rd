@@ -7,7 +7,8 @@ Test genes for expression enrichment in human brain regions
 Tests for enrichment of user defined candidate genes in the set of expressed protein coding genes in different human brain regions. It integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allan Brain Atlas project [1-4]. The statistical analysis is performed by interfacing the ontology enrichment software FUNC [5]. 
 }
 \usage{
-aba_enrich(genes, dataset = 'adult', test = 'hyper', cutoff_quantiles = seq(0.1, 0.9, 0.1), n_randsets = 1000)
+aba_enrich(genes, dataset = 'adult', test = 'hyper', 
+  cutoff_quantiles = seq(0.1, 0.9, 0.1), n_randsets = 1000)
 }
 \arguments{
   \item{genes}{
@@ -70,29 +71,36 @@ Steffi Grote
 }
 \examples{
 
-#### Perform gene expression enrichment analysis on 13 candidate genes in five developmental stages of the human brain using the hypergeometric test implemented in FUNC[5]   
-## create input vector with candidate genes 
+#### Perform gene expression enrichment analysis on 13 candidate genes in five developmental 
+#### stages of the human brain using the hypergeometric test implemented in FUNC[5]   
+## create input vector with candidate genes (HGNC-symbols)
 genes=rep(1,13)
-names(genes)=c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1', 'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
+names(genes)=c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
+  'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
 ## run enrichment analysis
-res=aba_enrich(genes,dataset='5_stages',cutoff_quantiles=c(0.5,0.7,0.9))
+res=aba_enrich(genes,dataset='5_stages',cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
 ## get FWERs for enrichment of candidate genes among expressed genes
 fwers=res[[1]]
-## see results for the brain regions with highest enrichment for children (3-11 yrs, age_category 3)
+## see results for the brain regions with highest enrichment for children (age_category 3)
 head(fwers[fwers[,1]==3,])
-## see the input genes vector and the expression values that correspond to the requested cutoff quantiles
-res[2:3]
+## see the input genes vector (only genes with expression data available) 
+res[2]
+## see the expression values that correspond to the requested cutoff quantiles
+res[3]
 
 
-#### Perform gene expression enrichment analysis on 15 candidate genes in the adult human brain using the wilcoxon rank test implemented in FUNC[5] 
-## create input vector with random scores associated with the candidate genes (using entrez-Ids)
+#### Perform gene expression enrichment analysis on 15 candidate genes in the  
+#### adult human brain using the wilcoxon rank test implemented in FUNC[5] 
+## create input vector with random scores associated with the candidate genes (Entrez-Ids)
 genes=sample(1:50,15)
 names(genes)=c(324,8312,673,1029,64764,1499,3021,3417,3418,8085,3845,9968,5290,5727,5728)
 ## run enrichment analysis
-res=aba_enrich(genes,dataset='adult',test='wilcoxon',cutoff_quantiles=c(0.2,0.5,0.8))
+res=aba_enrich(genes,dataset='adult',test='wilcoxon',cutoff_quantiles=c(0.2,0.5,0.8),
+  n_randsets=100)
 ## see results for the brain regions with highest enrichment 
 head(res[[1]])
-## see the input genes vector and the expression values that correspond to the requested cutoff quantiles
+## see the input genes vector and the expression values that correspond 
+## to the requested cutoff quantiles
 res[2:3]
 
 }

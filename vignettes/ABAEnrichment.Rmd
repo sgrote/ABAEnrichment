@@ -17,7 +17,7 @@ set.seed(123)
 
 Package: ABAEnrichment   
 Author: Steffi Grote   
-Date: August 08, 2015   
+Date: August 26, 2015   
 
 ## Overview
 `r Biocpkg("ABAEnrichment")` is an R package for the enrichment analysis of user defined candidate genes (in the set of expressed protein coding genes) in different human brain regions. The package integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allan Brain Atlas project [1-4]. The statistical analysis is performed by the core function `aba_enrich` which interfaces the ontology enrichment software FUNC [5]. Additional functions provided in this package are `get_expression`, `plot_expression`, `get_name`, `get_sampled_substructures` and `get_superstructures` supporting the exploration and visualization of the expression data. 
