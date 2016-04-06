@@ -22,7 +22,7 @@ vector of gene identifiers, either Entrez-ID, Ensembl-ID or HGNC-symbol. If not 
 'dev_effect' for a developmental effect score. If not defined, dataset from last enrichment analysis with \code{\link{aba_enrich}} are used.
 }
   \item{background}{
-logical indicating whether expression from background genes should be included. Only used when \code{gene_ids} and \code{dataset} are \code{NA} so that genes from the last enrichment analysis with \code{link{aba_enrich}} are used and when this analysis was performed using the hypergeometric test.  
+logical indicating whether expression from background genes should be included. Only used when \code{gene_ids} and \code{dataset} are \code{NA} so that genes from the last enrichment analysis with \code{\link{aba_enrich}} are used and when this analysis was performed using the hypergeometric test.  
 }
   \item{dendro}{
 logical indicating whether rows and columns should be rearranged with a dendrodram based on row/column means (using \code{\link{hclust}}). If \code{FALSE} and if \code{gene_ids} and \code{dataset} are \code{NA} so that genes from the last enrichment analysis with \code{\link{aba_enrich}} are used, the genes are arranged according to the last \code{\link{aba_enrich}} execution: for a hypergeometric test the genes are grouped into candidate and background genes (indicated by a coloured side-bar with red and black, respectively) and for a Wilcoxon rank test the genes are ordered by the scores which they were given for the Wilcoxon rank test, which are also indicated by a side-bar.

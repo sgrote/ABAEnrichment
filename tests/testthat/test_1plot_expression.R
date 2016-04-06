@@ -4,10 +4,6 @@
 
 # additional checks concerning dataset and genes are performed by get_expression() inside plot_expression
 
-test_that("normal input results in heatmap-object (list of 9)",{
-	expect_that(class(plot_expression(structure_ids=c('Allen:4010'),gene_ids=c(324,8312,673,1029,64764,1499),dataset='adult')), equals("list"))
-	expect_that(length(plot_expression(structure_ids=c('Allen:4010'),gene_ids=c(324,8312,673,1029,64764,1499),dataset='adult')), equals(9))
-})
 
 test_that("edge cases are handled",{
 	# only two genes and two structures

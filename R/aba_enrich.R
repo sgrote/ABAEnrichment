@@ -157,6 +157,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	
 	# compute cutoffs (tapply lasts much longer - use only when needed)
 	message("Computing cutoffs... ")
+	cutoff_quantiles = sort(cutoff_quantiles)
 	if(dataset=="5_stages"){
 		cutoff_list = tapply(pre_input$signal, pre_input$age_category, function(x) quantile(x, probs=cutoff_quantiles),simplify=FALSE)
 	} else {	
@@ -198,6 +199,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			
 			# for Hypergeometric Test: 0 for all genes, then convert to 1 for interesting genes (merge not possible if no background genes are defined)
 			message(" Check that there are sufficient genes above cutoff...")
+			breaky = FALSE
 			if (test=="hyper"){		
 				input$signal = 0
 				interesting_genes = names(remaining_genes)[remaining_genes==1]
@@ -205,29 +207,33 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 				# do input Input data have both 0 and 1? else break (FUNC would throw error and summary-file would not be generated)
 				if(sum(input$signal)==0){
 					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
-				break
+					breaky = TRUE
 				}	
 				if(sum(input$signal)==nrow(input)){
 					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No background gene expression above cutoff.",sep=""))
-				break
+					breaky = TRUE
 				}	
 			# for Wilcoxon test: replace expression signal with score
 			} else	if (test=="wilcoxon"){
 				if(length(unique(input[,1]))<2){
 					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". Less than 2 genes show expression above cutoff.",sep=""))
-					break
-				}
-				score = genes[match(input$gene_id,names(genes))]
-				input$signal = score
+					breaky = TRUE
+				} else {
+					score = genes[match(input$gene_id,names(genes))]
+					input$signal = score
+				}	
 			}	
+			# if first cutoff fails, no output produced, else return output from previous cutoffs
+			if (breaky){
+				if(i==1){
+					stop ("Expression cutoffs too high.")
+				} else {
+					break
+				}	
+			}
 			message(" Rearrange input for FUNC...")
 			# add "Allen:" string to structures (shouldn't be numeric)
 			input$structure=paste("Allen:",input[,2],sep="")	
-			# generate input and output name (cutoff and age_category)
-			input_name=paste("cutoff",names(cutoff)[i],s,sep="_")	
-			# write FUNC-input to Input-directory (how it would be for FUNC standalone)		
-			write.table(input,paste(directory,"/",input_name,".tsv",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")	
-			
 			# prepare input data (infile-data and root like in separate_taxonomies.pl)
 			# paste annotations
 			xx=tapply(input[,2],input[,1],function(x){paste(x,collapse=" ")})
@@ -235,15 +241,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			root=data.frame(genes=as.character(names(xx)),goterms=as.character(xx))
 			# "infile-data" (wilcox) / "Allen:4005-changed" (hyper)
 			if (test=="hyper"){
-				# subset to test genes
-				input=input[input[,3]==1,]	
-				# change factor to character			
-				input[,1]=as.character(input[,1])
-				input[,2]=as.character(input[,2])
-				# paste test annotations
-				yy=tapply(input[,2],input[,1],function(x){paste(paste(x,collapse=" "),"")})
-				# create infile-data dataframe
-				infile_data=data.frame(genes=as.character(names(yy)),goterms=as.character(yy))
+				infile_data = data.frame(genes=unique(input[input[,3]==1,1]))
 			} else if(test=="wilcoxon"){
 				infile_data = unique(input[,c(1,3)])
 			}
