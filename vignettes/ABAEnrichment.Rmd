@@ -195,4 +195,4 @@ sessionInfo()
 (Internet). Available from: [http://brainspan.org/]
 
 [5] Pruefer, K. et al. (2007) FUNC: A package for detecting significant associations between gene
-sets and ontological, BMC Bioinformatics 8: 41. [doi:10.1186/1471-2105-8-41]
+sets and ontological annotations, BMC Bioinformatics 8: 41. [doi:10.1186/1471-2105-8-41]
