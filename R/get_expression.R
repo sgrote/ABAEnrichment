@@ -104,7 +104,7 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
 	if(dataset=="adult") {
 		units="z-score-normalized microarray expression data"
 	} else if (dataset=="5_stages"){
-		units="log2(RPKM) from RNA-seq"
+		units="RPKM from RNA-seq"
 	} else if (dataset=="dev_effect"){
 		units="developmental effect score"
 	}

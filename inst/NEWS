@@ -1,0 +1,4 @@
+
+BUG FIXES
+
+* fixed error in get_expression(..., dataset="5_stages") message ("returning log2(RPKM)" to "returning RPKM") 
