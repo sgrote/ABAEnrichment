@@ -5,10 +5,14 @@ get_superstructures=function(structure_id){
 	if(length(structure_id)!=1){
 		stop("Please use a single structure id.")
 	}
-	# remove Allen: string
-	struc=strsplit(structure_id,":")[[1]][2]
+	# remove Allen: string if present
+	if(grepl("Allen:", structure_id)){
+		struc=strsplit(structure_id,":")[[1]][2]
+	} else {
+		struc=structure_id	
+	}	
 	# check if valid structure_id
-	if(!(struc) %in% daty_strucs[,1]){
+	if(!(struc %in% daty_strucs[,1])){
 		stop(paste("No data for structure_id ",structure_id,".",sep=""))
 	}
 	# get path
@@ -16,8 +20,10 @@ get_superstructures=function(structure_id){
 	path=unlist(strsplit(path,"/"))
 	# remove empty (first) entry
 	path=path[path!=""]
-	# add Allen: string again
-	path=paste("Allen:",path,sep="")
+	# add Allen: string again if it was in input	
+	if(grepl("Allen:", structure_id)){
+		path=paste("Allen:",path,sep="")
+	}
 #	# turn around, to go frome from current node to root
 #	path=rev(path)
 	return(path)
