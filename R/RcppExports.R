@@ -5,8 +5,8 @@ hyper_category_test <- function(input, output, cutoff, root) {
     invisible(.Call('ABAEnrichment_hyper_category_test', PACKAGE = 'ABAEnrichment', input, output, cutoff, root))
 }
 
-hyper_randset <- function(detected, changed, number_of_randomsets, outfile, term, graph_path, termtoterm, root) {
-    invisible(.Call('ABAEnrichment_hyper_randset', PACKAGE = 'ABAEnrichment', detected, changed, number_of_randomsets, outfile, term, graph_path, termtoterm, root))
+hyper_randset <- function(detected, number_of_randomsets, directory, root, mod) {
+    invisible(.Call('ABAEnrichment_hyper_randset', PACKAGE = 'ABAEnrichment', detected, number_of_randomsets, directory, root, mod))
 }
 
 unlock_environment <- function(env) {
@@ -17,7 +17,7 @@ wilcox_category_test <- function(input, output, cut, root) {
     invisible(.Call('ABAEnrichment_wilcox_category_test', PACKAGE = 'ABAEnrichment', input, output, cut, root))
 }
 
-wilcox_randset <- function(nodes_per_gene, gene_scores, number_of_randomsets, outfile, term, graph_path, termtoterm, root) {
-    invisible(.Call('ABAEnrichment_wilcox_randset', PACKAGE = 'ABAEnrichment', nodes_per_gene, gene_scores, number_of_randomsets, outfile, term, graph_path, termtoterm, root))
+wilcox_randset <- function(nodes_per_gene, number_of_randomsets, directory, root) {
+    invisible(.Call('ABAEnrichment_wilcox_randset', PACKAGE = 'ABAEnrichment', nodes_per_gene, number_of_randomsets, directory, root))
 }
 

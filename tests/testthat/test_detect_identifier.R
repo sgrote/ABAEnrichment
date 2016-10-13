@@ -26,3 +26,9 @@ test_that("HGNC is recognized",{
 	expect_that(detect_identifier(as.factor("4AGNT")), equals("hgnc_symbol"))
 	expect_that(detect_identifier(as.factor("A4GNTAH56THFGBH")), equals("hgnc_symbol"))
 })
+
+test_that("Chromosomal Region is recognized",{
+  	expect_that(detect_identifier("1:0-10000"), equals("blocks"))
+	expect_that(detect_identifier(as.factor("X:100-20000")), equals("blocks"))
+	expect_that(detect_identifier(as.factor("21:3000-300")), equals("blocks"))
+})

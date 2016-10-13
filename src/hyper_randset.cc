@@ -11,8 +11,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-//steffi:
-//using namespace std ;
 
 #include <time.h>
 #include <cstdlib>
@@ -22,117 +20,100 @@
 #include <set>
 #include <vector>
 #include <memory>
+#include <map> 		// das war gar nicht drin
+#include <iostream> // das war unter Rcpp.h, nur falls es Probleme macht 
 
-// steffi:
 #include "go.h"
 #include "go_graph_hyper.h"
 #include "idmap.h"
 #include "transitions.h"
 
+#include "structures.h"
+#include "read_bed.h"
+#include "blocks.h"
+#include "roll.h"
+#include "ran_genelen.h"
+
 #include <Rcpp.h>
-#include <iostream>
+
+
 using namespace Rcpp;
 
-#define MAX_LINE_LENGTH 20000
 
-// steffi:
-// int main( int argc, char *argv[] ) 
 
 //[[Rcpp::export]]
-void hyper_randset(std::string detected, std::string changed ,int number_of_randomsets, std::string outfile, std::string term, std::string graph_path, std::string termtoterm, std::string root) 
-
-{
-	/*steffi:
-	if (  argc != 9 ) {
-		cerr << "Usage: " << argv[0] << " detected "
-				"changed number_of_sets outfile term.txt" << endl
-				<< "       graph_path.txt term2term.txt GO_ID" << endl ;
-		//exit( 1 ) ;
-	}*/
+void hyper_randset(std::string detected, int number_of_randomsets, std::string directory, std::string root, std::string mod){
 	
-	// Build GO-Graph using different files from go_date_termdb-tables.tar.gz
-	// steffi: term.txt lesen
+// 1) Build GO-Graph using different files from go_date_termdb-tables.tar.gz
+	
+	// read term.txt
+	string term = directory + "/term.txt";
 	std::ifstream terms( term.c_str() ) ;
 	if ( ! terms ) {
-		Rcerr << "Cannot open " << term << "." << endl ;
-		//exit( 1 ) ;
+		//Rcerr << "Cannot open " << term << "." << endl ;
+		Rcpp::stop("Cannot open term.txt.\n"); // TODO: das Ã¼berall so machen
 	}
 	idmap id_to_go( terms ) ;
 	terms.close(  ) ;
-	Rcerr << "Read " << id_to_go.size() << " terms." << endl ;
+	Rcout << "Read " << id_to_go.size() << " terms." << endl ;
 
-	// steffi: graph_path.txt lesen
+	// read graph_path.txt lesen
+	string graph_path = directory + "/graph_path.txt";
 	std::ifstream transition_graph( graph_path.c_str() ) ;
 	if ( ! transition_graph ) {
 		Rcerr << "Cannot open " << graph_path << "." << endl ;
-		//exit( 1 ) ;
 	}
-	// steffi:
 	string parent_go( root ) ;
 	string parent_id = id_to_go.get_id_for_go( parent_go ) ;
 	transitions trans( parent_id, transition_graph ) ;
 	transition_graph.close(  ) ;
-	Rcerr << "Found " << trans.size() << " nodes." << endl ;
+	Rcout << "Found " << trans.size() << " nodes." << endl ;
 
-	// steffi: term2term lesen
+	// read term2term lesen
+	string termtoterm = directory + "/term2term.txt";
 	std::ifstream term2term( termtoterm.c_str() ) ;
 	if ( ! term2term ) {
 		Rcerr << "Cannot open " << termtoterm << "." << endl ;
-		//exit( 1 ) ;
 	}
 	go_graph_hyper graph( trans, term2term, id_to_go ) ;
 	term2term.close(  ) ;
-	Rcerr << "Graph created." << endl ;
+	Rcout << "Graph created." << endl ;
 	
-	// gos-object will be used to get one int* per GO and to print 
-	// the results.
-	go gos ;
-	
-	/* steffi: output immer file - delete am ende immer möglich
-	ostream *out ;
-	if ( string( argv[4] ) == "-" ) {
-		out = &cout ;
-	} else {
-		out = new ofstream( argv[4] ) ;
-	}
-	if ( !*out ) {
-		cerr << "Cannot open output file " << argv[4] << endl ;
-		//exit( 1 ) ;
-	}*/
-	std::ostream *out ;
-	out = new std::ofstream( outfile.c_str() ) ;
 
-	// steffi:	
+
+// 2) Read expressed genes, their positions and their annotated GO-categories
+		// gos-object will be used to get one int* per GO and to print the results.
+	go gos ;	
+
+	// maybe rename detected, changed to all_genes and cadidate_genes oder so
+	
 	std::ifstream in( detected.c_str() ) ;
-
-	// steffi:
-	Rcerr << "Reading detectedfile... " 
-			<< endl ;
-	
+	Rcout << "Reading detectedfile... " << endl ;
+			
 	// gens == genes. This vector is a simple representation of the go tree.
-	// every gene is 1 vector of int*, where the int represents one go-node.
-	vector<vector<int*> > gens;
-
-
+	// every gene is 1 vector of int*, where the int* represents one go-node.
+	vector< vector<int*> > gens;
+	// vector of structures to store coordinates of genes from Allen:4005
+	vector<gen_pos_str> genes_pos;
+	// genename to index for gens
 	map<string,int> genename_to_index ;
-	int index = 0 ;
-
-//	char line[MAX_LINE_LENGTH] ;
-	string line ;
-	while ( in ) {
-		getline( in, line ) ;
-//		in.getline(line, MAX_LINE_LENGTH, '\n' ) ;
-		std::istringstream is( line.c_str() ) ; 
-		string gen_name ;
-		is >> gen_name ; 
-#ifdef DEBUG
-		// Steffi:
-		Rcout << "gen_name: " << gen_name << endl ;
-#endif
-
-		vector<int*> gen_vec;
+	int index = 0 ;	
+	// in = Allen:4005-file = one line per expr gene: gene | chrom | start | end | GO1 GO2 GO3 
+	string line ;	
+	while ( getline(in, line) ) { 
+		std::istringstream is( line.c_str() ) ; // take line as input stream
+		// store name and optionally position of current gene
+		gen_pos_str gen_pos; 
+		is >> gen_pos.name;
+		if(mod!="classic"){	
+			is >> gen_pos.chrom >> gen_pos.start >> gen_pos.end;		
+		}
+		genes_pos.push_back(gen_pos);
+		// go through all annotated GOs of an expressed gene and store pointers to GOs
+		vector<int*> gen_vec; 
 		string go_name ;
 		set<string> parents ;
+		// go through all annotated GOs of an expressed gene
 		while ( is >> go_name ) {
 			// Get the names of all nodes that are parents of go_name
 			graph.get_parents( go_name, &parents ) ;
@@ -142,112 +123,133 @@ void hyper_randset(std::string detected, std::string changed ,int number_of_rand
 		{
 			// gos.add returns a unique int* for every string.
 			gen_vec.push_back( gos.add( *it ) ) ; 
-#ifdef DEBUG
-			// Steffi:
-			Rcout << "go: " << *it << endl ;
-#endif
+			//Rcout << "go: " << *it << endl ;
+
 		}
-		// if the gene is annotated, add it to the genes-vector
+		// if the gene is annotated, add it to the gens-vector (vector of vectors with GOs for all exp. genes)
 		if ( gen_vec.size() > 0 ) {
 			gens.push_back( gen_vec ) ;
-			genename_to_index[gen_name] = index ;
+			genename_to_index[gen_pos.name] = index ;
 			index++ ;	
-		}		
-
+		}	
 	}
-	// steffi:
-	Rcerr << "Found " << gens.size() << " usable entrys in " << detected
+	in.close();
+	
+	int n_background = gens.size();
+	
+	Rcout << "Found " << n_background << " usable entrys in " << detected
 		<< " with " << gos.size() << " GOs" << endl ;
+	
+	// write to file randset_out 
+	std::ostream *out ;
+	string outfile = directory + "/randset_out";
+	out = new std::ofstream( outfile.c_str() ) ;
 	
 	*out << "Genes:\t" << gens.size() << endl ;
 	*out << "GOs:\t" << gos.size() << endl ;
 	
+	// print line with names of GO-categories
+	// print another line with sums of expressed genes annotated to the GOs (including background genes) 
+	// also reset sums per GO to 0
 	gos.print_names( *out ) ;
 
-	// add changedfile...
-	// steffi:
+	
+// 3) Read expressed test genes and add 1s to their annotated categories
+
+	// read changedfile (infile data, one line per expressed TEST gene with genname
+	string changed = directory + "/infile-data";
 	std::ifstream changed_in( changed.c_str() ) ;
 	if ( ! changed_in ) {
 		Rcerr << "Cannot open " << changed << endl ;
-		//exit( 1 ) ;
 	}
-
-	string line_s ;
-
-	int size_of_random_sets = 0 ;
-
+	int n_candidate = 0 ; // number of expressed genes, previously size_of_random_sets
+	string line_s ;	
 	while( changed_in ) {
 		getline( changed_in, line_s ) ;
 		std::istringstream is( line_s.c_str() ) ;
 		string gen_name ;
 		is >> gen_name ;
+		//Rcout << "expressed test gene: " << gen_name << endl;
+		// genename_to_index: index of annotated GO-vec for a gene (gens[index])
+		// TODO if-statement should always be true because changed_in is subset of "in/detected" which was used to make genename_to_index 
 		if ( genename_to_index.find( gen_name ) != genename_to_index.end() ) {
+			// go through annotated GOs for the current gene and add 1
 			for ( vector<int*>::iterator it = gens[genename_to_index[gen_name]].begin() ;
 					it != gens[genename_to_index[gen_name]].end() ; ++it ) {
 				(*(*it))++ ;
 			}
-			size_of_random_sets++ ;
+			n_candidate++ ;
 		}
 	}
+	changed_in.close();
 	gos.print_sum( *out ) ;
 	gos.clear() ;
 
-	/*steffi: number_of_randomsets schon als int-argument 
-	int number_of_randomsets ;	
-	{
-		istringstream is( argv[3] ) ;
-		is >> number_of_randomsets ;
-	}*/
 
-/*	int size_of_random_sets ;
-	{
-		istringstream is( argv[2] ) ;
-		is >> size_of_random_sets;
+// 4) Read regions and store in vector of bed-structures
+	vector< bed_str > candidate_bed;
+	vector< bed_str > background_bed;
+	if (mod=="roll" || mod=="block"){	
+		candidate_bed = read_bed(directory + "/test_regions.bed"); 
+		background_bed = read_bed(directory+ "/bg_regions.bed"); 		
+		// print regions 
+		//Rcout << endl << "Candidate regions: " << endl;
+		//for (int k=0; k < candidate_bed.size(); k++){
+			//Rcout << candidate_bed[k].chrom << " " << candidate_bed[k].start << " " << candidate_bed[k].end  << " " << candidate_bed[k].len << " " << candidate_bed[k].cumu_len << endl;
+		//}	
+		//Rcout << endl << "Background regions: " << endl;
+		//for (int k=0; k < background_bed.size(); k++){
+			//Rcout << background_bed[k].chrom << " " << background_bed[k].start << " " << background_bed[k].end  << " " << background_bed[k].len << " " << background_bed[k].cumu_len << endl;
+		//}	
 	}
-*/
-	//steffi:
-	Rcerr << "Creating " << number_of_randomsets << " randomsets with "
-			"size " << size_of_random_sets << endl ;
-
-/*	*out << "Randomsets:\t" << number_of_randomsets << endl ;
-	*out << "Genes per randomset:\t" << size_of_random_sets << endl ;
-*/
 
 
-
-
+// 5) Create randomsets, randomly assign test genes among all expressed genes
+	if (mod=="roll" || mod=="block"){
+		Rcout << "Creating " << number_of_randomsets << " random gene sets from " << candidate_bed.size() << " random regions..." << endl ;	
+	} else {
+		Rcout << "Creating " << number_of_randomsets << " randomsets with size " << n_candidate << endl ;
+	}			
 	// forall randomsets
 	for ( int i = 1 ; i <= number_of_randomsets ; ++i ) {
-		// create randomset
-		set<int> random_numbers ;
-		double max = gens.size() ;
-		for ( int randi = 1 ; randi <= size_of_random_sets ; ++randi ) {
+		set<int> random_numbers ; // indices for the selected genes
 		
-			int rand_num = static_cast<int>(max*R::runif(0,1)) ;
-			while ( random_numbers.find( rand_num ) !=
-												random_numbers.end() ) {
-				rand_num = static_cast<int>(max*R::runif(0,1)) ;
-			}
-			random_numbers.insert( random_numbers.begin(), rand_num ) ;
-		}
-		// reset all go-nodes
+		if (mod=="block"){
+			random_numbers = rannum_blocks(candidate_bed, background_bed, genename_to_index, genes_pos);
+		} else if (mod=="roll"){
+			random_numbers = rannum_roll(candidate_bed, background_bed, genename_to_index, genes_pos);
+		} else if (mod=="gene_len"){
+			random_numbers = rannum_genelen(n_candidate, genename_to_index, genes_pos);
+		} else if (mod=="classic"){
+			while (random_numbers.size() < n_candidate) {	
+				long ran = R::runif(0,1) * n_background;				
+				random_numbers.insert(ran) ;
+			}	
+			//Rcout << "Candidate genes: " << n_candidate << ", Random genes: " << random_numbers.size() << std::endl;
+		} 	
+		
+		// reset all go-nodes, set all go_vec counters to zero
 		gos.clear(  ) ;
 
 		// add 1 to every GO that a randomly choosen gene is part of
-		for ( set<int>::const_iterator it = random_numbers.begin() ;
-				it != random_numbers.end() ; ++it ) {
-			for ( vector<int*>::iterator it2 = gens[*it].begin() ;
-					it2 != gens[*it].end() ; ++it2 ) {
+		// go through all random numbers 
+		//Rcout << "random numbers: " << endl;
+		for (set<int>::const_iterator it = random_numbers.begin() ;it != random_numbers.end() ; ++it){
+			//Rcout << *it << ", ";
+			// gens == genes. This vector is a simple representation of the go tree.
+			// every gene is 1 vector of int*, where the int represents one go-node.
+			// gens[*it] = vector with all GOs that belong to the gene *it points at
+			for ( vector<int*>::iterator it2 = gens[*it].begin() ;it2 != gens[*it].end() ; ++it2 ) {
 				(*(*it2))++ ;
 			}
 		}
 		random_numbers.clear() ;
 		
-		// print a line with the values for every go
+		// print a line with the sums of annotated genes for every go
 		gos.print_sum( *out ) ;
-
 	}
-	Rcerr << "\rFinished" << endl ;
-	// steffi:
 	delete out;
+	//mappable_bed.clear();
+	genes_pos.clear();
+	Rcout << "\rFinished" << endl ;
 }

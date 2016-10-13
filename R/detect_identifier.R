@@ -1,4 +1,5 @@
 # detect gene identifier given a gene_id of type either entrez, ensembl or hgnc-symbol	
+# new: or genomic regions given as chr:from-to
 
 detect_identifier=function(gene_id){
 	# de-factor
@@ -14,6 +15,10 @@ detect_identifier=function(gene_id){
 	if (nchar(gene_id)==15 && substring(gene_id,1,4)=="ENSG"){
 		return("ensembl_gene_id")
 	}
-	# c) neither of the above cases in present in HGNC-symbols
+	# c) genomic region is chr:from-to
+	if (grepl("^[0-9XY]*:[0-9]*-[0-9]*$", gene_id)){
+		return("blocks")
+	}
+	# d) neither of the above cases in present in HGNC-symbols
 	return("hgnc_symbol")			
 }	

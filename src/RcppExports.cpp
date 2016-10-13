@@ -19,19 +19,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // hyper_randset
-void hyper_randset(std::string detected, std::string changed, int number_of_randomsets, std::string outfile, std::string term, std::string graph_path, std::string termtoterm, std::string root);
-RcppExport SEXP ABAEnrichment_hyper_randset(SEXP detectedSEXP, SEXP changedSEXP, SEXP number_of_randomsetsSEXP, SEXP outfileSEXP, SEXP termSEXP, SEXP graph_pathSEXP, SEXP termtotermSEXP, SEXP rootSEXP) {
+void hyper_randset(std::string detected, int number_of_randomsets, std::string directory, std::string root, std::string mod);
+RcppExport SEXP ABAEnrichment_hyper_randset(SEXP detectedSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP, SEXP modSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< std::string >::type detected(detectedSEXP);
-    Rcpp::traits::input_parameter< std::string >::type changed(changedSEXP);
     Rcpp::traits::input_parameter< int >::type number_of_randomsets(number_of_randomsetsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type outfile(outfileSEXP);
-    Rcpp::traits::input_parameter< std::string >::type term(termSEXP);
-    Rcpp::traits::input_parameter< std::string >::type graph_path(graph_pathSEXP);
-    Rcpp::traits::input_parameter< std::string >::type termtoterm(termtotermSEXP);
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
     Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
-    hyper_randset(detected, changed, number_of_randomsets, outfile, term, graph_path, termtoterm, root);
+    Rcpp::traits::input_parameter< std::string >::type mod(modSEXP);
+    hyper_randset(detected, number_of_randomsets, directory, root, mod);
     return R_NilValue;
 END_RCPP
 }
@@ -60,19 +57,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // wilcox_randset
-void wilcox_randset(std::string nodes_per_gene, std::string gene_scores, int number_of_randomsets, std::string outfile, std::string term, std::string graph_path, std::string termtoterm, std::string root);
-RcppExport SEXP ABAEnrichment_wilcox_randset(SEXP nodes_per_geneSEXP, SEXP gene_scoresSEXP, SEXP number_of_randomsetsSEXP, SEXP outfileSEXP, SEXP termSEXP, SEXP graph_pathSEXP, SEXP termtotermSEXP, SEXP rootSEXP) {
+void wilcox_randset(std::string nodes_per_gene, int number_of_randomsets, std::string directory, std::string root);
+RcppExport SEXP ABAEnrichment_wilcox_randset(SEXP nodes_per_geneSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< std::string >::type nodes_per_gene(nodes_per_geneSEXP);
-    Rcpp::traits::input_parameter< std::string >::type gene_scores(gene_scoresSEXP);
     Rcpp::traits::input_parameter< int >::type number_of_randomsets(number_of_randomsetsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type outfile(outfileSEXP);
-    Rcpp::traits::input_parameter< std::string >::type term(termSEXP);
-    Rcpp::traits::input_parameter< std::string >::type graph_path(graph_pathSEXP);
-    Rcpp::traits::input_parameter< std::string >::type termtoterm(termtotermSEXP);
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
     Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
-    wilcox_randset(nodes_per_gene, gene_scores, number_of_randomsets, outfile, term, graph_path, termtoterm, root);
+    wilcox_randset(nodes_per_gene, number_of_randomsets, directory, root);
     return R_NilValue;
 END_RCPP
 }

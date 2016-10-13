@@ -12,8 +12,8 @@ rearrange_output=function(summary,cluster,term){
 	# add category 
 	summary$cate=cluster[match(summary$node_id, cluster$samples),"lables"]
 	# confirm that inside clusters FWERs are the same
-#	xx=aggregate(summary[,8],by=list(summary$cate,summary$age_category,summary$cutoff_quantile), function(x) length(unique(x)))
-#	if(!all(xx$x==1)) stop("Brain regions grouped have different FWERs.")
+	# xx=aggregate(summary[,8],by=list(summary$cate,summary$age_category,summary$cutoff_quantile), function(x) length(unique(x)))
+	# if(!all(xx$x==1)) stop("Brain regions grouped have different FWERs.")
 
 	# exclude redundant structures and stay only with FWER_overrep
 	pure=unique(summary[,c(1:3,8,10)])
@@ -37,7 +37,7 @@ rearrange_output=function(summary,cluster,term){
 	cluster$region=summary[match(cluster$flagship,summary$node_id),"node_name"]
 	
 	# collapse structure_names for categories
-#	cluster$name=summary[match(cluster$samples,summary$node_id),"node_name"]
+	#cluster$name=summary[match(cluster$samples,summary$node_id),"node_name"]
 		
 	names_string=aggregate(1:nrow(cluster),by=list(cate=cluster$lables),function(x) paste(cluster[x,"samples"][order(cluster[x,"samples"],decreasing=TRUE)],collapse=";"))
 	
@@ -57,9 +57,3 @@ rearrange_output=function(summary,cluster,term){
 	             	
 	return(out)
 }
-
-
-
-
-
-
