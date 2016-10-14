@@ -17,14 +17,14 @@ set.seed(123)
 
 Package: ABAEnrichment   
 Author: Steffi Grote   
-Date: October 13, 2016   
+Date: October 14, 2016   
 
 ## Overview
 `r Biocpkg("ABAEnrichment")` is an R package for the enrichment analysis of user defined candidate genes (in the set of expressed protein coding genes) in different human brain regions. The package integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allen Brain Atlas project [1-4]. The statistical analysis is performed by the core function `aba_enrich` which interfaces the ontology enrichment software FUNC [5]. Additional functions provided in this package are `get_expression`, `plot_expression`, `get_name`, `get_sampled_substructures` and `get_superstructures` supporting the exploration and visualization of the expression data. 
 
 The enrichment analysis for candidate genes is performed by using either the hypergeometric or the Wilcoxon rank test implemented in the ontology enrichment software FUNC [5]. The hypergeometric test evaluates the enrichment of expressed candidate genes compared to a set of background genes for each brain region. The background genes can be defined explicitly like the candidate genes or, by default, consist of all expressed genes from the dataset outside the candidate genes. Using the Wilcoxon rank test, scores assigned to candidate genes are tested for an enrichment in brain regions. The boundary between 'expressed' and 'not expressed' is defined by different expression quantiles (e.g. the lowest 40% of gene expression are 'not expressed' and the upper 60% are 'expressed' for a quantile of 0.4). These cutoffs are set with the parameter `cutoff_quantiles` and an analysis is run for every cutoff separately. 
 
-To account for multiple testing FUNC uses random permutations of scores assigned to genes for the Wilcoxon rank test. For the hypergeometric test candidate and background genes are permuted. This is also the default behaviour in `r Biocpkg("ABAEnrichment")`. In addition, `r Biocpkg("ABAEnrichment")` provides the option to condition the chance of a background gene to be selected as a random candidate gene on the length of the background gene (option `gene_len`).  
+To account for multiple testing FUNC uses random permutations of scores assigned to genes for the Wilcoxon rank test. For the hypergeometric test candidate and background genes are permuted (see Figure in  [Details](#Details)). This is also the default behaviour in `r Biocpkg("ABAEnrichment")`. In addition, `r Biocpkg("ABAEnrichment")` provides the option to condition the chance of a background gene to be selected as a random candidate gene on the length of the background gene (option `gene_len`).  
 Furthermore, whole genomic regions can be provided as input instead of defining genes explicitly. `r Biocpkg("ABAEnrichment")` then tests the expressed genes in the candidate regions for enrichment in brain regions compared to the expressed genes in the background regions. The randomsets then also consist of randomly chosen candidate regions inside the background regions, either as a whole block in one background region (default), or on the same chromosome allowing to overlap multiple background regions on that chromosome (option `circ_chrom`).
 
 The package incorporates three different brain expression datasets: first, microarray data from adult individuals, second, RNA-seq data from individuals of five different developmental stages (prenatal, infant, child, adolescent, adult) and third, a developmental effect score measuring the age effect on expression for given genes. In the latter case the data are not divided into 'expressed' and 'not expressed', but into 'developmental effect score above cutoff' or not. However, for simplicity we only refer to 'expression' in that documentation. For details on the datasets see the `r Biocexptpkg("ABAData")` vignette.
@@ -120,7 +120,7 @@ An alternative method to choose random blocks from the background regions can be
 ## create input vector with a candidate region on chromosome 8
 ## and background regions on chromosome 8
 genes = c(1,0,0)
-names(genes) = c('8:82000000-83000000', '8:7400000-44300000', '8:47600000-146300000')
+names(genes) = c('8:82000000-82700000', '8:7400000-44300000', '8:47600000-146300000')
 genes
 ```
 ```{r,results='hide'} 
@@ -146,7 +146,7 @@ expr = get_expression(fwers[1:5,"structure_id"], background=FALSE)
 ## look at the structure of the expression data
 str(expr)
 ## see expression for children (age_category 3 -> 3rd element of expression list)
-expr[[3]]
+head(expr[[3]])
 ```
 
 The function `plot_expression` enables the visualization of expression data. The input parameters of `plot_expression` are identical to those of `get_expression` except for the additional arguments `dendro` and `age_category` which determine whether or not a dendrogram should be added to the heatplot and the developmental stage to be plotted, respectively.
@@ -239,6 +239,15 @@ Again, the developmental effect scores can be retrieved with the functions `get_
 ## plot developmental effect score of the 5 brain strcutures with the lowest FWERs
 plot_expression(res[[1]][1:5,"structure_id"])
 ```
+
+
+## <a name="Details"></a>Details
+
+#### Schematic representation of the hypergeometric test and the FWER calculation
+
+![FWER calculation](./Skizze_Fig1.png "hypergeometric test and FWER")
+
+The FWER for the Wilcoxon rank test is computed in a similar way, with random permutations of the scores that are assigned to genes.
 
 ## Session Info
 ```{r}
