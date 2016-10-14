@@ -24,8 +24,8 @@ Date: October 14, 2016
 
 The enrichment analysis for candidate genes is performed by using either the hypergeometric or the Wilcoxon rank test implemented in the ontology enrichment software FUNC [5]. The hypergeometric test evaluates the enrichment of expressed candidate genes compared to a set of background genes for each brain region. The background genes can be defined explicitly like the candidate genes or, by default, consist of all expressed genes from the dataset outside the candidate genes. Using the Wilcoxon rank test, scores assigned to candidate genes are tested for an enrichment in brain regions. The boundary between 'expressed' and 'not expressed' is defined by different expression quantiles (e.g. the lowest 40% of gene expression are 'not expressed' and the upper 60% are 'expressed' for a quantile of 0.4). These cutoffs are set with the parameter `cutoff_quantiles` and an analysis is run for every cutoff separately. 
 
-To account for multiple testing FUNC uses random permutations of scores assigned to genes for the Wilcoxon rank test. For the hypergeometric test candidate and background genes are permuted (see Figure in  [Details](#Details)). This is also the default behaviour in `r Biocpkg("ABAEnrichment")`. In addition, `r Biocpkg("ABAEnrichment")` provides the option to condition the chance of a background gene to be selected as a random candidate gene on the length of the background gene (option `gene_len`).  
-Furthermore, whole genomic regions can be provided as input instead of defining genes explicitly. `r Biocpkg("ABAEnrichment")` then tests the expressed genes in the candidate regions for enrichment in brain regions compared to the expressed genes in the background regions. The randomsets then also consist of randomly chosen candidate regions inside the background regions, either as a whole block in one background region (default), or on the same chromosome allowing to overlap multiple background regions on that chromosome (option `circ_chrom`).
+To account for multiple testing FUNC uses random permutations of scores assigned to genes for the Wilcoxon rank test. For the hypergeometric test candidate and background genes are permuted (see [Schematic 1](#hyper_scheme) below). This is also the default behaviour in `r Biocpkg("ABAEnrichment")`. In addition, `r Biocpkg("ABAEnrichment")` provides the option to condition the chance of a background gene to be selected as a random candidate gene on the length of the background gene (option `gene_len`).  
+Furthermore, whole genomic regions can be provided as input instead of defining genes explicitly. `r Biocpkg("ABAEnrichment")` then tests the expressed genes in the candidate regions for enrichment in brain regions compared to the expressed genes in the background regions. The randomsets then also consist of randomly chosen candidate regions inside the background regions, either as a whole block in one background region (default), or on the same chromosome allowing to overlap multiple background regions on that chromosome (option `circ_chrom`, see [Schematic 2](#block_scheme) below).
 
 The package incorporates three different brain expression datasets: first, microarray data from adult individuals, second, RNA-seq data from individuals of five different developmental stages (prenatal, infant, child, adolescent, adult) and third, a developmental effect score measuring the age effect on expression for given genes. In the latter case the data are not divided into 'expressed' and 'not expressed', but into 'developmental effect score above cutoff' or not. However, for simplicity we only refer to 'expression' in that documentation. For details on the datasets see the `r Biocexptpkg("ABAData")` vignette.
 
@@ -89,7 +89,7 @@ aba_enrich(genes, gene_len = TRUE)
 ```
 
 ### Test gene expression enrichment for genomic regions
-Instead of defining candindate and background genes explicitly in the `genes` input vector, it is also possible to define entire chromosomal regions as candidate and background regions. The expression enrichment is then tested for all protein coding genes located in or overlapping the candidate region on the plus or the minus strand. The gene coordinates used to identify those genes were obtained from [http://grch37.ensembl.org/biomart/martview/]. For the random permutations used to compute the FWER, blocks as long as candidate regions are chosen from the background regions and genes contained in these blocks are considered candidate genes.  
+Instead of defining candindate and background genes explicitly in the `genes` input vector, it is also possible to define entire chromosomal regions as candidate and background regions. The expression enrichment is then tested for all protein coding genes located in or overlapping the candidate region on the plus or the minus strand. The gene coordinates used to identify those genes were obtained from [http://grch37.ensembl.org/biomart/martview/]. For the random permutations used to compute the FWER, blocks as long as candidate regions are chosen from the background regions and genes contained in these blocks are considered candidate genes ([Schematic 2](#block_scheme)).  
 To define chromosomal regions in the input vector, the names of the 1/0 vector have to be of the form `chr:start-stop`, where `start` always has to be smaller than `stop`. Note that this option requires the input of background regions. If multiple candidate regions are provided, in the randomsets they are placed randomly, but non-overlapping into the background regions. The output of `aba_enrich` is identical to the one that is produced for single genes. The second element of the output list contains the candidate and background genes located in the user defined regions:
 
 ```{r} 
@@ -113,7 +113,7 @@ candidate_genes = input_genes[input_genes==1]
 candidate_genes
 ```
 
-An alternative method to choose random blocks from the background regions can be used with the option `circ_chrom=TRUE`. Every candidate region is then compared to background regions on the same chromosome. And in contrast to the default `circ_chrom=FALSE`, randomly chosen blocks do not have to be located inside a single background region, but are allowed to overlap multiple background regions. This means that a randomly chose block can consist of the end of the last background region and the beginning of the first background region on a given chromosome.
+An alternative method to choose random blocks from the background regions can be used with the option `circ_chrom=TRUE`. Every candidate region is then compared to background regions on the same chromosome ([Schematic 2](#block_scheme)). And in contrast to the default `circ_chrom=FALSE`, randomly chosen blocks do not have to be located inside a single background region, but are allowed to overlap multiple background regions. This means that a randomly chose block can consist of the end of the last background region and the beginning of the first background region on a given chromosome.
 
 
 ```{r} 
@@ -241,13 +241,19 @@ plot_expression(res[[1]][1:5,"structure_id"])
 ```
 
 
-## <a name="Details"></a>Details
+## Schematics
 
-#### Schematic representation of the hypergeometric test and the FWER calculation
+#### <a name="hyper_scheme"></a>Schematic 1: Hypergeometric test and the FWER calculation
 
 ![FWER calculation](./Skizze_Fig1.png "hypergeometric test and FWER")
 
 The FWER for the Wilcoxon rank test is computed in a similar way, with random permutations of the scores that are assigned to genes.
+
+#### <a name="block_scheme"></a>Schematic 2: `circ_chrom` option for genomic regions input
+
+![genomic regions](./Skizze_Fig2.png "options for genomic regions input")
+
+To use genomic regions as input, the names of the `genes` input vector have to be of the form `chr:start-stop`. The option `circ_chrom` defines how candidate regions are randomly moved inside the background regions for computing the FWER. When `circ_chrom = FALSE` (default), candidate regions can be moved to any background region on any chromosome, but are not allowed to overlap multiple background regions. When `circ_chrom = TRUE`, candidate regions are only moved on the same chromosome and are allowed to overlap multiple background regions. The chromosome is "circularized", that is a randomly placed candidate region may start at the end of the chromosome and continue on the the beginning.
 
 ## Session Info
 ```{r}
