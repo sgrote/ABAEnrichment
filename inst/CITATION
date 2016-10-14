@@ -1,0 +1,19 @@
+citEntry(entry="article",
+         title = "Differential expression analysis for sequence count data",
+         author = personList( as.person("Steffi Grote"), 
+                              as.person("Kay Pruefer"),
+                              as.person("Janet Kelso"),
+                              as.person("Michael Dannemann") ),
+         year = 2016,
+         journal = "Bioinformatics",
+         volume = "32",
+         number = "20",
+         pages = "3201-3203",
+         doi = "10.1093/bioinformatics/btw392 ",
+         url = "http://bioinformatics.oxfordjournals.org/content/32/20/3201",
+         
+         textVersion = 
+         paste("Grote S., Pruefer K., Kelso J. and Dannemann, M. (2016):", 
+               "ABAEnrichment: an R package to test for gene set expression enrichment in the adult and developing human brain.",
+                "Bioinformatics, 32(20):3201-3203." ) )
+
