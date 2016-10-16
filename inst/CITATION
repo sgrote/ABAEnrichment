@@ -1,5 +1,5 @@
 citEntry(entry="article",
-         title = "Differential expression analysis for sequence count data",
+         title = "ABAEnrichment: an R package to test for gene set expression enrichment in the adult and developing human brain",
          author = personList( as.person("Steffi Grote"), 
                               as.person("Kay Pruefer"),
                               as.person("Janet Kelso"),
