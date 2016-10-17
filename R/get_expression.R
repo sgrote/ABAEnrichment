@@ -25,7 +25,7 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
 		new_data=FALSE
 		aba_env=as.environment("package:ABAEnrichment")
 		if(!exists("remember",where=aba_env)) {
-			stop("This function requires previous execution of aba_enrich(). Alernatively specify gene_ids and dataset")
+			stop("This function requires previous execution of aba_enrich(). Alternatively specify gene_ids and dataset")
 		}
 		expr=aba_env$remember$rge
 		genes=aba_env$remember$genes

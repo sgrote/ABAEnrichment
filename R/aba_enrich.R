@@ -113,8 +113,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		}		
 		
 		# convert coords from genes-vector to bed format, SORT, and extract genes overlapping test regions
-		# TODO get_genes_from regions sollte auch die nicht benutzten bg-regions von roll=T entfernen	
-		regions = get_genes_from_regions(genes, gene_coords, circ_chrom) # gene_coords from sysdata.rda HGNC
 		test_regions = regions[[1]]		
 		bg_regions = regions[[2]]
 		genes = regions[[3]]
@@ -160,7 +158,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	message("Loading dataset...")
 	pre_input = load_by_name(paste("dataset",dataset,sep="_"))
 	
-	# TO DO: save cutoff quantiles for all datasets for default cutoff_quantile values.
+	# TODO: save cutoff quantiles for all datasets for default cutoff_quantile values.
 		
 #	 compute cutoffs (tapply lasts much longer - use only when needed)
 	 message("Computing cutoffs... ")
@@ -204,18 +202,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		message(" Done.")
 	} else {message(" No gene duplicates - no aggregation needed.")}		
 	
-	# compute cutoffs (tapply lasts much longer - use only when needed)
-	## Now the cutoffs are computed above, using all genes and not just candidate and background genes!
-#	message("Computing cutoffs... ")
-#	cutoff_quantiles = sort(cutoff_quantiles)
-#	if(dataset=="5_stages"){
-#	  cutoff_list = tapply(pre_input$signal, pre_input$age_category, function(x) quantile(x, probs=cutoff_quantiles),simplify=FALSE)
-#	} else {	
-#	  cutoff_list = list()
-#	  cutoff_list[[1]] = quantile(pre_input$signal,probs=cutoff_quantiles)
-#	  names(cutoff_list) = pre_input$age_category[1]
-#	}	
-	
 	# load ontology and write files to tmp
 	term = get(paste("term",folder_ext,sep="_"))
 	term2term = get(paste("term2term",folder_ext,sep="_"))
@@ -253,19 +239,24 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			# for Hypergeometric Test: 0 for all genes, then convert to 1 for interesting genes (merge not possible if no background genes are defined)
 			message(" Check that there are sufficient genes above cutoff...")
 			breaky = FALSE
-			if (test=="hyper"){		
-				input$signal = 0
-				interesting_genes = names(remaining_genes)[remaining_genes==1]
-				input[input[,1] %in% interesting_genes,"signal"] = 1
-				# do input data have both 0 and 1? else break (FUNC would throw error and summary-file would not be generated)
-				if(sum(input$signal)==0){
-					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
+			if (test=="hyper"){	
+				# now that cutoffs get computed for all genes (not just input) both could be missing
+				if (nrow(input)==0){ 
+					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No input gene expression above cutoff.",sep=""))
 					breaky = TRUE
-				}	
-				if(sum(input$signal)==nrow(input)){
-					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No background gene expression above cutoff.",sep=""))
-					breaky = TRUE
-				}	
+				} else {	
+					input$signal = 0
+					interesting_genes = names(remaining_genes)[remaining_genes==1]
+					input[input[,1] %in% interesting_genes,"signal"] = 1
+					# do input data have both 0 and 1? else break (FUNC would throw error and summary-file would not be generated)					
+					if (sum(input$signal)==0){
+						message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
+						breaky = TRUE
+					} else if (sum(input$signal)==nrow(input)){
+						message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No background gene expression above cutoff.",sep=""))
+						breaky = TRUE
+					}
+				}		
 			# for Wilcoxon test: replace expression signal with score
 			} else	if (test=="wilcoxon"){
 				if(length(unique(input[,1]))<2){
@@ -345,7 +336,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 
 				hyper_category_test(paste(directory, "/randset_out",sep=""), paste(directory,"/category_test_out", sep=""), 1, root_node)
 			} else if (test=="wilcoxon"){
-				# randomset TODO also implement gene-len version
 				wilcox_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node)
 				# category test
 				wilcox_category_test(paste(directory, "/randset_out",sep=""), paste(directory,"/category_test_out", sep=""), 1, root_node)
