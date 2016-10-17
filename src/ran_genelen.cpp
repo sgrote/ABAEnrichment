@@ -10,18 +10,10 @@
 
 #include <Rcpp.h>
 
-std::set<int> rannum_genelen(int n_candidate, const std::map<std::string,int> &genename_to_index, std::vector<gen_pos_str> genes_pos){
+std::set<int> rannum_genelen(int n_candidate, const std::map<std::string,int> &genename_to_index, std::vector<gen_pos_str> genes_pos, long total_length){
 	
-	// go through all genes and add length and cumulative length
 	//Rcpp::Rcout << std::endl << "ran_genelen option:" << std::endl << std::endl;
-	long total_length = 0;
-	for (int i=0; i < genes_pos.size(); i++){
-		total_length += genes_pos[i].end - genes_pos[i].start;
-		genes_pos[i].cumu_len = total_length;
-		//if (i < 50) {
-			//Rcpp::Rcout << genes_pos[i].name << ", len: " << genes_pos[i].end - genes_pos[i].start << ", cumulen: " << genes_pos[i].cumu_len << std::endl;
-		//}	
-	}		
+	
 	// get random genes and their index, without duplicates
 	std::set<int> random_numbers;
 	// draw as many unique numbers of candidate genes

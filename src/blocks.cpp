@@ -51,7 +51,7 @@ std::set<int> rannum_blocks(std::vector<bed_str> candidate_bed, std::vector<bed_
 				Rcpp::Rcout << "This was trial " << trials << std::endl;
 				if(trials == 10){
 					Rcpp::Rcout << "Error: " << trials << " times in a row the candidate regions could not be placed randomly without forcing them to overlap. Consider using larger background regions." << std::endl;
-					Rcpp::stop("Background regions too small."); // TODO: das überall so machen
+					Rcpp::stop("Background regions too small."); 
 				}
 				break;		
 			} else {

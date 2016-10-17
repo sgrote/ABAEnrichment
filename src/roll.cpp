@@ -1,6 +1,12 @@
 
 // given input and background regions choose random regions on the same chromosome like input regions
 // find genes in these regions and add their index to random set
+
+// removing used parts from background regions
+// case a) candidate starts in one and ends in the second bg-region 
+// case b) like (a) with blocks inbetween which are used completely
+// case c) canidate region fits in just one block 
+// case d) there is just one bg-block, candidate region starts at end and ends at beginning (handled like case a) 
 	
 #include <set>
 //#include <stdlib.h>     // srand, rand 
@@ -18,22 +24,22 @@ std::set<int> rannum_roll(std::vector<bed_str> candidate_bed, std::vector<bed_st
 	
 	//Rcpp::Rcout << std::endl << "Circ_chrom option:" << std::endl;
 	
-	//srand (time(NULL)); // initialize random seed TODO: remove
+	//srand (time(NULL)); // initialize random seed
 	std::set<int> random_numbers; // indices of selected genes	
 	int sum_genes = 0;
 
-	// loop over candidate regions TODO: maybe change i and j
+	// loop over candidate regions
 	for (int j=0; j < candidate_bed.size(); j++){		
 		std::string candidate_chrom = candidate_bed[j].chrom;
 		// candidate.cumulen: length of background regions on same chromosome	
-		// go through mappable regions and store last value from chromosome, everything is nicely sorted!
-		// so last value from chrom gets assigned	
-		int chrom_len = 0;
+		// go through mappable regions, sum up length from chrom and store last value from chromosome
+		// last value from chrom gets assigned	
+		long chrom_len = 0;
 		for (int i=0; i < background_bed.size(); i++){
 			if (background_bed[i].chrom == candidate_chrom){
 				chrom_len += background_bed[i].len;
 				background_bed[i].cumu_len = chrom_len;
-				candidate_bed[j].cumu_len = chrom_len; //TODO: candidate_bed[j].cumu_len kann auch eigene var sein, braucht man sonst nicht, oder?
+				candidate_bed[j].cumu_len = chrom_len;
 			} 
 		}
 		//Rcpp::Rcout << std::endl << "Candidate region " << j+1 << " modified: " << std::endl;
@@ -42,7 +48,7 @@ std::set<int> rannum_roll(std::vector<bed_str> candidate_bed, std::vector<bed_st
 		//for (int i=0; i < background_bed.size(); i++){
 			//Rcpp::Rcout << background_bed[i].chrom << " " << background_bed[i].start << " " << background_bed[i].end  << " " << background_bed[i].len << " " << background_bed[i].cumu_len << std::endl;
 		//}	
-		// find chromosome in mappable regions	TODO: das kann auch in die schleife darueber mit rein	
+		// find chromosome in mappable regions
 		int k = 0;
 		while (background_bed[k].chrom != candidate_chrom){  
 			 k++;
@@ -76,18 +82,18 @@ std::set<int> rannum_roll(std::vector<bed_str> candidate_bed, std::vector<bed_st
 			if (ran_end > background_bed[k].end){
 				overhang = ran_end - background_bed[k].end;
 				ran_end = background_bed[k].end;
-				// shorten this block if it is the first one
+				// shorten this block if it is the first one (cases a,b,d)
 				if (used_bg_blocks == 1){
 					background_bed[k].end = ran_start;
 					background_bed[k].len = background_bed[k].end - background_bed[k].start;
-				} else { // delete this block (used completely)					
+				} else { // delete this block (used completely, case b)					
 					background_bed.erase(background_bed.begin() + k);
 					k--; // account for deleted object					
 				}									
 			} else {
 				need_more = false;
 				overhang = 0;
-				// shorten if this block is not the first (else it needs to be split in two)
+				// shorten if this block is not the first (cases a,b,d) (else it needs to be split in two)
 				if (used_bg_blocks != 1){
 					background_bed[k].start = ran_end;
 					background_bed[k].len = background_bed[k].end - background_bed[k].start;
