@@ -113,6 +113,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		}		
 		
 		# convert coords from genes-vector to bed format, SORT, and extract genes overlapping test regions
+		regions = get_genes_from_regions(genes, gene_coords, circ_chrom) # gene_coords from sysdata.rda HGNC
 		test_regions = regions[[1]]		
 		bg_regions = regions[[2]]
 		genes = regions[[3]]

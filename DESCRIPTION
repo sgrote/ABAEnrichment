@@ -1,8 +1,8 @@
 Package: ABAEnrichment
 Type: Package
 Title: Gene expression enrichment in human brain regions
-Version: 1.3.9
-Date: 2016-10-13
+Version: 1.3.10
+Date: 2016-10-17
 Author: Steffi Grote
 Maintainer: Steffi Grote <steffi_grote@eva.mpg.de>
 Description: The package ABAEnrichment is designed to test for
