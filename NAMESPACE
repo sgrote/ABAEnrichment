@@ -1,4 +1,8 @@
 useDynLib(ABAEnrichment)
 export("aba_enrich","get_expression","plot_expression","get_name","get_sampled_substructures","get_superstructures")
-importFrom(Rcpp, evalCpp)
-import(gplots, ABAData)
+importFrom(Rcpp, evalCpp)  
+importFrom("grDevices", "heat.colors", "rainbow")
+importFrom("stats", "aggregate", "quantile")
+importFrom("utils", "data", "read.table", "write.table")
+
+import(gplots, gtools, ABAData)

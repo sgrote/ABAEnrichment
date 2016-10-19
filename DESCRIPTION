@@ -1,7 +1,7 @@
 Package: ABAEnrichment
 Type: Package
 Title: Gene expression enrichment in human brain regions
-Version: 1.5.0
+Version: 1.5.1
 Date: 2016-10-17
 Author: Steffi Grote
 Maintainer: Steffi Grote <steffi_grote@eva.mpg.de>
@@ -17,7 +17,7 @@ Description: The package ABAEnrichment is designed to test for
         'get_expression' and 'plot_expression' facilitate exploring the
         expression data.
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.11.5), gplots (>= 2.14.2), ABAData (>= 0.99.2)
+Imports: Rcpp (>= 0.11.5), gplots (>= 2.14.2), gtools (>= 3.5.0), ABAData (>= 0.99.2)
 Depends: R (>= 3.2)
 LinkingTo: Rcpp
 Suggests: BiocStyle, knitr, testthat

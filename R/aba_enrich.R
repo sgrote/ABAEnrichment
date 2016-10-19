@@ -14,6 +14,8 @@
 # test: "hyper" or "wilcoxon"
 # cutoff_quantiles: numeric values in ]0,1[
 # n_randsets: number of random-sets
+# gene_len: randomset is dependent on length of genes
+# circ_chrom: for regions input: random regions are on same chrom and allowed to overlap multiple bg-regions
 
 #######################################################################################
 # 1. check arguments and define parameters
@@ -27,8 +29,6 @@
 
 aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,0.9,0.1),n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE){
 
-## TODO warn if user uses circ_chrom=T but has no regions input
-## TODO warn when "gene_len==TRUE" but regions as input
 
 	ref_genome = "grch37" # TODO: add grch38 as parameter and gene_coords_grch38 to sysdata.R 
 	
@@ -110,7 +110,11 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		# check that test is hyper
 		if (test != "hyper"){
 			stop("chromosomal regions can only be used with test='hyper'.")
-		}		
+		}	
+		# warn if gene_len=TRUE, although regions are used
+		if (gene_len == TRUE){
+			warning("Unused argument: 'gene_len = TRUE'.")
+		}	
 		
 		# convert coords from genes-vector to bed format, SORT, and extract genes overlapping test regions
 		regions = get_genes_from_regions(genes, gene_coords, circ_chrom) # gene_coords from sysdata.rda HGNC
@@ -126,6 +130,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		# write regions to files
 		write.table(test_regions,file=paste(directory, "/test_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
 		write.table(bg_regions,file=paste(directory, "/bg_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")		
+	} else if (circ_chrom == TRUE){
+		# warn if circ_chrom=TRUE, although individual genes are used
+		warning("Unused argument: 'circ_chrom = TRUE'.")
 	} 	
 	
 	gene_list = gene_symbols[,identifier]	
@@ -161,7 +168,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	
 	# TODO: save cutoff quantiles for all datasets for default cutoff_quantile values.
 		
-#	 compute cutoffs (tapply lasts much longer - use only when needed)
+	 # compute cutoffs (tapply lasts much longer - use only when needed)
 	 message("Computing cutoffs... ")
 	 cutoff_quantiles = sort(cutoff_quantiles)
 	 if(dataset=="5_stages"){
@@ -193,7 +200,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	n = length(unique(pre_input$age_category))*length(unique(pre_input$structure))
 	ngenes = table(pre_input$gene_id)
 	bose = ngenes[ngenes>n]
-		if(length(bose)>0){
+	if(length(bose)>0){
 		message(" Aggregate expression per gene...")
 		part1 = pre_input[pre_input$gene_id %in% names(bose),]
 		part2 = pre_input[!(pre_input$gene_id %in% names(bose)),]
@@ -351,8 +358,8 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 				
 			# combine with output from previous cutoffs
 			out = rbind(out,groups)			
-		}		
-	}
+		} # end cutoffs		
+	} # end ages
 	
 	if (length(candi_no_coords) > 0){
 			no_coords_string = paste(candi_no_coords,collapse=", ")
