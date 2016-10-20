@@ -12,7 +12,7 @@ The package ABAEnrichment is designed to test for enrichment of user defined can
 \tabular{ll}{
 Package: \tab ABAEnrichment\cr
 Type: \tab Package\cr
-Version: \tab 1.3.5\cr
+Version: \tab 1.5.2\cr
 Date: \tab 2016-10-13\cr
 License: \tab GPL (>= 2)\cr
 }
@@ -26,14 +26,14 @@ Steffi Grote\cr
 Maintainer: Steffi Grote <steffi_grote@eva.mpg.de>
 }
 \references{
-[1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. \url{doi:10.1038/nature11405}\cr
-[2] Miller, J.A. et al. (2014) Transcriptional landscape of the prenatal human brain, Nature 508: 199-206. \url{doi:10.1038/nature13185}\cr
+[1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. \doi{10.1038/nature11405}\cr
+[2] Miller, J.A. et al. (2014) Transcriptional landscape of the prenatal human brain, Nature 508: 199-206. \doi{10.1038/nature13185}\cr
 [3] Allen Institute for Brain Science. Allen Human Brain Atlas [Internet]. Available from:
 \url{http://human.brain-map.org/}\cr
 [4] Allen Institute for Brain Science. BrainSpan Atlas of the Developing Human Brain
 [Internet]. Available from: \url{http://brainspan.org/}\cr
 [5] Pruefer, K. et al. (2007) FUNC: A package for detecting significant associations between gene
-sets and ontological annotations, BMC Bioinformatics 8: 41. \url{doi:10.1186/1471-2105-8-41}
+sets and ontological annotations, BMC Bioinformatics 8: 41. \doi{10.1186/1471-2105-8-41}
 }
 \keyword{ package }
 \keyword{ htest }

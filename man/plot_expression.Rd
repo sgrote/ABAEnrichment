@@ -48,8 +48,8 @@ Invisibly, a list with components
 
 }
 \references{
-[1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. \url{doi:10.1038/nature11405}\cr
-[2] Miller, J.A. et al. (2014) Transcriptional landscape of the prenatal human brain, Nature 508: 199-206. \url{doi:10.1038/nature13185}\cr
+[1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. \doi{10.1038/nature11405}\cr
+[2] Miller, J.A. et al. (2014) Transcriptional landscape of the prenatal human brain, Nature 508: 199-206. \doi{10.1038/nature13185}\cr
 [3] Allen Institute for Brain Science. Allen Human Brain Atlas [Internet]. Available from:
 \url{http://human.brain-map.org/}\cr
 [4] Allen Institute for Brain Science. BrainSpan Atlas of the Developing Human Brain

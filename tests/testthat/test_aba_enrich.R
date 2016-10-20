@@ -51,7 +51,7 @@ reverse = too_small
 names(reverse)[3] = "2:15-10"
 
 test_that("input_regions are checked - blocks",{
-#    expect_that(aba_enrich(too_small), throws_error("Candidate regions bigger than any background region:\n  2:5-10")) # this fails in R CMD check "missing value where TRUE/FALSE is expected", but works in R
+    expect_that(aba_enrich(too_small), throws_error("Candidate regions bigger than any background region:\n  13:0-20")) 
     expect_that(aba_enrich(overlap), throws_error("Background regions overlap: 2:5-20, 2:10-12"))
     expect_that(aba_enrich(overlap2), throws_error("Candidate regions overlap: 2:0-8, 2:5-10"))
     expect_that(aba_enrich(tight), throws_error("Background regions too small."))
@@ -60,7 +60,7 @@ test_that("input_regions are checked - blocks",{
 })    
 
 test_that("input_regions are checked - circ_chrom",{
-#    expect_that(aba_enrich(too_small, circ_chrom=TRUE), throws_error("Sum of candidate regions is bigger than sum of background regions on chromosomes: 2, 13, X")) # this fails in R CMD check "missing value where TRUE/FALSE is expected", but works in R
+    expect_that(aba_enrich(too_small, circ_chrom=TRUE), throws_error("Sum of candidate regions is bigger than sum of background regions on chromosomes: 2, 13, X"))
     expect_that(aba_enrich(overlap, circ_chrom=TRUE), throws_error("Background regions overlap: 2:5-20, 2:10-12"))
     expect_that(aba_enrich(overlap2, circ_chrom=TRUE), throws_error("Candidate regions overlap: 2:0-8, 2:5-10"))      
     expect_that(aba_enrich(tight, circ_chrom=TRUE), throws_error("No background region for chromosomes: 1, 3, 7, 8.\n  With circ_chrom=TRUE only background regions on the same chromosome as a candidate region are used."))
