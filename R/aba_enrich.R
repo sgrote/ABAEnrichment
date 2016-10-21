@@ -225,9 +225,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	# initialize output
 	out = data.frame()
 	for (s in unique(pre_input$age_category)){
-		if (dataset=="5_stages"){
-			stage_input = pre_input[pre_input$age_category==s,2:4]	
-		} else 	stage_input = pre_input[,2:4] # TODO why the else? wouldn't it work for devel-score and adult as well?
+		stage_input = pre_input[pre_input$age_category==s,2:4]	
 		# get cutoffs		
 		cutoff = cutoff_list[[as.character(s)]]
 		colnames(stage_input)[3] = "signal"		

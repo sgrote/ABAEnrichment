@@ -17,7 +17,7 @@ set.seed(123)
 
 Package: ABAEnrichment   
 Author: Steffi Grote   
-Date: October 14, 2016   
+Date: October 21, 2016   
 
 ## Overview
 `r Biocpkg("ABAEnrichment")` is an R package for the enrichment analysis of user defined candidate genes (in the set of expressed protein coding genes) in different human brain regions. The package integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allen Brain Atlas project [1-4]. The statistical analysis is performed by the core function `aba_enrich` which interfaces the ontology enrichment software FUNC [5]. Additional functions provided in this package are `get_expression`, `plot_expression`, `get_name`, `get_sampled_substructures` and `get_superstructures` supporting the exploration and visualization of the expression data. 
@@ -52,7 +52,8 @@ For a random set of 13 genes a test for expression enrichment in human brain reg
 require(ABAEnrichment)
 ## create input vector with candidate genes 
 genes = rep(1,13)
-names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1', 'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
+names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1', 
+ 'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
 genes
 ```
 In order to test the 13 random genes for enrichment in brain regions at different developmental stages using `aba_enrich` the following parameters have to be defined: the vector 'genes' and the dataset '5\_stages'. Additionally, in this example two optional parameters are set: the `cutoff_quantiles` 0.5, 0.7 and 0.9 for an example of using the 50%, 70% and 90% expression quantile across all genes as the boundary between 'expressed' and 'not expressed' genes and `n_randsets` 100 to use 100 random permutations to calculate the FWER. `cutoff_quantiles` and `n_randsets` have default values seq(0.1,0.9,0.1) and '1000' respectively. The values in the examples are reduced to lower the computation time. 
@@ -96,7 +97,8 @@ To define chromosomal regions in the input vector, the names of the 1/0 vector h
 ## create input vector with a candidate region on chromosome 8
 ## and background regions on chromosome 7, 8 and 9
 genes = c(1, rep(0,6))
-names(genes) = c('8:82000000-83000000', '7:1300000-56800000', '7:74900000-148700000','8:7400000-44300000', '8:47600000-146300000', '9:0-39200000', '9:69700000-140200000')
+names(genes) = c('8:82000000-83000000', '7:1300000-56800000', '7:74900000-148700000',
+ '8:7400000-44300000', '8:47600000-146300000', '9:0-39200000', '9:69700000-140200000')
 genes
 ```
 ```{r,results='hide'} 
@@ -159,7 +161,8 @@ plot_expression(fwers[1:5,"structure_id"], age_category=1)
 The colored side bar in the plot without dendrogram colors candidate genes (red) and background genes (black) independently. In this case only candidate gene expression was plotted (with the default option `background=FALSE`):
 
 ```{r}
-## plot expression for the 10 highest scoring brain structures in age category 3 (children, 3-11 yrs) without dendrogram
+## plot expression for the 10 highest scoring brain structures in age category 3 (children, 3-11 yrs)
+## without dendrogram
 plot_expression(fwers[fwers$age_category==3, 'structure_id'][1:10], dendro=FALSE, age_category=3)
 ```
 
@@ -198,7 +201,9 @@ The Wilcoxon rank test requires a score for given sets of genes. It then evaluat
 ```{r}
 ## create input vector with random scores associated with the candidate genes
 genes = sample(1:50, 12)
-names(genes) = c('ENSG00000168036', 'ENSG00000157764', 'ENSG00000163041', 'ENSG00000182158', 'ENSG00000147889', 'ENSG00000103126', 'ENSG00000182054', 'ENSG00000184634', 'ENSG00000134982', 'ENSG00000138413', 'ENSG00000133703', 'ENSG00000132475')
+names(genes) = c('ENSG00000168036', 'ENSG00000157764', 'ENSG00000163041', 'ENSG00000182158',
+ 'ENSG00000147889', 'ENSG00000103126', 'ENSG00000182054', 'ENSG00000184634', 
+ 'ENSG00000134982', 'ENSG00000138413', 'ENSG00000133703', 'ENSG00000132475')
 genes
 ```
 ```{r,results='hide'} 
@@ -213,7 +218,8 @@ res[[1]][1:5,]
 Plotting the expression for the output brain regions with the option `dendro=FALSE` results in a side bar with genes and its scores that were used for the initial enrichment test:
 
 ```{r}
-## plot expression of the 5 brain strcutures with the lowest FWERs, with genes ordered by user defined score from Wilcoxon rank test
+## plot expression of the 5 brain strcutures with the lowest FWERs 
+## genes ordered by user defined score from Wilcoxon rank test
 plot_expression(res[[1]][1:5,"structure_id"], dendro=FALSE)
 ```
 

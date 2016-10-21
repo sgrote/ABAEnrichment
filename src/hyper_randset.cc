@@ -174,7 +174,6 @@ void hyper_randset(std::string all_genes, int number_of_randomsets, std::string 
 		is >> gen_name ;
 		//Rcout << "expressed test gene: " << gen_name << endl;
 		// genename_to_index: index of annotated GO-vec for a gene (gens[index])
-		// TODO if-statement should always be true because candidate_genes_in is subset of "in/detected" which was used to make genename_to_index 
 		if ( genename_to_index.find( gen_name ) != genename_to_index.end() ) {
 			// go through annotated GOs for the current gene and add 1
 			for ( vector<int*>::iterator it = gens[genename_to_index[gen_name]].begin() ;
