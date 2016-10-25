@@ -94,7 +94,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	# load gene_list and get gene identifier
 	gene_symbols = get(paste("gene_symbols",folder_ext,sep="_"))	
 	blocks = FALSE
-	# Das und die tests vielleicht hoch zu checking arguments
 	identifier = detect_identifier(names(genes)[1])	
 	
 	# load gene_coords
@@ -246,6 +245,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			message(" Check that there are sufficient genes above cutoff...")
 			breaky = FALSE
 			if (test=="hyper"){	
+				# do input data have both 0 and 1? else break (FUNC would throw error and summary-file would not be generated)
 				# now that cutoffs get computed for all genes (not just input) both could be missing
 				if (nrow(input)==0){ 
 					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No input gene expression above cutoff.",sep=""))
@@ -254,7 +254,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 					input$signal = 0
 					interesting_genes = names(remaining_genes)[remaining_genes==1]
 					input[input[,1] %in% interesting_genes,"signal"] = 1
-					# do input data have both 0 and 1? else break (FUNC would throw error and summary-file would not be generated)					
 					if (sum(input$signal)==0){
 						message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
 						breaky = TRUE
@@ -337,9 +336,8 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 				} else {						
 					hyper_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node, "classic")
 				}	
-				# category test
 #				stop("only randomset")
-
+				# category test
 				hyper_category_test(paste(directory, "/randset_out",sep=""), paste(directory,"/category_test_out", sep=""), 1, root_node)
 			} else if (test=="wilcoxon"){
 				wilcox_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node)

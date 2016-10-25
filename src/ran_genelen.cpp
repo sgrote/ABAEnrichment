@@ -16,7 +16,7 @@ std::set<int> rannum_genelen(int n_candidate, const std::map<std::string,int> &g
 	
 	// get random genes and their index, without duplicates
 	std::set<int> random_numbers;
-	// draw as many unique numbers of candidate genes
+	// draw as many unique numbers as candidate genes
 	while (random_numbers.size() < n_candidate) {	
 		// get random number [1,total length of genes]
 		//long ran = rand() % total_length + 1;	

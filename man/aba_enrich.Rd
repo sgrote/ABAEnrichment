@@ -46,7 +46,7 @@ To account for multiple testing the FWER is computed using random permutations o
 
 Instead of defining candindate and background genes explicitly in the \code{genes} input vector, it is also possible to define entire chromosomal regions as candidate and background regions. The expression enrichment is then tested for all protein coding genes located in or overlapping the candidate region on the plus or the minus strand. The gene coordinates used to identify those genes were obtained from \url{http://grch37.ensembl.org/biomart/martview/}. For the random permutations used to compute the FWER, blocks as long as candidate regions are chosen from the background regions and genes contained in these blocks are considered candidate genes. The output of \code{aba_enrich} is identical to the one that is produced for single genes.\cr
 To define chromosomal regions in the input vector, the names of the 1/0 vector have to be of the form \code{chr:start-stop}, where 'start' always has to be smaller than 'stop'. Note that this option requires the input of background regions. If multiple candidate regions are provided, in the randomsets they are placed randomly, but non-overlapping into the background regions. If the background regions are relatively small, it can happen that the remaining background regions available (after a candiate region has been placed there) are too small for the next candidate region to fit entirely and non-overlapping. In this case the random selection of candidate regions inside the background regions is restarted. If this fails 10 times \code{aba_enrich} quits.\cr
-An alternative method to choose random blocks from the background regions can be used with the option \code{circ_chrom=TRUE}. Every candidate region is then compared to background regions on the same chromosome. And in contrast to the default \code{circ_chrom=FALSE}, randomly chosen blocks do not have to be located inside a single background region, but are allowed to overlap multiple background regions. This means that a randomly chose block can consist of the end of the last background region and the beginning of the first background region on a given chromosome (see package vignette for details).
+An alternative method to choose random blocks from the background regions can be used with the option \code{circ_chrom = TRUE}. Every candidate region is then compared to background regions on the same chromosome. And in contrast to the default \code{circ_chrom = FALSE}, randomly chosen blocks do not have to be located inside a single background region, but are allowed to overlap multiple background regions. This means that a randomly chose block can consist of the end of the last background region and the beginning of the first background region on a given chromosome (see package vignette for details).
 
 The Wilcoxon rank test does not compare candidate and background genes, but the user defined scores associated with the candidate genes, i.e. it compares the ranks of the scores of expressed genes in a given brain region to the ranks of all candidate genes that are expressed somewhere in the brain.\cr 
 In addition to gene expression the enrichment may refer to a developmental effect score, which describes how much a gene's expression changes over time. Three different \code{datasets} can be used with \code{aba_enrich}: first, the developmental effect score, second, microarray data from adult donors and third, RNA-seq data from donors of five different developmental stages (prenatal, infant, child, adolescent, adult). In the latter case the analyses are performed independently for each developmental stage.\cr 
@@ -93,23 +93,23 @@ Steffi Grote
 #### Perform gene expression enrichment analysis on 13 candidate genes in five developmental 
 #### stages of the human brain using the hypergeometric test implemented in FUNC[5]   
 ## create input vector with candidate genes (HGNC-symbols)
-genes=rep(1,13)
-names(genes)=c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
+genes = rep(1,13)
+names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
   'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
 ## run enrichment analysis
-res=aba_enrich(genes,dataset='5_stages',cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
+res = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100)
 ## get FWERs for enrichment of candidate genes among expressed genes
-fwers=res[[1]]
+fwers = res[[1]]
 ## see results for the brain regions with highest enrichment for children (age_category 3)
-head(fwers[fwers[,1]==3,])
+head(fwers[fwers[,1] == 3,])
 ## see the input genes vector (only genes with expression data available) 
 res[2]
 ## see the expression values that correspond to the requested cutoff quantiles
 res[3]
 
 #### Perform the same analysis, but with random sets dependent on gene length
-res=aba_enrich(genes,dataset='5_stages',cutoff_quantiles=c(0.5,0.7,0.9), 
-n_randsets=100, gene_len=TRUE)
+res = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), 
+n_randsets = 100, gene_len = TRUE)
 
 #### Perform gene expression enrichment analysis for a chromosomal region 
 #### for the adult human brain using the hypergeometric test implemented in FUNC[5] 
@@ -119,22 +119,22 @@ genes = c(1,rep(0,6))
 names(genes) = c('3:76500000-90500000', '3:0-91600000', '3:92500000-198000000',
 '4:3600000-50300000', '4:51400000-191100000', '5:0-47000000', '5:48600000-180700000')
 ## run enrichment analysis for the 'adult' dataset
-res = aba_enrich(genes,dataset='adult', cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
+res = aba_enrich(genes,dataset = 'adult', cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100)
 ## look at he results from the enrichment analysis
 head(res[[1]])
 ## see which genes are located in the candidate regions
 input_genes = res[[2]]
-candidate_genes = input_genes[input_genes==1]
+candidate_genes = input_genes[input_genes == 1]
 candidate_genes
 
 #### Perform gene expression enrichment analysis on 15 candidate genes in the  
 #### adult human brain using the wilcoxon rank test implemented in FUNC[5] 
 ## create input vector with random scores associated with the candidate genes (Entrez-Ids)
-genes=sample(1:50,15)
-names(genes)=c(324,8312,673,1029,64764,1499,3021,3417,3418,8085,3845,9968,5290,5727,5728)
+genes = sample(1:50,15)
+names(genes) = c(324,8312,673,1029,64764,1499,3021,3417,3418,8085,3845,9968,5290,5727,5728)
 ## run enrichment analysis
-res=aba_enrich(genes,dataset='adult',test='wilcoxon',cutoff_quantiles=c(0.2,0.5,0.8),
-  n_randsets=100)
+res = aba_enrich(genes,dataset = 'adult',test = 'wilcoxon',cutoff_quantiles = c(0.2,0.5,0.8),
+  n_randsets = 100)
 ## see results for the brain regions with highest enrichment 
 head(res[[1]])
 ## see the input genes vector and the expression values that correspond 

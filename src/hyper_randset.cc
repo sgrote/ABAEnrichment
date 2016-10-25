@@ -97,17 +97,17 @@ void hyper_randset(std::string all_genes, int number_of_randomsets, std::string 
 	map<string,int> genename_to_index ;
 	int index = 0 ;
 	long total_length = 0; // for gene_len option	
-	// one line per expr gene: gene | chrom | start | end | GO1 GO2 GO3 
+	// one line per expr gene: gene | (chrom) | (start) | (end) | GO1 GO2 GO3 
 	string line ;	
 	while ( getline(in, line) ) { 
-		std::istringstream is( line.c_str() ) ; // take line as input stream
+		std::istringstream is( line.c_str() ) ; 
 		// store name and optionally position of current gene
 		gen_pos_str gen_pos; 
 		is >> gen_pos.name;
-		if(mod!="classic"){	
+		if(mod != "classic"){	
 			is >> gen_pos.chrom >> gen_pos.start >> gen_pos.end;		
 		}
-		if(mod=="gene_len"){
+		if(mod == "gene_len"){
 			total_length += gen_pos.end - gen_pos.start;
 			gen_pos.cumu_len = total_length;
 		}
@@ -212,7 +212,7 @@ void hyper_randset(std::string all_genes, int number_of_randomsets, std::string 
 	} else {
 		Rcout << "Creating " << number_of_randomsets << " randomsets with size " << n_candidate << endl ;
 	}			
-	// forall randomsets
+	// for all randomsets
 	for ( int i = 1 ; i <= number_of_randomsets ; ++i ) {
 		set<int> random_numbers ; // indices for the selected genes
 		
@@ -251,7 +251,6 @@ void hyper_randset(std::string all_genes, int number_of_randomsets, std::string 
 		gos.print_sum( *out ) ;
 	}
 	delete out;
-	//mappable_bed.clear();
 	genes_pos.clear();
 	Rcout << "\rFinished" << endl ;
 }

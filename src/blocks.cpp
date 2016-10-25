@@ -46,7 +46,7 @@ std::set<int> rannum_blocks(std::vector<bed_str> candidate_bed, std::vector<bed_
 			//}
 			// candidate region does not fit anymore, try again placing randomly
 			if(total_len == 0){
-				incomplete=true;
+				incomplete = true;
 				Rcpp::Rcout << "The candidate does not fit - try again..." << std::endl;
 				Rcpp::Rcout << "This was trial " << trials << std::endl;
 				if(trials == 10){
