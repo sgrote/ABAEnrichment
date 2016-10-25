@@ -1,8 +1,8 @@
 Package: ABAEnrichment
 Type: Package
 Title: Gene expression enrichment in human brain regions
-Version: 1.5.3
-Date: 2016-10-21
+Version: 1.5.4
+Date: 2016-10-25
 Author: Steffi Grote
 Maintainer: Steffi Grote <steffi_grote@eva.mpg.de>
 Description: The package ABAEnrichment is designed to test for
@@ -15,7 +15,8 @@ Description: The package ABAEnrichment is designed to test for
         ontology enrichment software FUNC to perform the statistical
         analyses. Additional functions provided in this package like
         'get_expression' and 'plot_expression' facilitate exploring the
-        expression data.
+        expression data. From version 1.3.5 onwards genomic regions 
+        can be provided as input, too.
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.11.5), gplots (>= 2.14.2), gtools (>= 3.5.0), ABAData (>= 0.99.2)
 Depends: R (>= 3.2)
