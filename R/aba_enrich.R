@@ -85,6 +85,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	} else	if (test=="wilcoxon"){
 		if(!is.numeric(genes)){
 			stop("Not a valid 'genes' argument. Please use a numeric vector.")	
+		}
+		if(gene_len == TRUE){
+			stop("Argument 'gene_len = TRUE' can only be used with 'test = 'hyper''.")
 		}	
 	} else (stop("Not a valid test. Please use 'hyper' or 'wilcoxon'."))
 	
