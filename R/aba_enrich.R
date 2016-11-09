@@ -60,33 +60,33 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	if (class(cutoff_quantiles)!="numeric"){
 		stop("Please enter numeric cutoff_quantiles.")
 	}	
-	if(min(cutoff_quantiles)<=0 | max(cutoff_quantiles)>=1){
+	if (min(cutoff_quantiles)<=0 | max(cutoff_quantiles)>=1){
 		stop("Please enter cutoff_quantiles between 0 and 1 (exclusive).")
 	}			
 	valid_datasets = c("adult","5_stages","dev_effect")
-	if(!(dataset %in% valid_datasets)){
+	if (!(dataset %in% valid_datasets)){
 		stop("Not a valid dataset. Please use 'adult', '5_stages' or 'dev_effect'.")	
 	}
-	if(length(n_randsets)>1 || !is.numeric(n_randsets) || n_randsets<1){
+	if (length(n_randsets)>1 || !is.numeric(n_randsets) || n_randsets<1){
 		stop("Please define 'n_randsets' as a positive integer.")
 	}
-	if(n_randsets != round(n_randsets)){
+	if (n_randsets != round(n_randsets)){
 		n_randsets = round(n_randsets)
 		warning(paste("'n_randsets' is expected to be an integer and was rounded to ",n_randsets,".",sep=""))
 	}
 	# test-specific arguments
 	if (test=="hyper"){
-		if(!all(genes %in% c(0,1))){
+		if (!all(genes %in% c(0,1))){
 			stop("Not a valid 'genes' argument for hypergeometric test. Please use a vector of 0/1.")	
 		}	
-		if(sum(genes)==0){
+		if (sum(genes)==0){
 			stop("Only 0 in genes vector. Please enter test genes.")	
 		}
 	} else	if (test=="wilcoxon"){
-		if(!is.numeric(genes)){
+		if (!is.numeric(genes)){
 			stop("Not a valid 'genes' argument. Please use a numeric vector.")	
 		}
-		if(gene_len == TRUE){
+		if (gene_len){
 			stop("Argument 'gene_len = TRUE' can only be used with 'test = 'hyper''.")
 		}	
 	} else (stop("Not a valid test. Please use 'hyper' or 'wilcoxon'."))
@@ -106,7 +106,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		identifier = "hgnc_symbol" # gene-name 
 		blocks = TRUE
 		# check that background region is specified
-		if(sum(genes) == length(genes)){
+		if (sum(genes) == length(genes)){
 			stop("All values of the 'genes' input are 1. Using chromosomal regions as input requires defining background regions with 0.")
 		}
 		# check that test is hyper
@@ -114,7 +114,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			stop("chromosomal regions can only be used with test='hyper'.")
 		}	
 		# warn if gene_len=TRUE, although regions are used
-		if (gene_len == TRUE){
+		if (gene_len){
 			warning("Unused argument: 'gene_len = TRUE'.")
 		}	
 		
@@ -123,6 +123,10 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		test_regions = regions[[1]]		
 		bg_regions = regions[[2]]
 		genes = regions[[3]]
+
+		# avoid scientific notation in regions (read in c++)
+		test_regions = format(test_regions, scientific=FALSE, trim=TRUE)
+		bg_regions = format(bg_regions, scientific=FALSE, trim=TRUE)
 
 		message("Candidate regions:")
 		print(test_regions)
@@ -139,11 +143,25 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	
 	gene_list = gene_symbols[,identifier]	
 	
-	# check which genes dont have expression data annotated
-	not_in = names(genes)[!(names(genes) %in% gene_list)]
-	remaining_genes = genes[names(genes) %in% gene_list]
-	
-	if (length(not_in)>0){		
+	# restrict to genes that have expression data annotated and warn about the rest
+	remaining_genes = genes[names(genes) %in% gene_list] # restrict
+	not_in = unique(names(genes)[!(names(genes) %in% names(remaining_genes))]) # removed
+	if (length(not_in) > 0 && !blocks){
+		not_in_string = paste(not_in,collapse=", ")
+		warning(paste("No expression data for genes: ",not_in_string,".\n  These genes were not included in the analysis.",sep=""))
+	}
+	# restrict to genes that have coordinates and warn about the rest
+	if (gene_len){
+		no_coords = unique(names(remaining_genes)[!(names(remaining_genes) %in% gene_coords[,identifier])]) # removed
+		if (length(no_coords) > 0){
+			remaining_genes = remaining_genes[!(names(remaining_genes) %in% no_coords)] # restrict
+			no_coords_string = paste(no_coords,collapse=", ")
+			warning(paste("No coordinates available for genes: ",no_coords_string,".\n  These genes were not included in the analysis.",sep=""))
+			not_in = c(not_in, no_coords)
+		}
+	}
+	# after removing genes without expression data or coordinates: are enough genes left?
+	if (length(not_in) > 0){
 		# is any gene in the data? if not, stop.
 		if (length(remaining_genes) == 0) {
 			stop("No requested genes in data.")
@@ -155,12 +173,11 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		if (test=="hyper" & sum(genes)!=length(genes) & sum(remaining_genes)==length(remaining_genes)) {
 			stop("No requested background genes in data.")
 		}
-		if(!blocks){ # this message is usually too long when blocks are used. 
-			not_in_string = paste(not_in,collapse=", ")
-			warning(paste("No expression data for genes: ",not_in_string,".\n  These genes were not included in the analysis.",sep=""))
-		}
-	}	
-
+	}
+	# candidate genes	
+	if (test=="hyper"){					
+		interesting_genes = names(remaining_genes)[remaining_genes==1] 
+	}
 
 	#####	2. Load expression data
 	
@@ -173,7 +190,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	 # compute cutoffs (tapply lasts much longer - use only when needed)
 	 message("Computing cutoffs... ")
 	 cutoff_quantiles = sort(cutoff_quantiles)
-	 if(dataset=="5_stages"){
+	 if (dataset=="5_stages"){
 	 	cutoff_list = tapply(pre_input$signal, pre_input$age_category, function(x) quantile(x, probs=cutoff_quantiles),simplify=FALSE)
 	 } else {	
 	 	cutoff_list = list()
@@ -187,9 +204,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 
 	# restrain input to required genes (unless test=hypergeometric and background genes are not defined - all other genes are background in this case)
 	# else exlude NAs if entrez-ID, (hgnc and ensembl dont have NAs)
-	if(!(test=="hyper" & sum(genes) == length(genes))){		
+	if (!(test=="hyper" & sum(genes) == length(genes))){		
 		message("Select requested genes...")
-		pre_input = pre_input[pre_input[,2] %in% names(genes),]
+		pre_input = pre_input[pre_input[,2] %in% names(remaining_genes),]
 	} else if (identifier == "entrezgene"){
 		message("Exclude NAs...")	
 		pre_input = pre_input[!is.na(pre_input$gene_id),]
@@ -202,7 +219,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	n = length(unique(pre_input$age_category))*length(unique(pre_input$structure))
 	ngenes = table(pre_input$gene_id)
 	bose = ngenes[ngenes>n]
-	if(length(bose)>0){
+	if (length(bose)>0){
 		message(" Aggregate expression per gene...")
 		part1 = pre_input[pre_input$gene_id %in% names(bose),]
 		part2 = pre_input[!(pre_input$gene_id %in% names(bose)),]
@@ -219,9 +236,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	write.table(term,file=paste(directory, "/term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
 	write.table(term2term,file=paste(directory, "/term2term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
 	write.table(graph_path,file=paste(directory, "/graph_path.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
-
-	# initialize for warning message if candidate genes have no coordinates
-	candi_no_coords = c()
 
 	#####	3. loop over age categories and cutoffs
 	# initialize output
@@ -242,7 +256,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			}
 			# restrain input with cutoff
 			message(" Apply cutoff...")
-			input = stage_input[stage_input$signal >= cutoff[i],]			
+			input = stage_input[stage_input$signal >= cutoff[i],]		
+			
+			# TODO: adding of signal, coordinates and GOs can be performed outside of the loop	
 		
 			# for Hypergeometric Test: 0 for all genes, then convert to 1 for interesting genes (merge not possible if no background genes are defined)
 			message(" Check that there are sufficient genes above cutoff...")
@@ -255,7 +271,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 					breaky = TRUE
 				} else {	
 					input$signal = 0
-					interesting_genes = names(remaining_genes)[remaining_genes==1]
 					input[input[,1] %in% interesting_genes,"signal"] = 1
 					if (sum(input$signal)==0){
 						message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
@@ -267,7 +282,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 				}		
 			# for Wilcoxon test: replace expression signal with score
 			} else	if (test=="wilcoxon"){
-				if(length(unique(input[,1]))<2){
+				if (length(unique(input[,1]))<2){
 					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". Less than 2 genes show expression above cutoff.",sep=""))
 					breaky = TRUE
 				}
@@ -278,7 +293,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			}	
 			# if first cutoff fails, no output produced, else return output from previous cutoffs
 			if (breaky){
-				if(i==1){
+				if (i==1){
 					stop ("Expression cutoffs too high.")
 				} else {
 					break
@@ -295,7 +310,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			if (test=="hyper"){
 				# subset to test genes
 				infile_data = data.frame(genes=unique(input[input[,3]==1,1]))
-			} else if(test=="wilcoxon"){
+			} else if (test=="wilcoxon"){
 				infile_data = unique(input[,c(1,3)])
 			}
 	
@@ -306,27 +321,24 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 				xx=tapply(input[,2],input[,1],function(x){paste(x,collapse=" ")}) # paste annotations
 				gene = as.character(names(xx))
 				# add coordinates
-				gene_position = gene_coords[match(gene, gene_coords[,identifier]),4:6]	
-				root = data.frame(genes=gene, gene_position ,goterms=as.character(xx))				
+				gene_position = gene_coords[match(gene, gene_coords[,identifier]),4:6]
+				root = data.frame(genes=gene, gene_position ,goterms=as.character(xx))
+				# remove genes with unknown coordinates (possible for default bg in gene_len-option) 
+				if (gene_len){					
+					root = root[!is.na(root[,3]),] 			
+				}
+				# NEW just in case - avoid scientific notation of gene coordinates	
+				root[,3:4] = format(root[,3:4], scientific=FALSE, trim=TRUE)				
 			} else {
 				# each row contains gene and a string with all annotaded brain regions
 				xx = tapply(input[,2],input[,1],function(x){paste(x,collapse=" ")}) # paste annotations
 				root = data.frame(genes=as.character(names(xx)),goterms=as.character(xx))
-			}
-			# remove genes with unknown coordinates (possible in gene_len-option) and 
-			if (gene_len){					
-				# warn if this affects test genes (background genes might be undefined and then its weird to get a warning about them)
-				no_coords = root[is.na(root[,3]),1]
-				candi_no_coords = c(candi_no_coords, as.character(no_coords[no_coords %in% infile_data[,1]]))
-				candi_no_coords = unique(candi_no_coords)	
-				root = root[!is.na(root[,3]),] 			
-			}	
-		
+			}		
 			# write input-files to tmp-directory
 			# last priority rename root and infile-data files to all_genes_annotation and test_genes
 			write.table(infile_data,sep="\t",quote=FALSE,col.names=FALSE,row.names=FALSE,file=paste(directory,"/infile-data",sep=""))
 			write.table(root,sep="\t",quote=FALSE,col.names=FALSE,row.names=FALSE,file=paste(directory,"/",root_node,sep=""))
-			
+
 			###	3b) run func
 			if (test=="hyper"){
 				# randomset
@@ -350,6 +362,20 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		
 			## 3c) summarize func-output
 			groupy = read.table(paste(directory,"/category_test_out",sep=""))
+			
+			# NEW check that FWER order follows p-value order
+			colnames(groupy)=c("node_id","p_under","p_over","FWER_under","FWER_over")
+			groupy_sorted = groupy[order(round(groupy$p_over,12), -groupy$FWER_over),]
+			if(any(groupy_sorted$FWER_over != cummax(groupy_sorted$FWER_over))){
+				print(data.frame(groupy_sorted[,c(1,3,5)], FWER_check=groupy_sorted$FWER_over == cummax(groupy_sorted$FWER_over)))
+				stop("FWER_over does not strictly follow p_over. This looks like a bug.\n  Please contact steffi_grote@eva.mpg.de.")
+			}
+			groupy_sorted = groupy[order(round(groupy$p_under,12), -groupy$FWER_under),]	
+			if(any(groupy_sorted$FWER_under != cummax(groupy_sorted$FWER_under))){
+				print(data.frame(groupy_sorted[,c(1,2,4)], FWER_check=groupy_sorted$FWER_under == cummax(groupy_sorted$FWER_under)))
+				stop("FWER_under does not strictly follow p_under. This looks like a bug.\n  Please contact steffi_grote@eva.mpg.de.")
+			}
+			
 			age_category = rep(s,nrow(groupy))			
 			cutoff_quantile = rep(cutoff_quantiles[i],nrow(groupy))
 			cutoff_value = rep(cutoff[i],nrow(groupy))
@@ -359,12 +385,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			out = rbind(out,groups)			
 		} # end cutoffs		
 	} # end ages
-	
-	if (length(candi_no_coords) > 0){
-			no_coords_string = paste(candi_no_coords,collapse=", ")
-			warning(paste("No coordinates available for candidate genes: ",no_coords_string,".\n  These genes were not included in the analysis.",sep=""))
-	}	
-	
+	 
 	#####. 4 rearrange output
 	message("Creating output...")
 	
@@ -386,7 +407,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	rownames(requested_gene_expression) = NULL
 	colnames(requested_gene_expression)[3] = "structure_id"
 	requested_gene_expression[,3] = paste("Allen:",requested_gene_expression[,3],sep="")
-	remember = list(rge=requested_gene_expression, test=c(test,dataset), genes=genes)
+	remember = list(rge=requested_gene_expression, test=c(test,dataset), genes=remaining_genes)
 	# save to package environment
 	aba_env = as.environment("package:ABAEnrichment")
 	unlock_environment(aba_env)
