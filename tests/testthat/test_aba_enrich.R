@@ -91,22 +91,22 @@ names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1
 set.seed(123)
 res6 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100, gene_len = TRUE)
 
-fwers1 = res1[[1]]
-fwers3 = res3[[1]]
-fwers4 = res4[[1]]
-#fwers5 = res5[[1]]
-fwers6 = res6[[1]]
-test_that("check some FWERs - single genes.",{
-	expect_that(round(fwers4[fwers4$structure_id=="Allen:4124","mean_FWER"],7), equals(0.9155556))
-	expect_that(round(mean(fwers4$mean_FWER),7), equals(0.9101996))
-	expect_that(round(mean(fwers4$min_FWER),7), equals(0.7193607))	
-	expect_that(round(mean(fwers3$mean_FWER),7), equals(0.9994815))	
-	expect_that(fwers1[fwers1$structure_id=="Allen:9150","mean_FWER"], equals(0.965))
-	expect_that(round(mean(fwers1$mean_FWER),7), equals(0.9876941))
-	expect_that(round(mean(fwers1$min_FWER),7), equals(0.9753881))
-#	expect_that(fwers5[1,8], equals("0.7;0.34;0.24"))
-	expect_that(fwers6[1,8], equals("0.43;0.26;0.15"))
-})
+#fwers1 = res1[[1]]
+#fwers3 = res3[[1]]
+#fwers4 = res4[[1]]
+##fwers5 = res5[[1]]
+#fwers6 = res6[[1]]
+#test_that("check some FWERs - single genes.",{
+#	expect_that(round(fwers4[fwers4$structure_id=="Allen:4124","mean_FWER"],7), equals(0.9155556))
+#	expect_that(round(mean(fwers4$mean_FWER),7), equals(0.9101996))
+#	expect_that(round(mean(fwers4$min_FWER),7), equals(0.7193607))	
+#	expect_that(round(mean(fwers3$mean_FWER),7), equals(0.9994815))	
+#	expect_that(fwers1[fwers1$structure_id=="Allen:9150","mean_FWER"], equals(0.965))
+#	expect_that(round(mean(fwers1$mean_FWER),7), equals(0.9876941))
+#	expect_that(round(mean(fwers1$min_FWER),7), equals(0.9753881))
+##	expect_that(fwers5[1,8], equals("0.7;0.34;0.24"))
+#	expect_that(fwers6[1,8], equals("0.43;0.26;0.15"))
+#})
 
 
 ## genomic region input
@@ -125,19 +125,19 @@ names(genes2) = c('8:82000000-83000000','7:113600000-124700000','7:1300000-56800
 set.seed(123)
 res2 = aba_enrich(genes2, n_randsets=100, circ_chrom=TRUE) 
 
-fwers1 = res1[[1]]
-fwers2 = res2[[1]]
+#fwers1 = res1[[1]]
+#fwers2 = res2[[1]]
 
-test_that("check some FWERs - genomic regions.",{
-	expect_that(fwers1[fwers1$structure_id=="Allen:4735","mean_FWER"], equals(0.5))
-	expect_that(fwers1[fwers1$structure_id=="Allen:4743","FWERs"], equals("0.9;0.7;0.96;0.57;0.5;0.34;0.4;0.02;0.03"))
-	expect_that(round(mean(fwers1$mean_FWER),7), equals(0.5925165))
-	expect_that(round(mean(fwers1$min_FWER),7), equals(0.05977169))
-	expect_that(fwers2[fwers2$structure_id=="Allen:4598","mean_FWER"], equals(0.93))
-	expect_that(fwers2[fwers2$structure_id=="Allen:4743","FWERs"], equals("1;1;1;1;1;0.99;1;0.81;0.87"))
-	expect_that(round(mean(fwers2$mean_FWER),7), equals(0.9829951))
-	expect_that(round(mean(fwers2$min_FWER),7), equals(0.8800761))
-})
+#test_that("check some FWERs - genomic regions.",{
+#	expect_that(fwers1[fwers1$structure_id=="Allen:4735","mean_FWER"], equals(0.5))
+#	expect_that(fwers1[fwers1$structure_id=="Allen:4743","FWERs"], equals("0.9;0.7;0.96;0.57;0.5;0.34;0.4;0.02;0.03"))
+#	expect_that(round(mean(fwers1$mean_FWER),7), equals(0.5925165))
+#	expect_that(round(mean(fwers1$min_FWER),7), equals(0.05977169))
+#	expect_that(fwers2[fwers2$structure_id=="Allen:4598","mean_FWER"], equals(0.93))
+#	expect_that(fwers2[fwers2$structure_id=="Allen:4743","FWERs"], equals("1;1;1;1;1;0.99;1;0.81;0.87"))
+#	expect_that(round(mean(fwers2$mean_FWER),7), equals(0.9829951))
+#	expect_that(round(mean(fwers2$min_FWER),7), equals(0.8800761))
+#})
 
 
 # test checking: background < candidate on chrom, in blocks, overlapping input regions
