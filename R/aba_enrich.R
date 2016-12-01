@@ -188,15 +188,15 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	# TODO: save cutoff quantiles for all datasets for default cutoff_quantile values.
 		
 	 # compute cutoffs (tapply lasts much longer - use only when needed)
-	 message("Computing cutoffs... ")
-	 cutoff_quantiles = sort(cutoff_quantiles)
-	 if (dataset=="5_stages"){
-	 	cutoff_list = tapply(pre_input$signal, pre_input$age_category, function(x) quantile(x, probs=cutoff_quantiles),simplify=FALSE)
-	 } else {	
-	 	cutoff_list = list()
-	 	cutoff_list[[1]] = quantile(pre_input$signal,probs=cutoff_quantiles)
-	 	names(cutoff_list) = pre_input$age_category[1]
-	 }
+	message("Computing cutoffs... ")
+	cutoff_quantiles = sort(unique(cutoff_quantiles))
+	if (dataset=="5_stages"){
+		cutoff_list = tapply(pre_input$signal, pre_input$age_category, function(x) quantile(x, probs=cutoff_quantiles),simplify=FALSE)
+	} else {	# this if-else is only to save time, tapply would work in both cases
+		cutoff_list = list()
+		cutoff_list[[1]] = quantile(pre_input$signal,probs=cutoff_quantiles)
+		names(cutoff_list) = pre_input$age_category[1]
+	}
 
 	# select gene identifier
 	pre_input = pre_input[,c("age_category",identifier,"structure","signal")]
@@ -227,7 +227,10 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		colnames(part1)[4]="signal"
 		pre_input = rbind(part1,part2)
 		message(" Done.")
-	} else {message(" No gene duplicates - no aggregation needed.")}		
+	} else {message(" No gene duplicates - no aggregation needed.")}
+
+	# Add "Allen:"-string to brain region IDs
+	pre_input$structure = paste("Allen:", pre_input$structure, sep="")
 	
 	# load ontology and write files to tmp
 	term = get(paste("term",folder_ext,sep="_"))
@@ -258,8 +261,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			message(" Apply cutoff...")
 			input = stage_input[stage_input$signal >= cutoff[i],]		
 			
-			# TODO: adding of signal, coordinates and GOs can be performed outside of the loop	
-		
 			# for Hypergeometric Test: 0 for all genes, then convert to 1 for interesting genes (merge not possible if no background genes are defined)
 			message(" Check that there are sufficient genes above cutoff...")
 			breaky = FALSE
@@ -300,9 +301,6 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 				}	
 			}
 			message(" Rearrange input for FUNC...")
-			# add "Allen:" string to structures (shouldn't be numeric)
-			input$structure=paste("Allen:",input[,2],sep="")	
-			
 			# prepare input data (infile-data and root like in separate_taxonomies.pl)
 			
 			# "infile-data": genes and associated scores (wilcox) 
