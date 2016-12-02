@@ -404,7 +404,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	requested_gene_expression = pre_input
 	rownames(requested_gene_expression) = NULL
 	colnames(requested_gene_expression)[3] = "structure_id"
-	requested_gene_expression[,3] = paste("Allen:",requested_gene_expression[,3],sep="")
+#	requested_gene_expression[,3] = paste("Allen:",requested_gene_expression[,3],sep="")
 	remember = list(rge=requested_gene_expression, test=c(test,dataset), genes=remaining_genes)
 	# save to package environment
 	aba_env = as.environment("package:ABAEnrichment")
