@@ -5,7 +5,7 @@
 	# circ_chrom-option T/F
 # output: list with elements
 	# test-regions (bed)
-	# background_regions (bed)
+	# background_regions (merged with test-regions) (bed)
 	# genes-vector ("normal hyper-input" for genes from test-regions) 
 
 get_genes_from_regions = function(genes, gene_pos, circ_chrom){
@@ -54,8 +54,6 @@ get_genes_from_regions = function(genes, gene_pos, circ_chrom){
 	}
 		
 	# sort  (mixedorder does not work with multiple columns) 
-#	test_reg = test_reg[order(test_reg[,1], test_reg[,2]),] 
-#	bg_reg = bg_reg[order(bg_reg[,1], bg_reg[,2]),] 
 	test_reg = test_reg[order(test_reg[,2]),] 
 	bg_reg = bg_reg[order(bg_reg[,2]),] 
 	test_reg = test_reg[mixedorder(test_reg[,1]),] 
@@ -74,38 +72,30 @@ get_genes_from_regions = function(genes, gene_pos, circ_chrom){
 			wo_bg = paste(wo_bg, collapse=", ")
 			stop(paste("No background region for chromosomes: ",  wo_bg, ".\n  With circ_chrom=TRUE only background regions on the same chromosome as a candidate region are used." ,sep=""))
 		}
-		# check that background is big enough on all chroms, bg and test chroms are the same and have the same order 
-		bg_length = tapply(bg_reg[,3] - bg_reg[,2], bg_reg[,1], sum)
-		test_length = tapply(test_reg[,3] - test_reg[,2], test_reg[,1], sum)
-		too_big_indi = test_length > bg_length
-		if (sum(too_big_indi) > 0){
-			too_big = names(bg_length)[too_big_indi]
-			too_big = paste(mixedsort(too_big), collapse=", ")
-			stop(paste( "Sum of candidate regions is bigger than sum of background regions on chromosomes: ", too_big, sep=""))
-		}
-				
 	} else {  # normal blocks option
-		# check that biggest test_region is not bigger than biggest bg_region
-		max_bg = max(bg_reg[,3] - bg_reg[,2])
-		too_big_indi = (test_reg[,3] - test_reg[,2]) > max_bg
-		if (sum(too_big_indi) > 0){
-			too_big = paste(paste(test_reg[,1],":",test_reg[,2],"-",test_reg[,3],sep="")[too_big_indi], collapse=", ")
-			stop(paste( "Candidate regions bigger than any background region:\n  ", too_big, sep=""))
-		}
 		# sort candidate regions by length (better chances that random placement works with small bg-regions)
-		test_reg = test_reg[order(test_reg[,3] - test_reg[,2], decreasing=T),]
+		test_reg = test_reg[order(test_reg[,3] - test_reg[,2], decreasing=TRUE),]
 	}
 	
 	# get genes overlapping background-regions
 	bg_genes = c()
 	for (i in 1:nrow(bg_reg)){
-		bg_genes = c(bg_genes, gene_pos[gene_pos[,"chr"]==bg_reg[i,1] & ((gene_pos[,"start"] >= bg_reg[i,2] & gene_pos[,"start"] < bg_reg[i,3]) | (gene_pos[,"end"] >= bg_reg[i,2] & gene_pos[,"end"] < bg_reg[i,3]) |  (gene_pos[,"start"] <= bg_reg[i,2] & gene_pos[,"end"] >= bg_reg[i,3])), "hgnc_symbol"])		
+		bg_genes = c(bg_genes, gene_pos[gene_pos[,1]==bg_reg[i,1] & ((gene_pos[,2] >= bg_reg[i,2] & gene_pos[,2] < bg_reg[i,3]) | (gene_pos[,3] >= bg_reg[i,2] & gene_pos[,3] < bg_reg[i,3]) |  (gene_pos[,2] <= bg_reg[i,2] & gene_pos[,3] >= bg_reg[i,3])), 4])		
+	}
+	# check that bg-region contains genes
+	# (if no bg-genes here, all non-candidate genes would be background in go_enrich -> unwanted)
+	if (length(bg_genes)==0){
+		stop("Background regions do not contain protein-coding genes.")
 	}
 	
 	# get genes overlapping test-regions
 	test_genes = c()
 	for (i in 1:nrow(test_reg)){
-		test_genes = c(test_genes, gene_pos[gene_pos[,"chr"]==test_reg[i,1] & ((gene_pos[,"start"] >= test_reg[i,2] & gene_pos[,"start"] < test_reg[i,3]) | (gene_pos[,"end"] >= test_reg[i,2] & gene_pos[,"end"] < test_reg[i,3]) | (gene_pos[,"start"] <= test_reg[i,2] & gene_pos[,"end"] >= test_reg[i,3])), "hgnc_symbol"])		
+		test_genes = c(test_genes, gene_pos[gene_pos[,1]==test_reg[i,1] & ((gene_pos[,2] >= test_reg[i,2] & gene_pos[,2] < test_reg[i,3]) | (gene_pos[,3] >= test_reg[i,2] & gene_pos[,3] < test_reg[i,3]) | (gene_pos[,2] <= test_reg[i,2] & gene_pos[,3] >= test_reg[i,3])), 4])
+	}
+	# check that test-region contains genes
+	if (length(test_genes)==0){
+		stop("Candidate regions do not contain protein-coding genes.")
 	}
 
 	# convert to classic "genes" func-input-vector 
@@ -113,6 +103,9 @@ get_genes_from_regions = function(genes, gene_pos, circ_chrom){
 	genes_vec = rep(0, length(gene_names))
 	names(genes_vec) = gene_names
 	genes_vec[names(genes_vec) %in% test_genes] = 1
+
+	# NEW: merge candidate into background regions (single-genes-FUNC also implicitly integrates candidate into background genes to choose from in randomsets)
+	bg_reg = merge_bed(rbind(bg_reg,test_reg))
 	
 	return(list(test_reg, bg_reg, genes_vec))	
 }

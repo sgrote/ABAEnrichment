@@ -16,6 +16,7 @@ get_one_name=function(structure_id, no_allen){
 }
 
 get_name=function(structure_ids){
+	structure_ids = as.character(structure_ids)
 	# add and then remove again Allen: string if not present
 	no_allen = FALSE
 	if(!(grepl("Allen:", structure_ids[1]))){

@@ -82,14 +82,23 @@ test_that("genes that are not in data or coordinates are not returned in the gen
 
 })
 
+genes = c(rep(1,6),rep(0,4))
+genes_willi = 1:10
+names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1','APOL4', 'NXPH4')
+names(genes_willi) = c('NCAPG', 'APOL4', 'NGFR', 'NGFR', 'NXPH4', 'C21orf59', 'AGTR1', 'CACNG2', 'AGTR1', 'ANO1')
+test_that("multiple assignment of scores to genes throws error",{
+    expect_that(aba_enrich(genes), throws_error("Genes with multiple assignment in input: APOL4, NXPH4"))
+    expect_that(aba_enrich(genes_willi, test="wilcoxon"), throws_error("Genes with multiple assignment in input: AGTR1, NGFR"))
+})
+
 # full run using all genes as background  
-genes = rep(1,13)
-names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
-'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
+#genes = rep(1,13)
+#names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
+#'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
 #set.seed(123)
-#res5 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100)
-set.seed(123)
-res6 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100, gene_len = TRUE)
+##res5 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100)
+#set.seed(123)
+#res6 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100, gene_len = TRUE)
 
 #fwers1 = res1[[1]]
 #fwers3 = res3[[1]]
@@ -104,7 +113,7 @@ res6 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), 
 #	expect_that(fwers1[fwers1$structure_id=="Allen:9150","mean_FWER"], equals(0.965))
 #	expect_that(round(mean(fwers1$mean_FWER),7), equals(0.9876941))
 #	expect_that(round(mean(fwers1$min_FWER),7), equals(0.9753881))
-##	expect_that(fwers5[1,8], equals("0.7;0.34;0.24"))
+##	expect_that(fwers5[1,8], equals("0.7;0.34;0.24")) # ("0.7;0.35;0.24" in standard testing environment)
 #	expect_that(fwers6[1,8], equals("0.43;0.26;0.15"))
 #})
 
@@ -112,18 +121,18 @@ res6 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), 
 ## genomic region input
 #######################
 
-# normal runs (examples similar to vignette)
+## normal runs (examples similar to vignette)
 genes1 = c(1, rep(0,6))
 names(genes1) = c('8:82000000-83000000', '7:1300000-56800000', '7:74900000-148700000',
  '8:7400000-44300000', '8:47600000-146300000', '9:0-39200000', '9:69700000-140200000')
-set.seed(123)
-res1 = aba_enrich(genes1, n_randsets=100) 
+#set.seed(123)
+#res1 = aba_enrich(genes1, n_randsets=100) 
 
-genes2 = c(1,1,rep(0,4))
-names(genes2) = c('8:82000000-83000000','7:113600000-124700000','7:1300000-56800000', '7:74900000-148700000',
- '8:7400000-44300000', '8:47600000-146300000')
-set.seed(123)
-res2 = aba_enrich(genes2, n_randsets=100, circ_chrom=TRUE) 
+#genes2 = c(1,1,rep(0,4))
+#names(genes2) = c('8:82000000-83000000','7:113600000-124700000','7:1300000-56800000', '7:74900000-148700000',
+# '8:7400000-44300000', '8:47600000-146300000')
+#set.seed(123)
+#res2 = aba_enrich(genes2, n_randsets=100, circ_chrom=TRUE) 
 
 #fwers1 = res1[[1]]
 #fwers2 = res2[[1]]
@@ -148,25 +157,28 @@ names(overlap) = c("X:0-1","2:0-3","2:5-10","13:0-20",  "2:5-20","13:0-30","X:0-
 overlap2 = too_small
 names(overlap2)[2] = "2:0-8"
 tight = c(rep(1,4),0)
-names(tight) = c("1:104000000-114900000", "3:76500000-90500000", "7:113600000-124700000", "8:54500000-65400000", "5:0-47000000")
+names(tight) = c("1:104000000-114900000", "3:76500000-90500000", "7:113600000-124700000", "8:54500000-65400000", "5:0-4700000")
 no_bg = too_small[1:4]
 reverse = too_small
 names(reverse)[3] = "2:15-10"
+no_can_genes = genes1
+names(no_can_genes)[1] = c("1:10-20")
+no_bg_genes = c(1,0)
+names(no_bg_genes) = c("8:82000000-83000000", "21:1-3000000")
 
 test_that("input_regions are checked - blocks",{
-    expect_that(aba_enrich(too_small), throws_error("Candidate regions bigger than any background region:\n  13:0-20")) 
     expect_that(aba_enrich(overlap), throws_error("Background regions overlap: 2:5-20, 2:10-12"))
     expect_that(aba_enrich(overlap2), throws_error("Candidate regions overlap: 2:0-8, 2:5-10"))
-#    expect_that(aba_enrich(tight), throws_error("Background regions too small.")) # testthat fails on bioconductor test (actual value: "basic_string::_M_replace_aux"). error is thrown in blocks.cpp by Rcpp::stop. thestthat failure not reproducible locally (with R_DEFAULT_PACKAGES= LC_COLLATE=C LANGUAGE=EN R) 
+    expect_that(aba_enrich(tight), throws_error("Background regions too small."))
     expect_that(aba_enrich(no_bg), throws_error("All values of the 'genes' input are 1. Using chromosomal regions as input requires defining background regions with 0."))
-    expect_that(aba_enrich(reverse), throws_error("Invalid regions: 2:15-10.\n  In 'chr:start-stop' start < stop is required."))
+	expect_that(aba_enrich(reverse), throws_error("Invalid regions: 2:15-10.\n  In 'chr:start-stop' start < stop is required."))
+	expect_that(aba_enrich(no_can_genes), throws_error("Candidate regions do not contain protein-coding genes."))
+	expect_that(aba_enrich(no_bg_genes), throws_error("Background regions do not contain protein-coding genes."))
 })    
 
 test_that("input_regions are checked - circ_chrom",{
-    expect_that(aba_enrich(too_small, circ_chrom=TRUE), throws_error("Sum of candidate regions is bigger than sum of background regions on chromosomes: 2, 13, X"))
     expect_that(aba_enrich(overlap, circ_chrom=TRUE), throws_error("Background regions overlap: 2:5-20, 2:10-12"))
     expect_that(aba_enrich(overlap2, circ_chrom=TRUE), throws_error("Candidate regions overlap: 2:0-8, 2:5-10"))      
-    expect_that(aba_enrich(tight, circ_chrom=TRUE), throws_error("No background region for chromosomes: 1, 3, 7, 8.\n  With circ_chrom=TRUE only background regions on the same chromosome as a candidate region are used."))
     expect_that(aba_enrich(no_bg, circ_chrom=TRUE), throws_error("All values of the 'genes' input are 1. Using chromosomal regions as input requires defining background regions with 0."))    
     expect_that(aba_enrich(reverse, circ_chrom=TRUE), throws_error("Invalid regions: 2:15-10.\n  In 'chr:start-stop' start < stop is required."))
-})    
+})

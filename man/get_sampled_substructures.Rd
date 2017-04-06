@@ -11,7 +11,7 @@ get_sampled_substructures(structure_id)
 }
 \arguments{
   \item{structure_id}{
-a brain structure ID, e.g. 'Allen:10657'
+a brain structure ID, e.g. 'Allen:10657' or '10657'
 }
 }
 \details{
@@ -33,7 +33,7 @@ Steffi Grote
 
 
 \seealso{
-\code{vignette("ABAEnrichment",package="ABAEnrichment")}\cr
+\code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
 \code{vignette("ABAData",package="ABAData")}\cr
 \code{\link{aba_enrich}}\cr
 \code{\link{get_name}}\cr

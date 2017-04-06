@@ -58,6 +58,7 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
 		
 	# get all structures that provide data to the structures
 	daty_children=c()
+	structure_ids = as.character(structure_ids)
 	for (i in 1:length(structure_ids)){
 		daty_children=c(daty_children, get_sampled_substructures(structure_ids[i]))}	
 	# subset to queried structures (the structures that provide data)	

@@ -12,12 +12,12 @@ The package ABAEnrichment is designed to test for enrichment of user defined can
 \tabular{ll}{
 Package: \tab ABAEnrichment\cr
 Type: \tab Package\cr
-Version: \tab 1.5.2\cr
-Date: \tab 2016-10-13\cr
+Version: \tab 1.5.9\cr
+Date: \tab 2017-04-05\cr
 License: \tab GPL (>= 2)\cr
 }
 
-For details see \code{vignette("ABAEnrichment",package="ABAEnrichment")}\cr
+For details see \code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
 
 }
 
@@ -38,14 +38,16 @@ sets and ontological annotations, BMC Bioinformatics 8: 41. \doi{10.1186/1471-21
 \keyword{ package }
 \keyword{ htest }
 \seealso{
-\code{vignette("ABAEnrichment",package="ABAEnrichment")}\cr
-\code{vignette("ABAData",package="ABAData")}\cr
+\code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
+\code{vignette("ABAData", package="ABAData")}\cr
 \code{\link{aba_enrich}}\cr
 \code{\link{get_expression}}\cr 
 \code{\link{plot_expression}}\cr
 \code{\link{get_name}}\cr
+\code{\link{get_id}}\cr
 \code{\link{get_sampled_substructures}}\cr
 \code{\link{get_superstructures}}\cr
+\code{\link{get_annotated_genes}}\cr
 }
 
 

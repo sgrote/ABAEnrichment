@@ -1,23 +1,40 @@
-CHANGES IN VERSION 1.5.6
+
+
+CHANGES IN VERSION 1.5.9
+------------------------
+
+NEW FEATURES
+
+	o New function get_annotated_genes returns genes annotated 
+	  to enriched or user-defined brain regions
+	  
+	o New function get_id returns the ID of a brain region 
+	  given its name
+
+
+USER-LEVEL CHANGES
+
+	o results from aba_enrich get sorted on 
+	  times_FWER_under_0.05 followed by min_FWER and mean_FWER
+	  (order of min and mean switched)
+	 
+	o genes in aba_enrich(...)[[2]] are sorted alphabetically
+
+	o when genomic regions are provided as input, candidate
+	  regions are implicitly also part of the background
+	  for the randomsets
+	  (like it is for single-genes-input)
+
+
+	  
+CHANGES IN VERSION 1.5.8
 ------------------------
 
 IMPROVEMENTS
+
+	o Use dynamic tolerance for FWER calculation
 
 	o Added more tests and checks
-
-
-CHANGES IN VERSION 1.5.5
-------------------------
-
-BUG FIXES
-
-	o Fixed floating point inaccuracy in FWER calculation
-
-
-CHANGES IN VERSION 1.5.1
-------------------------
-
-IMPROVEMENTS
 
 	o Improved checking of arguments when genomic regions are
 	  provided as input

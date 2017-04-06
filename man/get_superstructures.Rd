@@ -11,7 +11,7 @@ get_superstructures(structure_id)
 }
 \arguments{
   \item{structure_id}{
-a brain structure ID, e.g. 'Allen:10657'
+a brain structure ID, e.g. 'Allen:10657' or '10657'
 }
 }
 
@@ -35,13 +35,14 @@ The ontologies for the adult and the developing human brain are different.
 
 \seealso{
 \code{\link{get_name}}\cr
+\code{\link{get_id}}\cr
 \code{\link{get_sampled_substructures}}\cr
 
 }
 \examples{
-## Get the ids of the superstructures of the precentral gyrus (adult brain ontology)
+## Get the IDs of the superstructures of the precentral gyrus (adult brain ontology)
 get_superstructures('Allen:4010')
-## Get the ids and the names of the superstructures of the dorsolateral prefrontal cortex 
+## Get the IDs and the names of the superstructures of the dorsolateral prefrontal cortex 
 ## (developing brain ontology) 
 data.frame(hierarchy=get_name(get_superstructures("Allen:10173")))
 }

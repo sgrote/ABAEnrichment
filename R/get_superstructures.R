@@ -5,6 +5,7 @@ get_superstructures=function(structure_id){
 	if(length(structure_id)!=1){
 		stop("Please use a single structure id.")
 	}
+	structure_id = as.character(structure_id)
 	# remove Allen: string if present
 	if(grepl("Allen:", structure_id)){
 		struc=strsplit(structure_id,":")[[1]][2]

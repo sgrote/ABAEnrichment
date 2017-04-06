@@ -5,6 +5,7 @@ get_sampled_substructures=function(structure_id){
 	if(length(structure_id)!=1){
 		stop("Please use a single structure id.")
 	}
+	structure_id = as.character(structure_id)
 	# subset ontology to directly sampled leaves and their ancestors
 	directly_sampled=daty_strucs[daty_strucs$directly_sampled==1,]
 	# remove Allen: string if present

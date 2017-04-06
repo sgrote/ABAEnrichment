@@ -74,6 +74,12 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		n_randsets = round(n_randsets)
 		warning(paste("'n_randsets' is expected to be an integer and was rounded to ",n_randsets,".",sep=""))
 	}
+	if (!is.logical(gene_len)){
+		stop("Please set gene_len to TRUE or FALSE.")
+	}
+	if (!is.logical(circ_chrom)){
+		stop("Please set circ_chrom to TRUE or FALSE.")
+	}
 	# test-specific arguments
 	if (test=="hyper"){
 		if (!all(genes %in% c(0,1))){
@@ -88,7 +94,10 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		}
 		if (gene_len){
 			stop("Argument 'gene_len = TRUE' can only be used with 'test = 'hyper''.")
-		}	
+		}
+		if(length(genes) < 2){
+			stop("Only one gene provided as input.")
+		}
 	} else (stop("Not a valid test. Please use 'hyper' or 'wilcoxon'."))
 	
 	# Create input and output folder
@@ -136,10 +145,18 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		# write regions to files
 		write.table(test_regions,file=paste(directory, "/test_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
 		write.table(bg_regions,file=paste(directory, "/bg_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")		
-	} else if (circ_chrom == TRUE){
-		# warn if circ_chrom=TRUE, although individual genes are used
-		warning("Unused argument: 'circ_chrom = TRUE'.")
-	} 	
+	} else {
+		if (circ_chrom == TRUE){
+			# warn if circ_chrom=TRUE, although individual genes are used
+			warning("Unused argument: 'circ_chrom = TRUE'.")
+		}
+		# NEW: check for multiple assignment for one gene (add to line 160)
+		genetab = unique(data.frame(genes, names(genes))) # allow for multiple assignment of the same value
+		multi_genes = sort(unique(genetab[,2][duplicated(genetab[,2])]))
+		if (length(multi_genes) > 0){
+			stop(paste("Genes with multiple assignment in input:", paste(multi_genes,collapse=", ")))
+		}
+	}
 	
 	gene_list = gene_symbols[,identifier]	
 	
@@ -319,7 +336,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 				xx=tapply(input[,2],input[,1],function(x){paste(x,collapse=" ")}) # paste annotations
 				gene = as.character(names(xx))
 				# add coordinates
-				gene_position = gene_coords[match(gene, gene_coords[,identifier]),4:6]
+				gene_position = gene_coords[match(gene, gene_coords[,identifier]),1:3]
 				root = data.frame(genes=gene, gene_position ,goterms=as.character(xx))
 				# remove genes with unknown coordinates (possible for default bg in gene_len-option) 
 				if (gene_len){					
@@ -360,20 +377,21 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		
 			## 3c) summarize func-output
 			groupy = read.table(paste(directory,"/category_test_out",sep=""))
+			# NEW remove expected and actual no. of candidate, ranksum (included in c++ files to be the same for go_enrich)
+			groupy = groupy[,1:5]
 			
-			# NEW check that FWER order follows p-value order
-			# NEW now output high-precision to category_test_out in go_groups
-			colnames(groupy)=c("node_id","p_under","p_over","FWER_under","FWER_over")
-			groupy_sorted = groupy[order(signif(groupy$p_over,12), -groupy$FWER_over),]
-			if(any(groupy_sorted$FWER_over != cummax(groupy_sorted$FWER_over))){
-				print(data.frame(groupy_sorted[,c(1,3,5)], FWER_check=groupy_sorted$FWER_over == cummax(groupy_sorted$FWER_over)))
-				stop("FWER_over does not strictly follow p_over. This looks like a bug.\n  Please contact steffi_grote@eva.mpg.de.")
-			}
-			groupy_sorted = groupy[order(signif(groupy$p_under,12), -groupy$FWER_under),]
-			if(any(groupy_sorted$FWER_under != cummax(groupy_sorted$FWER_under))){
-				print(data.frame(groupy_sorted[,c(1,2,4)], FWER_check=groupy_sorted$FWER_under == cummax(groupy_sorted$FWER_under)))
-				stop("FWER_under does not strictly follow p_under. This looks like a bug.\n  Please contact steffi_grote@eva.mpg.de.")
-			}
+#			# check that FWER order follows p-value order
+#			colnames(groupy)=c("node_id","p_under","p_over","FWER_under","FWER_over")
+#			groupy_sorted = groupy[order(signif(groupy$p_over,12), -groupy$FWER_over),]
+#			if(any(groupy_sorted$FWER_over != cummax(groupy_sorted$FWER_over))){
+#				print(data.frame(groupy_sorted[,c(1,3,5)], FWER_check=groupy_sorted$FWER_over == cummax(groupy_sorted$FWER_over)))
+#				stop("FWER_over does not strictly follow p_over. This looks like a bug.\n  Please contact steffi_grote@eva.mpg.de.")
+#			}
+#			groupy_sorted = groupy[order(signif(groupy$p_under,12), -groupy$FWER_under),]
+#			if(any(groupy_sorted$FWER_under != cummax(groupy_sorted$FWER_under))){
+#				print(data.frame(groupy_sorted[,c(1,2,4)], FWER_check=groupy_sorted$FWER_under == cummax(groupy_sorted$FWER_under)))
+#				stop("FWER_under does not strictly follow p_under.")
+#			}
 			
 			age_category = rep(s,nrow(groupy))			
 			cutoff_quantile = rep(cutoff_quantiles[i],nrow(groupy))
@@ -399,7 +417,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	# rearrange cutoff-list
 	cutoffs = do.call(cbind.data.frame, cutoff_list)
 	colnames(cutoffs) = paste("age_category",colnames(cutoffs),sep="_")
-
+	# sort genes alphabetically (useful for regions input)
+	remaining_genes = remaining_genes[mixedorder(names(remaining_genes))]
+	
 	# save in package environment: dataframes for test and background-gene expression, test, dataset	
 	# (to be returned with get_expression(structure_ids))	
 	requested_gene_expression = pre_input
@@ -419,7 +439,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	final_output = list(results=results, genes=remaining_genes, cutoffs=cutoffs)
 	
 	message("\nDone.\n")	
-	return(final_output)	
+	return(final_output)
 }
 
 	

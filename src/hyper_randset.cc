@@ -112,8 +112,6 @@ void hyper_randset(std::string all_genes, int number_of_randomsets, std::string 
 			gen_pos.cumu_len = total_length;
 		}
 		genes_pos.push_back(gen_pos);
-		//Rcout << gen_pos.name << "\t" << gen_pos.chrom << "\t" << gen_pos.start << "\t" << gen_pos.end << "\t" << gen_pos.cumu_len << endl;
-		
 		// go through all annotated GOs of an expressed gene and store pointers to GOs
 		vector<int*> gen_vec; 
 		string go_name ;
@@ -132,7 +130,6 @@ void hyper_randset(std::string all_genes, int number_of_randomsets, std::string 
 
 		}
 		// if the gene is annotated, add it to the gens-vector (vector of vectors with GOs for all exp. genes)
-		// this should always be true since all genes are annotated (in R)
 		if ( gen_vec.size() > 0 ) {
 			gens.push_back( gen_vec ) ;
 			genename_to_index[gen_pos.name] = index ;
@@ -177,7 +174,6 @@ void hyper_randset(std::string all_genes, int number_of_randomsets, std::string 
 		is >> gen_name ;
 		//Rcout << "expressed test gene: " << gen_name << endl;
 		// genename_to_index: index of annotated GO-vec for a gene (gens[index])
-		// this should always be true since all genes are annotated (in R)
 		if ( genename_to_index.find( gen_name ) != genename_to_index.end() ) {
 			// go through annotated GOs for the current gene and add 1
 			for ( vector<int*>::iterator it = gens[genename_to_index[gen_name]].begin() ;

@@ -1,6 +1,6 @@
 
 
-# context("get sampled substructures")
+# context("get name")
 
 test_that("names from developmental ontology are returned",{
   	expect_that(get_name("Allen:13324"), is_equivalent_to("VLTC_ventrolateral temporal neocortex"))

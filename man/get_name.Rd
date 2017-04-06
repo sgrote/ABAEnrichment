@@ -1,7 +1,7 @@
 \name{get_name}
 \alias{get_name}
 \title{
-Get the full name of a brain region given structure ids
+Get the full name of a brain region given structure IDs
 }
 \description{
 Returns the full name of brain regions given the structure IDs, e.g. 'Allen:10657' as used throughout the ABAEnrichment package. The full name is composed of an acronym and the name as used by the Allen Brain Atlas project [1-2]. 
@@ -11,7 +11,8 @@ get_name(structure_ids)
 }
 \arguments{
   \item{structure_ids}{
-a vector of brain structure IDs, e.g. c('Allen:10657','Allen:10173')
+a vector of brain structure IDs, e.g. c('Allen:10657','Allen:10173') or c(10657,10173)
+
 }
 }
 
@@ -33,6 +34,7 @@ The acronym is added because the names alone are not unique.
 
 
 \seealso{
+\code{\link{get_id}}\cr
 \code{\link{get_sampled_substructures}}\cr
 \code{\link{get_superstructures}}\cr
 }

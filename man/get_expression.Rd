@@ -1,7 +1,7 @@
 \name{get_expression}
 \alias{get_expression}
 \title{
-Get expression data for given genes and brain structure ids
+Get expression data for given genes and brain structure IDs
 }
 \description{
 Expression data obtained from the Allen Brain Atlas project [1-4].   
@@ -11,7 +11,7 @@ get_expression(structure_ids, gene_ids = NA, dataset = NA, background = FALSE)
 }
 \arguments{
   \item{structure_ids}{
-vector of brain structure ids, e.g. 'Allen:10208'.
+vector of brain structure IDs, e.g. 'Allen:10208'.
 }
   \item{gene_ids}{
 vector of gene identifiers, either Entrez-ID, Ensembl-ID or HGNC-symbol. If not defined, genes from previous enrichment analysis with \code{\link{aba_enrich}} are used.
@@ -55,16 +55,18 @@ Steffi Grote
 \code{\link{plot_expression}}\cr
 \code{\link{aba_enrich}}\cr
 \code{\link{get_name}}\cr
+\code{\link{get_id}}\cr
 \code{\link{get_sampled_substructures}}\cr
+\code{\link{get_annotated_genes}}\cr
 }
 
 \examples{ 
 ## get expression data for six genes in the brain structure 'Allen:4010'
-get_expression(structure_ids=c('Allen:4010'),gene_ids=c(324,8312,673,1029,64764,1499),
+get_expression(structure_ids=c('Allen:4010'), gene_ids=c(324,8312,673,1029,64764,1499),
   dataset='adult')
 ## get expression data of six genes in two brain regions from developing human brain, 
 ## each of the five list elements corresponds to an age category 
 get_expression(structure_ids=c('Allen:10657','Allen:10208'), gene_ids=c('ENSG00000168036', 
-  'ENSG00000157764', 'ENSG00000182158', 'ENSG00000147889'),dataset='5_stages')
+  'ENSG00000157764','ENSG00000182158','ENSG00000147889'), dataset='5_stages')
 }
 
