@@ -20,21 +20,21 @@ test_that("warning and return(NULL) when no node below fwer-threshold",{
     expect_that(get_annotated_genes(res_adult), equals(NULL))
 }) 
 
-x = get_annotated_genes(res_adult, fwer_threshold=0.5)
-test_that("result for res_adult as expected",{
-    expect_that(unique(x[,1]), equals(factor(5)))
-    expect_that(unique(x[,2]), equals(c("Allen:4263","Allen:4264")))
-    expect_that(unique(x[,3]), equals(0.5))
-    expect_that(unique(x[,4]), equals(c("FABP5","FABP6","FABP7")))
-    expect_that(unique(x[,5]), equals(0.49))
-    expect_that(unique(x[,6]), equals(1))
-}) 
+#x = get_annotated_genes(res_adult, fwer_threshold=0.5)
+#test_that("result for res_adult as expected",{
+#    expect_that(unique(x[,1]), equals(factor(5)))
+#    expect_that(unique(x[,2]), equals(c("Allen:4263","Allen:4264")))
+#    expect_that(unique(x[,3]), equals(0.5))
+#    expect_that(unique(x[,4]), equals(c("FABP5","FABP6","FABP7")))
+#    expect_that(unique(x[,5]), equals(0.49))
+#    expect_that(unique(x[,6]), equals(1))
+#}) 
 
-y = get_annotated_genes(res_adult, background=TRUE, fwer_threshold=0.5)
-test_that("result for res_adult as expected - background=TRUE",{
-    expect_that(nrow(y), equals(12))
-    expect_that(unique(y[,6]), equals(c(0,1)))
-}) 
+#y = get_annotated_genes(res_adult, background=TRUE, fwer_threshold=0.5)
+#test_that("result for res_adult as expected - background=TRUE",{
+#    expect_that(nrow(y), equals(12))
+#    expect_that(unique(y[,6]), equals(c(0,1)))
+#}) 
 
 # 5-stages, wilcox, entrez
 set.seed(123)
@@ -47,28 +47,28 @@ test_that("warning and return(NULL) when no node below fwer-threshold - 5_stages
     expect_that(get_annotated_genes(res_5), equals(NULL))
 }) 
 
-z = get_annotated_genes(res_5, fwer_threshold=0.55)
-test_that("result for res_adult as expected",{
-    expect_that(as.numeric(unique(z[,1])), equals(c(4,1)))
-    expect_that(unique(z[,3]), equals(0.8))
-    expect_that(unique(z[,5]), equals(c(0.42, 0.53)))
-    expect_that(unique(z[,6]), equals(c(3,15,24,46,43,49)))
-}) 
+#z = get_annotated_genes(res_5, fwer_threshold=0.55)
+#test_that("result for res_adult as expected",{
+#    expect_that(as.numeric(unique(z[,1])), equals(c(4,1)))
+#    expect_that(unique(z[,3]), equals(0.8))
+#    expect_that(unique(z[,5]), equals(c(0.42, 0.53)))
+#    expect_that(unique(z[,6]), equals(c(3,15,24,46,43,49)))
+#}) 
 
 
 ## structures, dataset, cutoffs defined by user
 ###############################################
-x0 = get_annotated_genes(structure_ids=unique(x$structure_id)[1:2], cutoff_quantiles=0.5, dataset="adult") 
-x1 = get_annotated_genes(structure_ids=unique(x$structure_id)[1:2], cutoff_quantiles=0.5, dataset="adult",genes=c(test_genes)) 
-y1 = get_annotated_genes(structure_ids=unique(x$structure_id)[1:2], cutoff_quantiles=0.5, dataset="adult", genes=c(test_genes, bg_genes)) 
-z1 = get_annotated_genes(structure_ids=unique(z$structure_id), cutoff_quantiles=c(0.2,0.8), dataset="5_stages", genes=names(genes))
+#x0 = get_annotated_genes(structure_ids=unique(x$structure_id)[1:2], cutoff_quantiles=0.5, dataset="adult") 
+#x1 = get_annotated_genes(structure_ids=unique(x$structure_id)[1:2], cutoff_quantiles=0.5, dataset="adult",genes=c(test_genes)) 
+#y1 = get_annotated_genes(structure_ids=unique(x$structure_id)[1:2], cutoff_quantiles=0.5, dataset="adult", genes=c(test_genes, bg_genes)) 
+#z1 = get_annotated_genes(structure_ids=unique(z$structure_id), cutoff_quantiles=c(0.2,0.8), dataset="5_stages", genes=names(genes))
 
-test_that("check nrow of result with user-defined structures, cutoffs, dataset, and genes",{
-    expect_that(nrow(x0), equals(14175))
-    expect_that(all(x1==x[,1:4]), is_true())
-    expect_that(all(table(y1$anno_gene)==table((y$anno_gene))), is_true())
-    expect_that(unique(z1[,3]), equals(c(0.2,0.8)))
-}) 
+#test_that("check nrow of result with user-defined structures, cutoffs, dataset, and genes",{
+#    expect_that(nrow(x0), equals(14175))
+#    expect_that(all(x1==x[,1:4]), is_true())
+#    expect_that(all(table(y1$anno_gene)==table((y$anno_gene))), is_true())
+#    expect_that(unique(z1[,3]), equals(c(0.2,0.8)))
+#}) 
 
 
 

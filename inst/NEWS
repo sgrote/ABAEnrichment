@@ -1,5 +1,24 @@
 
 
+CHANGES IN VERSION 1.5.10
+------------------------
+
+NEW FEATURES
+
+	o added hg20 as reference genome for gene coordinates
+	  (used for genomic-regions-input and gene_len=TRUE)
+	  Previously only hg19 was available, which is still
+	  the default
+
+
+USER-LEVEL CHANGES
+
+	o hgnc-symbols for gene coordinates are replaced by 
+	  gene symbols which are available for a higher
+	  number of genes (in most cases they are identical)
+
+
+
 CHANGES IN VERSION 1.5.9
 ------------------------
 
@@ -26,7 +45,7 @@ USER-LEVEL CHANGES
 	  (like it is for single-genes-input)
 
 
-	  
+
 CHANGES IN VERSION 1.5.8
 ------------------------
 

@@ -4,19 +4,19 @@
 Test genes for expression enrichment in human brain regions
 }
 \description{
-Tests for enrichment of user defined candidate genes in the set of expressed protein-coding genes in different human brain regions. It integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allen Brain Atlas project [1-4]. The statistical analysis is performed by interfacing the ontology enrichment software FUNC [5]. 
+Tests for enrichment of user defined candidate genes in the set of expressed protein-coding genes in different human brain regions. It integrates the expression of the candidate gene set (averaged across donors) and the structural information of the brain using an ontology, both provided by the Allen Brain Atlas project [1-4]. The statistical analysis is performed using the ontology enrichment software FUNC [5].
 }
 \usage{
 aba_enrich(genes, dataset = 'adult', test = 'hyper', 
   cutoff_quantiles = seq(0.1, 0.9, 0.1), n_randsets = 1000, 
-  gene_len = FALSE, circ_chrom = FALSE)
+  gene_len = FALSE, circ_chrom = FALSE, ref_genome = 'grch37')
 }
 \arguments{
   \item{genes}{
 If \code{test='wilcoxon'} a numeric vector of scores.
 If \code{test='hyper'} (default) a binary vector with 1 for candidate genes and 0 for background
 genes. If no background genes are defined, all remaining protein-coding genes are used as background.
-The names of the vector are the gene identifiers: either Entrez-ID, Ensembl-ID or HGNC-symbol. 
+The names of the vector are the gene identifiers: either Entrez-ID, Ensembl-ID or gene-symbol. 
 For \code{test='hyper'} the names of the vector can also describe chromosomal regions ('chr:start-stop').
 }
   \item{dataset}{
@@ -38,23 +38,15 @@ logical. If \code{test='hyper'} the probability of a background gene to be chose
   \item{circ_chrom}{
 logical. When \code{genes} defines chromosomal regions, \code{circ_chrom=TRUE} uses background regions from the same chromosome and allows randomly chosen blocks to overlap multiple background regions. Only if \code{test='hyper'}.
 }
+  \item{ref_genome}{
+'grch37' (default) or 'grch38'. Defines the reference genome used when genomic regions are provided as input or when \code{gene_len=TRUE}.
+}
+
 }
 \details{
-The function \code{aba_enrich} performs enrichment analyses of candidate genes within expressed protein-coding genes in human brain regions. The brain regions are categorized using an ontology. Enrichment of candidate genes is tested using the hypergeometric or the Wilcoxon rank test of the ontology enrichment software FUNC [5].\cr
-The hypergeometric test evaluates the enrichment of expressed candidate genes compared to a set of expressed background genes for each brain region. The background genes can be defined explicitly like the candidate genes or, as default, consist of all protein-coding genes from the dataset, which are not candidate genes.\cr
-To account for multiple testing the FWER is computed using random permutations of candidate and background genes (see package vignette for details). By default each gene is chosen with the same probability as a random candidate gene. If \code{gene_len=TRUE} the probability is dependent on the gene length, i.e. a gene that is twice as long as another gene is also twice as likely to be chosen as a random candidate gene.
-
-Instead of defining candidate and background genes explicitly in the \code{genes} input vector, it is also possible to define entire chromosomal regions as candidate and background regions. The expression enrichment is then tested for all protein-coding genes located in or overlapping the candidate regions on the plus or the minus strand. The gene coordinates used to identify those genes were obtained from \url{http://grch37.ensembl.org/biomart/martview/}. For the random permutations used to compute the FWER, blocks as long as candidate regions are chosen from the merged candidate and background regions and genes contained in these blocks are considered candidate genes. The output of \code{aba_enrich} is identical to the one that is produced for single genes.\cr
-To define chromosomal regions in the input vector, the names of the 1/0 vector have to be of the form \code{chr:start-stop}, where 'start' always has to be smaller than 'stop'. Note that this option requires the input of background regions. If multiple candidate regions are provided, in the randomsets they are placed randomly, but non-overlapping into the background regions. If the background regions are relatively small, it can happen that the remaining background regions available (after a candidate region has been placed there) are too small for the next candidate region to fit entirely and non-overlapping. In this case the random selection of candidate regions inside the background regions is restarted. If this fails 10 times \code{aba_enrich} quits.\cr
-An alternative method to choose random blocks from the background regions can be used with the option \code{circ_chrom=TRUE}. Every candidate region is then compared to background regions on the same chromosome. And in contrast to the default \code{circ_chrom=FALSE}, randomly chosen blocks do not have to be located inside a single background region, but are allowed to overlap multiple background regions. This means that a randomly chose block can consist of the end of the last background region and the beginning of the first background region on a given chromosome (see package vignette for details).
-
-The Wilcoxon rank test does not compare candidate and background genes, but the user defined scores associated with the candidate genes, i.e. it compares the ranks of the scores of expressed genes in a given brain region to the ranks of all candidate genes that are expressed somewhere in the brain.\cr 
-In addition to gene expression the enrichment may refer to a developmental effect score, which describes how much a gene's expression changes over time. Three different \code{datasets} can be used with \code{aba_enrich}: first, the developmental effect score, second, microarray data from adult donors and third, RNA-seq data from donors of five different developmental stages (prenatal, infant, child, adolescent, adult). In the latter case the analyses are performed independently for each developmental stage.\cr 
-The expression definition for genes is variable. Different quantiles of expression over all genes are used (e.g. the lowest 40\% of gene expression are 'not expressed' and the upper 60\% are 'expressed' for a quantile of 0.4). These cutoffs are set with the parameter \code{cutoff_quantiles} and an analysis is run for every cutoff separately.
+For details please refer to \code{vignette("ABAEnrichment", package="ABAEnrichment")}.
 }
-
 \value{
-
 A list with components
 \item{results}{
 a dataframe with the FWERs from the enrichment analyses per brain region and age category, ordered by 'age_category', 'times_FWER_under_0.05','min_FWER' and 'mean_FWER'; with 'min_FWER' for example denoting the minimum FWER for expression enrichment of the candidate genes in this brain region across all expression cutoffs. 'FWERs' is a semicolon separated string with the single FWERs for all cutoffs. 'equivalent_structures' is a semicolon separated string that lists structures with identical expression data due to lack of independent expression measurements in all regions.}
@@ -63,6 +55,7 @@ a vector of the requested genes, excluding those genes for which no expression d
 \item{cutoffs}{
 a dataframe with the expression values that correspond to the requested cutoff quantiles.}   
 }
+
 \references{
 [1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. \doi{10.1038/nature11405}\cr
 [2] Miller, J.A. et al. (2014) Transcriptional landscape of the prenatal human brain, Nature 508: 199-206. \doi{10.1038/nature13185}\cr
@@ -97,7 +90,7 @@ Steffi Grote
 
 #### Perform gene expression enrichment analysis on 13 candidate genes in five developmental 
 #### stages of the human brain using the hypergeometric test implemented in FUNC[5]   
-## create input vector with candidate genes (HGNC-symbols)
+## create input vector with candidate genes (gene-symbols)
 genes = rep(1, 13)
 names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
   'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')

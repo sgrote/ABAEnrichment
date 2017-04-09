@@ -67,8 +67,8 @@ function | description
 [get_name](#onto) | returns the full name of a brain region given a structure ID
 [get_sampled_substructures](#onto) | returns the substructures of a given brain region that have expression data available
 [get_superstructures](#onto) | returns the superstructures of a given brain region
-[get_id](#getid) | NEW: returns the structure ID given the name of a brain region
-[get_annotated_genes](#anno) | NEW: returns genes annotated to enriched or user-defined brain regions
+[get_id](#getid) | *NEW: returns the structure ID given the name of a brain region*
+[get_annotated_genes](#anno) | *NEW: returns genes annotated to enriched or user-defined brain regions*
 
 
 
@@ -77,7 +77,7 @@ function | description
 
 ### <a name='aba_enrich'></a>Test gene expression enrichment using the hypergeometric test
 For a random set of 13 candidate genes, two analyses to identify human brain regions with enriched  expression of the candidate genes are performed: one using data from adult donors (from *Allen Human Brain Atlas* [3]) and one using data from five developmental stages (from *BrainSpan Atlas of the Developing Human Brain* [4]).
-To run a hypergeometric test, a binary vector with `1` for a candidate gene and `0` for a background gene needs to be defined. The names of the vector elements are the corresponding gene identifiers (*Entrez-ID*, *Ensembl-ID* or *HGNC-symbol*). 
+To run a hypergeometric test, a binary vector with `1` for a candidate gene and `0` for a background gene needs to be defined. The names of the vector elements are the corresponding gene identifiers (*Entrez-ID*, *Ensembl-ID* or *gene-symbol*). 
 In this example no background genes are defined, so all remaining protein-coding genes of the dataset are used as default background.
 
 ```{r} 
@@ -134,11 +134,13 @@ For example, in the enrichment analysis of age category 2 (infant) with an expre
 #### Choose random candidate regions dependent on gene length
 The default behavior of `aba_enrich` is to permute candidate and background genes randomly to compute the FWER.
 With the option `gene_len=TRUE`, random selection of background genes as candidate genes is dependent on the gene length, i.e. a gene twice as long as another gene also is twice as likely selected as a candidate gene in a randomset.
-This is useful when the procedure that led to the identification of the candidate gene set is also more likely to discover longer genes. Gene coordinates were obtained from [http://grch37.ensembl.org/biomart/martview/].
+This is useful when the procedure that led to the identification of the candidate gene set is also more likely to discover longer genes. Gene coordinates were obtained from http://grch37.ensembl.org/biomart/martview/ (GRCh37.p13). *NEW: the option* `ref_genome=grch38` *uses gene coordinates from the GRCh38 genome (GRCh38.p10) obtained from http://ensembl.org/biomart/martview/*.
 
 ```{r,eval=FALSE} 
 ## run enrichment analysis, with randomsets dependent on gene length
 res_len = aba_enrich(genes, gene_len=TRUE)
+## run the same analysis using gene coordinates from GRCh38 instead of the default GRCh37
+res_len_hg20 = aba_enrich(genes, gene_len=TRUE, ref_genome='grch38')
 ```
 
 
@@ -163,7 +165,7 @@ head(res_wilcox[[1]])
 
 ### Test gene expression enrichment for genomic regions
 Instead of defining candidate and background genes explicitly in the `genes` input vector, it is also possible to define entire chromosomal regions as candidate and background regions.
-The expression enrichment is then tested for all protein-coding genes located in, or overlapping the candidate regions on the plus or the minus strand. The gene coordinates used to identify those genes were obtained from [http://grch37.ensembl.org/biomart/martview/].
+The expression enrichment is then tested for all protein-coding genes located in, or overlapping the candidate regions on the plus or the minus strand. The gene coordinates used to identify those genes were obtained from http://grch37.ensembl.org/biomart/martview/ (GRCh37.p13). *NEW: the option* `ref_genome=grch38` *uses gene coordinates from the hg20 genome (GRCh38.p10) obtained from http://ensembl.org/biomart/martview/*.
 
 In comparison to defining candidate and background genes explicitly, this option has the advantage that the FWER accounts for spatial clustering of genes.
 For the random permutations used to compute the FWER, blocks as long as candidate regions are chosen from the merged candidate and background regions and genes contained in these blocks are considered candidate genes ([Schematic 2](#block_scheme)).
@@ -217,7 +219,7 @@ expr = get_expression(top_regions, background=FALSE)
 head(expr)
 ```
 
-The same output would be created independently of an `aba_enrich` analysis by, in addition to `structure_ids`, setting `gene_ids` and `dataset` manually. Like in all functions of the *ABAEnrichment* package `gene_ids` can be *Entrez-ID*, *Ensembl-ID* or *HGNC-symbol*. 
+The same output would be created independently of an `aba_enrich` analysis by, in addition to `structure_ids`, setting `gene_ids` and `dataset` manually. Like in all functions of the *ABAEnrichment* package `gene_ids` can be *Entrez-ID*, *Ensembl-ID* or *gene-symbol*. 
 ```{r, eval=FALSE}
 ## get expression data independent from previous aba_enrich analysis
 regions = c('Allen:12926', 'Allen:4738', 'Allen:4671', 'Allen:12909', 'Allen:4718')

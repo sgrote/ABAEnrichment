@@ -16,6 +16,7 @@
 # n_randsets: number of random-sets
 # gene_len: randomset is dependent on length of genes
 # circ_chrom: for regions input: random regions are on same chrom and allowed to overlap multiple bg-regions
+# ref_genome: "grch37" or "grch38" for region input and gen_len=T
 
 #######################################################################################
 # 1. check arguments and define parameters
@@ -27,11 +28,9 @@
 # 4. create output
 #######################################################################################
 
-aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,0.9,0.1),n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE){
+aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,0.9,0.1),n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE, ref_genome="grch37"){
 
 
-	ref_genome = "grch37" # TODO: add grch38 as parameter and gene_coords_grch38 to sysdata.R 
-	
 	#####	1. Check arguments and define parameters
 		
 	## Define dataset dependent parameters
@@ -80,6 +79,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	if (!is.logical(circ_chrom)){
 		stop("Please set circ_chrom to TRUE or FALSE.")
 	}
+	if (!(ref_genome %in% c("grch37", "grch38"))){
+		stop("Not a valid ref_genome. Please use 'grch37' or 'grch38'.")
+	}
 	# test-specific arguments
 	if (test=="hyper"){
 		if (!all(genes %in% c(0,1))){
@@ -93,7 +95,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			stop("Not a valid 'genes' argument. Please use a numeric vector.")	
 		}
 		if (gene_len){
-			stop("Argument 'gene_len = TRUE' can only be used with 'test = 'hyper''.")
+			warning("Unused argument: 'gene_len = TRUE'.")
 		}
 		if(length(genes) < 2){
 			stop("Only one gene provided as input.")
@@ -111,7 +113,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	# load gene_coords
 	gene_coords = get(paste("gene_coords_", ref_genome, sep=""))
 	
-	if (identifier=="blocks"){
+	if (identifier == "blocks"){
 		identifier = "hgnc_symbol" # gene-name 
 		blocks = TRUE
 		# check that background region is specified
@@ -157,9 +159,13 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			stop(paste("Genes with multiple assignment in input:", paste(multi_genes,collapse=", ")))
 		}
 	}
-	
+	if (ref_genome == "grch38" & !(blocks | gene_len)){
+		# warn if ref-genome is switched to hg20 but not used
+		warning("Unused argument: 'ref_genome = grch38'.")
+	}
+
 	gene_list = gene_symbols[,identifier]	
-	
+
 	# restrict to genes that have expression data annotated and warn about the rest
 	remaining_genes = genes[names(genes) %in% gene_list] # restrict
 	not_in = unique(names(genes)[!(names(genes) %in% names(remaining_genes))]) # removed
