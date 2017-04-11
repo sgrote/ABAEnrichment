@@ -10,7 +10,7 @@ genes=rep(0:1,4)
 names(genes)=c(324,8312,673,1029,64764,1499,"abc",000)
 
 set.seed(123)
-res1=aba_enrich(genes,dataset='adult',cutoff_quantiles=c(0.2,0.7),n_randsets=30)
+res1=aba_enrich(genes,dataset="adult",cutoff_quantiles=c(0.2,0.7),n_randsets=30)
 
 test_that("normal input results in list",{
 	expect_that(class(res1), equals("list"))
@@ -18,7 +18,7 @@ test_that("normal input results in list",{
 	expect_that(length(unlist(strsplit(res1[[1]][1,8],";"))), equals(2))
 })
 
-res2=aba_enrich(genes,dataset='adult',cutoff_quantiles=c(0.999,0.2),n_randsets=5)
+res2=aba_enrich(genes,dataset="adult",cutoff_quantiles=c(0.999,0.2),n_randsets=5)
 
 test_that("cutoffs get sorted, output for successful cutoffs is returned",{
 	expect_that(class(res2), equals("list"))
@@ -30,7 +30,7 @@ willi = as.integer(runif(length(genes),1,30))
 names(willi) = names(genes)
 
 set.seed(123)
-res3=aba_enrich(willi,dataset='5_stages',test="wilcoxon",cutoff_quantiles=c(0.4),n_randsets=30)
+res3=aba_enrich(willi,dataset="5_stages",test="wilcoxon",cutoff_quantiles=c(0.4),n_randsets=30)
 
 test_that("corner case 5_stages with one cutoff works",{
 	expect_that(nrow(res3$cutoffs), equals(1))
@@ -45,8 +45,8 @@ test_that("genes that are not in data are not returned in the genes object",{
 
 # test warnings and more on handling of no coords and data
 
-test_genes = c(paste(rep('FABP', 5), c(2,4:7), sep=''), c('HSPB2' ,'LINC00239', 'TESTI'))
-bg_genes = c('NCAPG', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1', 'BTBD3', 'MTUS1', 'MIRLET7BHG', 'MUELL')
+test_genes = c(paste(rep("FABP", 5), c(2,4:7), sep=""), c("HSPB2" ,"LINC00239", "TESTI"))
+bg_genes = c("NCAPG", "NGFR", "NXPH4", "C21orf59", "CACNG2", "AGTR1", "ANO1", "BTBD3", "MTUS1", "MIRLET7BHG", "MUELL")
 genes = c(rep(1,length(test_genes)), rep(0,length(bg_genes)))
 names(genes) = c(test_genes, bg_genes)
 
@@ -60,7 +60,7 @@ test_that("One candidate or background gene without expression data stops.",{
     expect_that(aba_enrich(genes[c(1:8,length(genes))],cutoff_quantiles=c(0.7,0.8),n_randsets=5), throws_error("No requested background genes in data."))    
 })
 
-# 'LINC00239', 'MIRLET7BHG' -> no coordinates
+# "LINC00239", "MIRLET7BHG" -> no coordinates
 test_that("Warning about test and background genes with no coordinates.",{
     expect_that(aba_enrich(genes,cutoff_quantiles=c(0.7,0.8),n_randsets=5,gene_len=TRUE), gives_warning("No coordinates available for genes: LINC00239, MIRLET7BHG.\n  These genes were not included in the analysis."))    
 })
@@ -82,6 +82,7 @@ test_that("genes that are not in data or coordinates are not returned in the gen
 	expect_that("MIRLET7BHG" %in% names(res4$genes), is_false())	
 
 })
+
 # NEW: grch38
 set.seed(123)
 res4b = aba_enrich(genes,n_randsets=5,gene_len=TRUE,ref_genome="grch38")
@@ -93,8 +94,8 @@ test_that("genes that are not in data or coordinates are not returned in the gen
 	expect_that("MUELL" %in% names(res4b$genes), is_false())	
 	expect_that("LINC00239" %in% names(res4b$genes), is_true()) # not in hg19	
 	expect_that("MIRLET7BHG" %in% names(res4b$genes), is_true())# not in hg19
-
 })
+
 ## NEW test unused arguments
 test_that("Warning about unuesed arguments.",{
     expect_that(aba_enrich(genes,test="wilcoxon",cutoff_quantiles=c(0.7,0.8),n_randsets=5,gene_len=TRUE), gives_warning("Unused argument: 'gene_len = TRUE'."))    
@@ -103,8 +104,8 @@ test_that("Warning about unuesed arguments.",{
 
 genes = c(rep(1,6),rep(0,4))
 genes_willi = 1:10
-names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1','APOL4', 'NXPH4')
-names(genes_willi) = c('NCAPG', 'APOL4', 'NGFR', 'NGFR', 'NXPH4', 'C21orf59', 'AGTR1', 'CACNG2', 'AGTR1', 'ANO1')
+names(genes) = c("NCAPG", "APOL4", "NGFR", "NXPH4", "C21orf59", "CACNG2", "AGTR1", "ANO1","APOL4", "NXPH4")
+names(genes_willi) = c("NCAPG", "APOL4", "NGFR", "NGFR", "NXPH4", "C21orf59", "AGTR1", "CACNG2", "AGTR1", "ANO1")
 test_that("multiple assignment of scores to genes throws error",{
     expect_that(aba_enrich(genes), throws_error("Genes with multiple assignment in input: APOL4, NXPH4"))
     expect_that(aba_enrich(genes_willi, test="wilcoxon"), throws_error("Genes with multiple assignment in input: AGTR1, NGFR"))
@@ -114,12 +115,12 @@ test_that("multiple assignment of scores to genes throws error",{
 
 ## full run using all genes as background  
 #genes = rep(1,13)
-#names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
-#'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
+#names(genes) = c("NCAPG", "APOL4", "NGFR", "NXPH4", "C21orf59", "CACNG2", "AGTR1", "ANO1",
+#"BTBD3", "MTUS1", "CALB1", "GYG1", "PAX2")
 #set.seed(123)
-##res5 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100)
+##res5 = aba_enrich(genes,dataset = "5_stages",cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100)
 #set.seed(123)
-#res6 = aba_enrich(genes,dataset = '5_stages',cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100, gene_len = TRUE)
+#res6 = aba_enrich(genes,dataset = "5_stages",cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100, gene_len = TRUE)
 
 #fwers1 = res1[[1]]
 #fwers3 = res3[[1]]
@@ -153,14 +154,14 @@ test_that("multiple assignment of scores to genes throws error",{
 
 ### normal runs (examples similar to vignette)
 #genes1 = c(1, rep(0,6))
-#names(genes1) = c('8:81000000-83000000', '7:1300000-56800000', '7:74900000-148700000',
-# '8:7400000-44300000', '8:47600000-146300000', '9:0-39200000', '9:69700000-140200000')
+#names(genes1) = c("8:81000000-83000000", "7:1300000-56800000", "7:74900000-148700000",
+# "8:7400000-44300000", "8:47600000-146300000", "9:0-39200000", "9:69700000-140200000")
 #set.seed(123)
 #res1 = aba_enrich(genes1, n_randsets=100) 
 
 #genes2 = c(1,1,rep(0,4))
-#names(genes2) = c('8:81000000-83000000','7:113600000-124700000','7:1300000-56800000', '7:74900000-148700000',
-# '8:7400000-44300000', '8:47600000-146300000')
+#names(genes2) = c("8:81000000-83000000","7:113600000-124700000","7:1300000-56800000", "7:74900000-148700000",
+# "8:7400000-44300000", "8:47600000-146300000")
 #set.seed(123)
 #res2 = aba_enrich(genes2, n_randsets=100, circ_chrom=TRUE) 
 
@@ -207,8 +208,8 @@ names(tight) = c("1:104000000-114900000", "3:76500000-90500000", "7:113600000-12
 no_bg = too_small[1:4]
 reverse = too_small
 names(reverse)[3] = "2:15-10"
-no_can_genes = genes1
-names(no_can_genes)[1] = c("1:10-20")
+no_can_genes = c(1, rep(0,6))
+names(no_can_genes) = c("1:10-20", "7:1300000-56800000", "7:74900000-148700000", "8:7400000-44300000", "8:47600000-146300000", "9:0-39200000", "9:69700000-140200000")
 no_bg_genes = c(1,0)
 names(no_bg_genes) = c("8:82000000-83000000", "21:1-3000000")
 
