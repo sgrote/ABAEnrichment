@@ -308,18 +308,18 @@ While this can be accomplished using the expression cutoffs from `aba_enrich(...
 This function takes the output from `aba_enrich` and a FWER-threshold (`fwer_threshold`, default=0.05) as input and returns all brain-region/expression-cutoff combinations with a FWER below the FWER-threshold together with the corresponding annotated genes, the FWER and the score (1 for candidate and 0 for background genes or the scores from the Wilcoxon rank-sum test). Note that a brain region gets all genes annotated that are expressed in the brain region itself or in any of the sampled substructures (see [Schematic 1](#hyper_scheme) below).
 
 ```{r, results='hide'}
-## run an enrichment analysis with 15 candidate genes for the developing brain
-gene_ids = c(324, 8312, 673, 1029, 64764, 1499, 3021, 3417, 3418, 
-  8085, 3845, 9968, 5290, 5727, 5728)
-genes = rep(1, length(gene_ids))
+## run an enrichment analysis with 7 candidate and 7 background genes for the developing brain
+gene_ids = c('FOXJ1', 'NTS', 'LTBP1', 'STON2', 'KCNJ6', 'AGT', 
+  'ANO3', 'TTR', 'ELAVL4', 'BEAN1', 'TOX', 'EPN3', 'PAX2', 'KLHL1')
+genes = rep(c(1,0), each=7)
 names(genes) = gene_ids
 res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
 ```
 ```{r}
 head(res[[1]])
-## see which candidate genes are annotated to brain regions with a FWER < 0.1
+## see which candidate genes are annotated to brain regions with a FWER < 0.01
 anno = get_annotated_genes(res, fwer_threshold=0.1)
-head(anno)
+anno
 ```
 
 In addition to passing the result of an enrichment analysis together with a FWER-threshold to `get_annotated_genes`, it is also possible to define brain regions, expression cutoffs and (optionally) genes directly. The function then returns all genes that have expression above the cutoffs in the respective brain regions. If `genes` are defined, the output is reduced to this set of genes; if not, all protein-coding genes with available expression data are analyzed.

@@ -71,19 +71,23 @@ Steffi Grote
 }
 
 \examples{ 
-## perform an enrichment analysis for expression of 13 candidate genes
-## and get genes annotated to brain regions that have a FWER < 0.1
+#### Note that arguments 'cutoff_quantiles' and 'n_randsets' are reduced 
+#### to lower computational time in the examples.
+
+## perform an enrichment analysis for expression of 7 candidate and 7 background genes
+## and get candidate genes annotated to brain regions that have a FWER < 0.05
 set.seed(123)
-genes = rep(1, 13)
-names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 
-  'AGTR1', 'ANO1', 'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
-res = aba_enrich(genes, n_randset=100)
-get_annotated_genes(res, fwer_threshold=0.1)
+genes = rep(c(1,0), each=7)
+names(genes) = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
+  'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
+res = aba_enrich(genes, cutoff_quantiles=c(0.3,0.5,0.7,0.9), n_randset=100)
+anno = get_annotated_genes(res, fwer_threshold=0.05)
+head(anno)
 
 ## find out which of the above genes have expression above 
-## the 60% and 90% expression-cutoff, respectively,
+## the 50% and 70% expression-cutoff, respectively,
 ## in the Cerebellar Cortex of the developing human brain (Allen:10657)
 get_annotated_genes(structure_ids="Allen:10657", dataset="5_stages",
-  cutoff_quantiles=c(0.6,0.9), genes=names(genes))
+  cutoff_quantiles=c(0.5,0.7), genes=names(genes))
 }
 

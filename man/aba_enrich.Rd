@@ -105,7 +105,11 @@ res[2]
 ## see the expression values that correspond to the requested cutoff quantiles
 res[3]
 
-#### Perform the same analysis, but with random sets dependent on gene length
+#### Perform an analysis with defined background genes
+#### and with random sets dependent on gene length
+genes = rep(c(1,0),each=7)
+names(genes) = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
+  'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
 res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.5,0.7,0.9), 
   n_randsets=100, gene_len=TRUE)
 

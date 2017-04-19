@@ -10,7 +10,7 @@ genes=rep(0:1,4)
 names(genes)=c(324,8312,673,1029,64764,1499,"abc",000)
 
 set.seed(123)
-res1=aba_enrich(genes,dataset="adult",cutoff_quantiles=c(0.2,0.7),n_randsets=30)
+res1=aba_enrich(genes,dataset="adult",cutoff_quantiles=c(0.2,0.7),n_randsets=5)
 
 test_that("normal input results in list",{
 	expect_that(class(res1), equals("list"))
@@ -30,7 +30,7 @@ willi = as.integer(runif(length(genes),1,30))
 names(willi) = names(genes)
 
 set.seed(123)
-res3=aba_enrich(willi,dataset="5_stages",test="wilcoxon",cutoff_quantiles=c(0.4),n_randsets=30)
+res3=aba_enrich(willi,dataset="5_stages",test="wilcoxon",cutoff_quantiles=c(0.4),n_randsets=5)
 
 test_that("corner case 5_stages with one cutoff works",{
 	expect_that(nrow(res3$cutoffs), equals(1))
