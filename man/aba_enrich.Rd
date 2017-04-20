@@ -88,30 +88,19 @@ Steffi Grote
 #### to lower computational time in the examples. 
 #### Using the default values is recommended.
 
-#### Perform gene expression enrichment analysis on 13 candidate genes in five developmental 
-#### stages of the human brain using the hypergeometric test implemented in FUNC[5]   
-## create input vector with candidate genes (gene-symbols)
-genes = rep(1, 13)
-names(genes) = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1',
-  'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
-## run enrichment analysis
-res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
-## get FWERs for enrichment of candidate genes among expressed genes
-fwers = res[[1]]
-## see results for the brain regions with highest enrichment for children (age_category 3)
-head(fwers[fwers[,1]==3, ])
-## see the input genes vector (only genes with expression data available) 
-res[2]
-## see the expression values that correspond to the requested cutoff quantiles
-res[3]
-
 #### Perform an analysis with defined background genes
 #### and with random sets dependent on gene length
 genes = rep(c(1,0),each=7)
 names(genes) = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
   'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
-res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.5,0.7,0.9), 
+res = aba_enrich(genes, dataset='adult', cutoff_quantiles=c(0.5,0.9), 
   n_randsets=100, gene_len=TRUE)
+## see results for the brain regions with highest enrichment for children (age_category 3)
+head(res[[1]])
+## see the input genes vector (only genes with expression data available) 
+res[2]
+## see the expression values that correspond to the requested cutoff quantiles
+res[3]
 
 #### Perform gene expression enrichment analysis for a chromosomal region 
 #### for the adult human brain using the hypergeometric test implemented in FUNC[5] 
@@ -121,7 +110,7 @@ genes = c(1, rep(0, 6))
 names(genes) = c('3:76500000-90500000', '3:0-91600000', '3:92500000-198000000',
 '4:3600000-50300000', '4:51400000-191100000', '5:0-47000000', '5:48600000-180700000')
 ## run enrichment analysis for the 'adult' dataset
-res = aba_enrich(genes, dataset='adult', cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
+res = aba_enrich(genes, dataset='adult', cutoff_quantiles=c(0.5,0.9), n_randsets=100)
 ## look at he results from the enrichment analysis
 head(res[[1]])
 ## see which genes are located in the candidate regions
@@ -136,7 +125,7 @@ genes = sample(1:50, 15)
 names(genes) = c(324, 8312, 673, 1029, 64764, 1499, 3021, 3417, 3418, 8085, 
   3845, 9968, 5290, 5727, 5728)
 ## run enrichment analysis
-res = aba_enrich(genes, dataset='adult', test='wilcoxon', cutoff_quantiles=c(0.2,0.5,0.8),
+res = aba_enrich(genes, dataset='adult', test='wilcoxon', cutoff_quantiles=c(0.5,0.9),
   n_randsets=100)
 ## see results for the brain regions with highest enrichment 
 head(res[[1]])
