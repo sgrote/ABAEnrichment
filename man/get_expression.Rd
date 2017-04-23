@@ -61,9 +61,6 @@ Steffi Grote
 }
 
 \examples{ 
-## get expression data for six genes in the brain structure 'Allen:4010'
-get_expression(structure_ids=c('Allen:4010'), gene_ids=c(324,8312,673,1029,64764,1499),
-  dataset='adult')
 ## get expression data of six genes in two brain regions from developing human brain, 
 ## each of the five list elements corresponds to an age category 
 get_expression(structure_ids=c('Allen:10657','Allen:10208'), gene_ids=c('ENSG00000168036', 

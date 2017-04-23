@@ -10,7 +10,7 @@ genes=rep(0:1,4)
 names(genes)=c(324,8312,673,1029,64764,1499,"abc",000)
 
 set.seed(123)
-res1=aba_enrich(genes,dataset="adult",cutoff_quantiles=c(0.2,0.7),n_randsets=5)
+res1=aba_enrich(genes,dataset="5_stages",cutoff_quantiles=c(0.2,0.7),n_randsets=5)
 
 test_that("normal input results in list",{
 	expect_that(class(res1), equals("list"))
@@ -18,7 +18,7 @@ test_that("normal input results in list",{
 	expect_that(length(unlist(strsplit(res1[[1]][1,8],";"))), equals(2))
 })
 
-res2=aba_enrich(genes,dataset="adult",cutoff_quantiles=c(0.999,0.2),n_randsets=5)
+res2=aba_enrich(genes,dataset="5_stages",cutoff_quantiles=c(0.999,0.2),n_randsets=5)
 
 test_that("cutoffs get sorted, output for successful cutoffs is returned",{
 	expect_that(class(res2), equals("list"))
@@ -110,90 +110,6 @@ test_that("multiple assignment of scores to genes throws error",{
     expect_that(aba_enrich(genes), throws_error("Genes with multiple assignment in input: APOL4, NXPH4"))
     expect_that(aba_enrich(genes_willi, test="wilcoxon"), throws_error("Genes with multiple assignment in input: AGTR1, NGFR"))
 })
-
-
-
-## full run using all genes as background  
-#genes = rep(1,13)
-#names(genes) = c("NCAPG", "APOL4", "NGFR", "NXPH4", "C21orf59", "CACNG2", "AGTR1", "ANO1",
-#"BTBD3", "MTUS1", "CALB1", "GYG1", "PAX2")
-#set.seed(123)
-##res5 = aba_enrich(genes,dataset = "5_stages",cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100)
-#set.seed(123)
-#res6 = aba_enrich(genes,dataset = "5_stages",cutoff_quantiles = c(0.5,0.7,0.9), n_randsets = 100, gene_len = TRUE)
-
-#fwers1 = res1[[1]]
-#fwers3 = res3[[1]]
-#fwers4 = res4[[1]]
-#fwers4b = res4b[[1]] #NEW
-##fwers5 = res5[[1]]
-#fwers6 = res6[[1]]
-#test_that("check some FWERs - single genes.",{
-#	expect_that(round(fwers4[fwers4$structure_id=="Allen:4124","mean_FWER"],7), equals(0.8155556))
-#	expect_that(round(mean(fwers4$mean_FWER),7), equals(0.7959293))
-#	expect_that(round(mean(fwers4$min_FWER),7), equals(0.4330594))	
-	
-#	# NEW
-#	expect_that(round(fwers4b[fwers4b$structure_id=="Allen:4124","mean_FWER"],7), equals(0.8744444))
-#	expect_that(round(mean(fwers4b$mean_FWER),7), equals(0.8469711))
-#	expect_that(round(mean(fwers4b$min_FWER),7), equals(0.5332725))	
-	
-#	expect_that(round(mean(fwers3$mean_FWER),7), equals(0.9994815))	
-	
-#	expect_that(fwers1[fwers1$structure_id=="Allen:9150","mean_FWER"], equals(0.965))
-#	expect_that(round(mean(fwers1$mean_FWER),7), equals(0.9876941))
-#	expect_that(round(mean(fwers1$min_FWER),7), equals(0.9753881))
-
-##	expect_that(fwers5[1,8], equals("0.7;0.34;0.24")) # ("0.7;0.35;0.24" in standard testing environment)
-#	expect_that(fwers6[1,8], equals("0.37;0.25;0.11"))
-#})
-
-
-## genomic region input
-#######################
-
-### normal runs (examples similar to vignette)
-#genes1 = c(1, rep(0,6))
-#names(genes1) = c("8:81000000-83000000", "7:1300000-56800000", "7:74900000-148700000",
-# "8:7400000-44300000", "8:47600000-146300000", "9:0-39200000", "9:69700000-140200000")
-#set.seed(123)
-#res1 = aba_enrich(genes1, n_randsets=100) 
-
-#genes2 = c(1,1,rep(0,4))
-#names(genes2) = c("8:81000000-83000000","7:113600000-124700000","7:1300000-56800000", "7:74900000-148700000",
-# "8:7400000-44300000", "8:47600000-146300000")
-#set.seed(123)
-#res2 = aba_enrich(genes2, n_randsets=100, circ_chrom=TRUE) 
-
-### NEW: hg20
-#set.seed(123)
-#res1b = aba_enrich(genes1, n_randsets=100, ref_genome="grch38") 
-#set.seed(123)
-#res2b = aba_enrich(genes2, n_randsets=100, circ_chrom=TRUE, ref_genome="grch38") 
-
-#fwers1 = res1[[1]]
-#fwers2 = res2[[1]]
-#fwers1b = res1b[[1]]
-#fwers2b = res2b[[1]]
-
-#test_that("check some FWERs - genomic regions.",{
-#	expect_that(round(fwers1[fwers1$structure_id=="Allen:4735","mean_FWER"],7), equals(0.5277778))
-#	expect_that(round(fwers1b[fwers1b$structure_id=="Allen:4735","mean_FWER"],7), equals(0.6166667))
-#	expect_that(fwers1[fwers1$structure_id=="Allen:4743","FWERs"], equals("0.98;0.74;0.88;0.46;0.43;0.34;0.37;0;0.1"))
-#	expect_that(fwers1b[fwers1b$structure_id=="Allen:4743","FWERs"], equals("0.97;0.84;0.99;0.68;0.61;0.48;0.64;0.07;0.14"))
-#	expect_that(round(mean(fwers1$mean_FWER),7), equals(0.6313699))
-#	expect_that(round(mean(fwers1b$mean_FWER),7), equals(0.7154997))
-#	expect_that(round(mean(fwers1$min_FWER),7), equals(0.0472603))
-#	expect_that(round(mean(fwers1b$min_FWER),7), equals(0.1219635))
-#	expect_that(round(fwers2[fwers2$structure_id=="Allen:4598","mean_FWER"],7), equals(0.9022222))
-#	expect_that(round(fwers2b[fwers2b$structure_id=="Allen:4598","mean_FWER"],7), equals(0.9166667))
-#	expect_that(fwers2[fwers2$structure_id=="Allen:4743","FWERs"], equals("1;1;1;1;0.98;0.97;0.99;0.65;0.84"))
-#	expect_that(fwers2b[fwers2b$structure_id=="Allen:4743","FWERs"], equals("1;1;1;1;1;0.98;1;0.85;0.9"))
-#	expect_that(round(mean(fwers2$mean_FWER),7), equals(0.9648537))
-#	expect_that(round(mean(fwers2b$mean_FWER),7), equals(0.9824505))
-#	expect_that(round(mean(fwers2$min_FWER),7), equals(0.7839726))
-#	expect_that(round(mean(fwers2b$min_FWER),7), equals(0.8764079))
-#})
 
 
 # test checking: background < candidate on chrom, in blocks, overlapping input regions

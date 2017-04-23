@@ -80,7 +80,7 @@ set.seed(123)
 genes = rep(c(1,0), each=7)
 names(genes) = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
   'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
-res = aba_enrich(genes, cutoff_quantiles=c(0.3,0.5,0.7,0.9), n_randset=100)
+res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.3,0.5,0.7,0.9), n_randset=100)
 anno = get_annotated_genes(res, fwer_threshold=0.05)
 head(anno)
 
