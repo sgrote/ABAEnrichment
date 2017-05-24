@@ -9,7 +9,7 @@ Tests for enrichment of user defined candidate genes in the set of expressed pro
 \usage{
 aba_enrich(genes, dataset = 'adult', test = 'hyper', 
   cutoff_quantiles = seq(0.1, 0.9, 0.1), n_randsets = 1000, 
-  gene_len = FALSE, circ_chrom = FALSE, ref_genome = 'grch37')
+  gene_len = FALSE, circ_chrom = FALSE, ref_genome = 'grch37', silent=FALSE)
 }
 \arguments{
   \item{genes}{
@@ -40,6 +40,9 @@ logical. When \code{genes} defines chromosomal regions, \code{circ_chrom=TRUE} u
 }
   \item{ref_genome}{
 'grch37' (default) or 'grch38'. Defines the reference genome used when genomic regions are provided as input or when \code{gene_len=TRUE}.
+}
+  \item{silent}{
+logical. If TRUE all output to the screen except for warnings and errors is suppressed.
 }
 
 }

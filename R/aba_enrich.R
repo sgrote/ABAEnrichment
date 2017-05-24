@@ -28,7 +28,7 @@
 # 4. create output
 #######################################################################################
 
-aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,0.9,0.1),n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE, ref_genome="grch37"){
+aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0.1,0.9,0.1), n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE, ref_genome="grch37", silent=FALSE){
 
 
 	#####	1. Check arguments and define parameters
@@ -49,7 +49,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	
 	## Check arguments
 	# general
-	message("Checking arguments...")
+	if (!silent) message("Checking arguments...")
 	if (length(genes)==0){
 		stop("Please enter genes.")
 	}	
@@ -102,8 +102,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		}
 	} else (stop("Not a valid test. Please use 'hyper' or 'wilcoxon'."))
 	
-	# Create input and output folder
-	directory = tempdir()
+	# Create tempfile prefix (in contrast to tempdir() alone, this allows parallel processing)
+	directory = tempfile()
+#	dir.create("tempdir"); directory = paste("./tempdir/tempfile",Sys.info()["nodename"],sep="_")
 	
 	# load gene_list and get gene identifier
 	gene_symbols = get(paste("gene_symbols",folder_ext,sep="_"))	
@@ -139,14 +140,16 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		test_regions = format(test_regions, scientific=FALSE, trim=TRUE)
 		bg_regions = format(bg_regions, scientific=FALSE, trim=TRUE)
 
-		message("Candidate regions:")
-		print(test_regions)
-		message("Background regions:")
-		print(bg_regions)		
+		if (!silent){
+			message("Candidate regions:")
+			print(test_regions)
+			message("Background regions:")
+			print(bg_regions)
+		}
 	
 		# write regions to files
-		write.table(test_regions,file=paste(directory, "/test_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
-		write.table(bg_regions,file=paste(directory, "/bg_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")		
+		write.table(test_regions,file=paste(directory, "_test_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+		write.table(bg_regions,file=paste(directory, "_bg_regions.bed",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")		
 	} else {
 		if (circ_chrom == TRUE){
 			# warn if circ_chrom=TRUE, although individual genes are used
@@ -205,13 +208,13 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	#####	2. Load expression data
 	
 	# load pre input
-	message("Loading dataset...")
-	pre_input = load_by_name(paste("dataset",dataset,sep="_"))
+	if (!silent) message("Loading dataset...")
+	pre_input = load_by_name(paste("dataset",dataset,sep="_"), silent)
 	
 	# TODO: save cutoff quantiles for all datasets for default cutoff_quantile values.
 		
 	 # compute cutoffs (tapply lasts much longer - use only when needed)
-	message("Computing cutoffs... ")
+	if (!silent) message("Computing cutoffs... ")
 	cutoff_quantiles = sort(unique(cutoff_quantiles))
 	if (dataset=="5_stages"){
 		cutoff_list = tapply(pre_input$signal, pre_input$age_category, function(x) quantile(x, probs=cutoff_quantiles),simplify=FALSE)
@@ -228,14 +231,14 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	# restrain input to required genes (unless test=hypergeometric and background genes are not defined - all other genes are background in this case)
 	# else exlude NAs if entrez-ID, (hgnc and ensembl dont have NAs)
 	if (!(test=="hyper" & sum(genes) == length(genes))){		
-		message("Select requested genes...")
+		if (!silent) message("Select requested genes...")
 		pre_input = pre_input[pre_input[,2] %in% names(remaining_genes),]
 	} else if (identifier == "entrezgene"){
-		message("Exclude NAs...")	
+		if (!silent) message("Exclude NAs...")	
 		pre_input = pre_input[!is.na(pre_input$gene_id),]
 	}			
 	# aggregate expression per gene (duplicates due to different identifiers)
-	message("Checking for gene duplicates to aggregate... ")
+	if (!silent) message("Checking for gene duplicates to aggregate... ")
 	# simple aggregate would take very long for large input vectors
 	# number of structure-age-combinations: if all structures are present in all ages they can simply be multiplied -> thats the case
 	# n=nrow(unique(pre_input[,c("age_category","structure")]))
@@ -243,14 +246,16 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	ngenes = table(pre_input$gene_id)
 	bose = ngenes[ngenes>n]
 	if (length(bose)>0){
-		message(" Aggregate expression per gene...")
+		if (!silent) message(" Aggregate expression per gene...")
 		part1 = pre_input[pre_input$gene_id %in% names(bose),]
 		part2 = pre_input[!(pre_input$gene_id %in% names(bose)),]
 		part1 = aggregate(part1$signal,by=list("age_category"=part1$age_category,"gene_id"=part1$gene_id,"structure"=part1$structure),mean)
 		colnames(part1)[4]="signal"
 		pre_input = rbind(part1,part2)
-		message(" Done.")
-	} else {message(" No gene duplicates - no aggregation needed.")}
+		if (!silent) message(" Done.")
+	} else {
+		if (!silent) message(" No gene duplicates - no aggregation needed.")
+	}
 
 	# Add "Allen:"-string to brain region IDs
 	pre_input$structure = paste("Allen:", pre_input$structure, sep="")
@@ -259,9 +264,9 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	term = get(paste("term",folder_ext,sep="_"))
 	term2term = get(paste("term2term",folder_ext,sep="_"))
 	graph_path = get(paste("graph_path",folder_ext,sep="_"))
-	write.table(term,file=paste(directory, "/term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
-	write.table(term2term,file=paste(directory, "/term2term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
-	write.table(graph_path,file=paste(directory, "/graph_path.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+	write.table(term,file=paste(directory, "_term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+	write.table(term2term,file=paste(directory, "_term2term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+	write.table(graph_path,file=paste(directory, "_graph_path.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
 
 	#####	3. loop over age categories and cutoffs
 	# initialize output
@@ -274,40 +279,41 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 		for (i in 1:length(cutoff)){
 			
 			##	3a) create input
-
-			if (dataset=="5_stages"){
-				message(paste("Preparing age category ", s," with ",names(cutoff[i]),"-quantile expression cutoff for FUNC...",sep=""))			
-			} else {
-				message(paste("Preparing data with ",names(cutoff[i]),"-quantile expression cutoff for FUNC...",sep=""))	
+			if (!silent){ 
+				if (dataset=="5_stages"){
+					message(paste("Preparing age category ", s," with ",names(cutoff[i]),"-quantile expression cutoff for FUNC...",sep=""))			
+				} else {
+					message(paste("Preparing data with ",names(cutoff[i]),"-quantile expression cutoff for FUNC...",sep=""))	
+				}
 			}
 			# restrain input with cutoff
-			message(" Apply cutoff...")
+			if (!silent) message(" Apply cutoff...")
 			input = stage_input[stage_input$signal >= cutoff[i],]		
 			
 			# for Hypergeometric Test: 0 for all genes, then convert to 1 for interesting genes (merge not possible if no background genes are defined)
-			message(" Check that there are sufficient genes above cutoff...")
+			if (!silent) message(" Check that there are sufficient genes above cutoff...")
 			breaky = FALSE
 			if (test=="hyper"){	
 				# do input data have both 0 and 1? else break (FUNC would throw error and summary-file would not be generated)
 				# now that cutoffs get computed for all genes (not just input) both could be missing
 				if (nrow(input)==0){ 
-					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No input gene expression above cutoff.",sep=""))
+					if (!silent) message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No input gene expression above cutoff.",sep=""))
 					breaky = TRUE
 				} else {	
 					input$signal = 0
 					input[input[,1] %in% interesting_genes,"signal"] = 1
 					if (sum(input$signal)==0){
-						message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
+						if (!silent) message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
 						breaky = TRUE
 					} else if (sum(input$signal)==nrow(input)){
-						message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No background gene expression above cutoff.",sep=""))
+						if (!silent) message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No background gene expression above cutoff.",sep=""))
 						breaky = TRUE
 					}
 				}		
 			# for Wilcoxon test: replace expression signal with score
 			} else	if (test=="wilcoxon"){
 				if (length(unique(input[,1]))<2){
-					message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". Less than 2 genes show expression above cutoff.",sep=""))
+					if (!silent) message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". Less than 2 genes show expression above cutoff.",sep=""))
 					breaky = TRUE
 				}
 				if (!breaky){
@@ -323,7 +329,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 					break
 				}	
 			}
-			message(" Rearrange input for FUNC...")
+			if (!silent) message(" Rearrange input for FUNC...")
 			# prepare input data (infile-data and root like in separate_taxonomies.pl)
 			
 			# "infile-data": genes and associated scores (wilcox) 
@@ -334,55 +340,54 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 			} else if (test=="wilcoxon"){
 				infile_data = unique(input[,c(1,3)])
 			}
-	
+
 			# create "root" dataframe, add genomic positions if block option is used
+			# gene_name | (chr | start | end) | GO_string 
 			# add gene-coordinates, despite for classic FUNC option (user defined genes might get lost because they have no annotated position - there are some from ABA which are not in gene_coords)			
+			anno = tapply(input[,2], input[,1], function(x) {paste(x,collapse=" ")}) # paste annotations
+			anno = anno[mixedorder(names(anno))]
+			gene = as.character(names(anno))
 			if (blocks || gene_len){
-				# each row contains gene and a string with all annotaded brain regions
-				xx=tapply(input[,2],input[,1],function(x){paste(x,collapse=" ")}) # paste annotations
-				gene = as.character(names(xx))
 				# add coordinates
 				gene_position = gene_coords[match(gene, gene_coords[,identifier]),1:3]
-				root = data.frame(genes=gene, gene_position ,goterms=as.character(xx))
+				root = data.frame(genes=gene, gene_position ,goterms=as.character(anno))
 				# remove genes with unknown coordinates (possible for default bg in gene_len-option) 
 				if (gene_len){					
 					root = root[!is.na(root[,3]),] 			
 				}
-				# NEW just in case - avoid scientific notation of gene coordinates	
+				# just in case - avoid scientific notation of gene coordinates	
 				root[,3:4] = format(root[,3:4], scientific=FALSE, trim=TRUE)				
 			} else {
-				# each row contains gene and a string with all annotaded brain regions
-				xx = tapply(input[,2],input[,1],function(x){paste(x,collapse=" ")}) # paste annotations
-				root = data.frame(genes=as.character(names(xx)),goterms=as.character(xx))
-			}		
+				root = data.frame(genes=gene, goterms=as.character(anno))
+			}
 			# write input-files to tmp-directory
 			# last priority rename root and infile-data files to all_genes_annotation and test_genes
-			write.table(infile_data,sep="\t",quote=FALSE,col.names=FALSE,row.names=FALSE,file=paste(directory,"/infile-data",sep=""))
-			write.table(root,sep="\t",quote=FALSE,col.names=FALSE,row.names=FALSE,file=paste(directory,"/",root_node,sep=""))
+			write.table(infile_data,sep="\t",quote=FALSE,col.names=FALSE,row.names=FALSE,file=paste(directory,"_infile-data",sep=""))
+			write.table(root,sep="\t",quote=FALSE,col.names=FALSE,row.names=FALSE,file=paste(directory,"_",root_node,sep=""))
 
 			###	3b) run func
 			if (test=="hyper"){
 				# randomset
 				if (blocks & circ_chrom){
-					hyper_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node, "roll")
+					hyper_randset(paste(directory,"_",root_node,sep=""), n_randsets, directory, root_node, "roll", silent)
 				} else if (blocks){
-					hyper_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node,"block")				
+					hyper_randset(paste(directory,"_",root_node,sep=""), n_randsets, directory, root_node,"block", silent)				
 				} else if (gene_len){						
-					hyper_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node, "gene_len")	
+					hyper_randset(paste(directory,"_",root_node,sep=""), n_randsets, directory, root_node, "gene_len", silent)	
 				} else {						
-					hyper_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node, "classic")
+					hyper_randset(paste(directory,"_",root_node,sep=""), n_randsets, directory, root_node, "classic", silent)
 				}	
 #				stop("only randomset")
 				# category test
-				hyper_category_test(paste(directory, "/randset_out",sep=""), paste(directory,"/category_test_out", sep=""), 1, root_node)
+				hyper_category_test(paste(directory, "_randset_out",sep=""), paste(directory,"_category_test_out", sep=""), 1, root_node, silent)
 			} else if (test=="wilcoxon"){
-				wilcox_randset(paste(directory,"/",root_node,sep=""), n_randsets, directory, root_node)
+				wilcox_randset(paste(directory,"_",root_node,sep=""), n_randsets, directory, root_node, silent)
 				# category test
-				wilcox_category_test(paste(directory, "/randset_out",sep=""), paste(directory,"/category_test_out", sep=""), 1, root_node)
+				wilcox_category_test(paste(directory, "_randset_out",sep=""), paste(directory,"_category_test_out", sep=""), 1, root_node, silent)
 			}
 		
 			## 3c) summarize func-output
-			groupy = read.table(paste(directory,"/category_test_out",sep=""))
+			groupy = read.table(paste(directory,"_category_test_out",sep=""))
 			# NEW remove expected and actual no. of candidate, ranksum (included in c++ files to be the same for go_enrich)
 			groupy = groupy[,1:5]
 			
@@ -410,7 +415,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 	} # end ages
 	 
 	#####. 4 rearrange output
-	message("Creating output...")
+	if (!silent) message("Creating output...")
 	
 	if (test == "hyper"){
 		colnames(out)[4:8] = c("node_id","raw_p_underrep","raw_p_overrep","FWER_underrep","FWER_overrep")
@@ -444,7 +449,7 @@ aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,
 
 	final_output = list(results=results, genes=remaining_genes, cutoffs=cutoffs)
 	
-	message("\nDone.\n")	
+	if (!silent) message("\nDone.\n")	
 	return(final_output)
 }
 

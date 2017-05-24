@@ -1,4 +1,23 @@
 
+CHANGES IN VERSION 1.7.1
+------------------------
+
+NEW FEATURES
+
+	o new 'silent' option represses all output to the screen
+	  except for warnings and error messages
+
+IMPROVEMENTS
+	  
+	o modified generation of temporary files allows 
+	  parallel processing with mclapply
+	  
+USER-LEVEL CHANGES
+
+	o sort aba_enrich(...)[[1]] output also on structure-ID
+	  (after sorting on age category and FWER)
+	o sort genes in 'get_annotated_genes' output (mixedsort)
+	
 
 CHANGES IN VERSION 1.5.10
 ------------------------
