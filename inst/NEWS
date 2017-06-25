@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.7.2
+------------------------
+
+IMPROVEMENTS
+	  
+	o performance improvements for aba_enrich and
+	  get_annotated_genes
+
 
 CHANGES IN VERSION 1.7.1
 ------------------------

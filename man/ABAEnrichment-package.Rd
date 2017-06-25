@@ -12,8 +12,8 @@ The package ABAEnrichment is designed to test for enrichment of user defined can
 \tabular{ll}{
 Package: \tab ABAEnrichment\cr
 Type: \tab Package\cr
-Version: \tab 1.5.9\cr
-Date: \tab 2017-04-05\cr
+Version: \tab 1.7.2\cr
+Date: \tab 2017-06-25\cr
 License: \tab GPL (>= 2)\cr
 }
 

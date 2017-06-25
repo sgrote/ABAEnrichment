@@ -7,8 +7,6 @@
 # output: age, strcuture_id, cutoff_quantile, gene, (FWER, candiate/score)
 # additional output: structure name? (sampled substructure? - vielleicht nur verwirrend)
 
-# TODO maye use saved standard cutoff_quantiles (if(all quantiles in gespeicherte tabelle) oder so) 
-
 
 get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, structure_ids=NULL, dataset=NULL, cutoff_quantiles=NULL, genes=NULL){
 	
@@ -135,40 +133,44 @@ get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, struc
 	
 	# aggregate genes per structure and age (duplicates possible due to 3 different gene-IDs)
 	message("aggregate gene expression...")
-	# normal aggregate takes much longer. most genes are no duplicates --> extract duplicates first
-	n = length(unique(expr$age_category))*length(unique(expr$structure_id))
-	ngenes = table(expr$gene_id)
-	bose = ngenes[ngenes>n]
-	if (length(bose)>0){
-		part1 = expr[expr$gene_id %in% names(bose),]
-		part2 = expr[!(expr$gene_id %in% names(bose)),]
-		part1 = aggregate(part1$signal,by=list("age_category"=part1$age_category,"gene_id"=part1$gene_id,"structure_id"=part1$structure_id),mean)
-		colnames(part1)[4]="signal"
-		expr = rbind(part1,part2)
-	} else {message(" No gene duplicates - no aggregation needed.")}	
+	expr = as.data.table(expr)
+	expr_ag = expr[,mean(signal), by=list(age_category, gene_id, structure_id)]
+	colnames(expr_ag)[4] = "signal"
+
+	# subset expression to to signal>min(cutoff)
+	expr_ag2 = expr_ag[signal > min(combis$cutoff_value),]
 
 	# for every significant age-structure-cutoff combi:
 	message("get annotated genes...")
-	out = data.frame()
-	for (i in 1:nrow(combis)){ # TODO speed up this part
-		child_ids = anno_children[[combis[i,"structure_id"]]]
-		# select genes above cutoff
-		express = expr[expr$age_category == combis[i,"age_category"] & expr$structure_id %in% child_ids & expr$signal > combis[i,"cutoff_value"],]
-		# make unique
-		expre_genes = unique(express$gene_id)
-		# duplicate the line for every annotated gene
-		to_out = combis[rep(i, length(expre_genes)), -c(3,5)] # remove structure-name and cutoff-value
-		to_out$anno_gene = expre_genes
-		out = rbind(out, to_out)
+	out = vector(mode = "list", length = nrow(combis)) # initialize list
+	li = 1 # list index
+	for (age in unique(combis$age_category)){
+		expr_ag3 = expr_ag2[age_category == age,]
+		combis_age = combis[combis$age_category == age,]
+		for (i in 1:nrow(combis_age)){
+			child_ids = anno_children[[combis_age[i,"structure_id"]]]
+			# select genes above cutoff
+			express = expr_ag3[structure_id %in% child_ids & signal > combis_age[i,"cutoff_value"],]
+			# make unique
+			expre_genes = unique(express$gene_id)
+			# duplicate the line for every annotated gene
+			to_out = combis_age[rep(i, length(expre_genes)), -c(3,5)] # remove structure-name and cutoff-value
+			to_out$anno_gene = expre_genes
+			out[[li]] = to_out
+			li = li + 1
+		}
 	}
+	out = do.call(rbind,out)
+
 	if(nrow(out) == 0){
 		warning("No GO-annotations found for the input genes.")
 		return(out)
 	}
-	## given res as input:
-		# add candiate-T/F or score	
+
 	out = out[mixedorder(out$anno_gene),] # NEW: mixedorder genes instead of normal order
+	## given res as input:
 	if(!(missing(res))){
+		# add candiate-T/F or score
 		out$score = genes[as.character(out$anno_gene)]
 		# replace NA with 0 for background genes (needed when not in input)		
 		out$score[is.na(out$score)] = 0
