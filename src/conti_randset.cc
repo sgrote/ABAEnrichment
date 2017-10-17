@@ -9,24 +9,26 @@
 #include <vector>
 #include <memory>
 
-#include "go_graph.h"
 #include "idmap.h"
 #include "transitions.h" 
-#include "genes.h"
 
-#include <Rcpp.h>
-#include <iostream>
-using namespace Rcpp;
+#include "go_graph_conti.h"
+#include "genes_conti.h"
 
 #define MAX_LINE_LENGTH 20000
 
+#include <Rcpp.h>
+using namespace Rcpp ;
+
 //[[Rcpp::export]]
-void wilcox_randset(std::string nodes_per_gene ,int number_of_randomsets, std::string directory, std::string root, bool silent) 
+void conti_randset(std::string nodes_per_gene ,int number_of_randomsets, std::string directory, std::string root, bool silent)
+
 {
-		
+	
 	/*****************
          * read graph-structure and create graph
 	 *******************/
+	// argv[5] == term.txt from go_date_termdb-tables.tar.gz
 	// read term.txt
 	string term = directory + "_term.txt";
 	std::ifstream terms( term.c_str() ) ;
@@ -57,11 +59,13 @@ void wilcox_randset(std::string nodes_per_gene ,int number_of_randomsets, std::s
 	if ( ! term2term ) {
 		Rcpp::stop("Cannot open term2term.txt.\n"); 
 	}
-	go_graph graph( trans, term2term, id_to_go ) ;
+	go_graph_conti graph( trans, term2term, id_to_go ) ;
 	term2term.close(  ) ;
 	if ( !silent ){
 		Rcpp::Rcout << "Graph created." << endl ;
 	}
+	
+	
 
 	/*****************
          * read gene information and annotate to graph
@@ -71,14 +75,14 @@ void wilcox_randset(std::string nodes_per_gene ,int number_of_randomsets, std::s
 	if ( ! annf ) {
 		Rcpp::stop("Cannot open nodes_per_gene.\n");
 	}
-	// read gene-scores: two columns: gene | score
+	// read gene-scores: three columns: gene | count1 | count2
 	string gene_scores = directory + "_infile-data";
 	std::ifstream dataf( gene_scores.c_str() ) ;
 	if ( ! dataf ) {
 		Rcpp::stop("Cannot open infile-data.\n"); 
 	}
 
-	genes gns( graph, annf, dataf ) ;
+	genes_conti gns( graph, annf, dataf ) ;
 	
 	if ( !silent ){
 		Rcpp::Rcout << "Data and annotation file parsed." << endl ;
@@ -86,28 +90,40 @@ void wilcox_randset(std::string nodes_per_gene ,int number_of_randomsets, std::s
 		// steffi:
 		Rcpp::Rcout << "Computing randomsets..." << number_of_randomsets << "." <<endl;
 	}
+	
+
+	/*****************
+         * save #genes per go to extra file
+	 *******************/
+	// outfile for n_genes
+	string outfile_ngene = directory + "_ngenes_per_go";
+	ofstream out_n;
+	out_n.open ( outfile_ngene.c_str() );
+	graph.print_nr_genes( out_n ) ;
+	out_n.close(  ) ;
+
+
+	// outfile for randomsets
 	string outfile = directory + "_randset_out";
 	ofstream out;
 	out.open ( outfile.c_str() );
 
-
-	// force full length of all written floats...
-	out.precision( 100 ) ; 
+	/*****************
+         * save dataset to randomsetfile
+	 *******************/
+	graph.print_groups( out ) ;
+	graph.print_vals( out ) ;
 
 	/*****************
-         * save original data, create and save randdata to randomsetfile, 
+         * save random data to randomsetfile
 	 *******************/
-	out << gns.sumnties() << endl ;
-	graph.print_header( out ) ;
-	graph.print_sumranks( out ) ;
-
 	for ( int i=1 ; i <= number_of_randomsets ; ++i ) {
-		graph.clear_genes(  ) ;
+		graph.clear_vals(  ) ;
 		gns.create_random_set(  ) ;
-		graph.print_sumranks( out ) ;
+		graph.print_vals( out ) ;
 	}
 	if ( !silent ){
 		Rcpp::Rcout << "\rFinished" << endl ;
 	}
-
+	
 }

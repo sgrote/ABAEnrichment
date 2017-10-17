@@ -1,71 +1,66 @@
 
-#ifndef GO_GROUPS_HYPE_H
-#define GO_GROUPS_HYPE_H
+#ifndef GO_GROUPS_CONTI_H
+#define GO_GROUPS_CONTI_H
 
 #include <string>
 #include <vector>
 #include <iostream>
 #include <sstream>
-#include <set>
 //#include "overall_sign.h"
+#include <set>
+
+
 
 using namespace std ;
 
 /*******************
  * encapsulates parsing and analysis of randomset-lines
  ********************/
-class go_groups_hyper {
+class go_groups_conti {
 	public:
 		/**********
-		 * save name, changed and detected 
+		 * save name and boolean (if more genes than co in group) for 
+		 * each group
 		 ***********/
-		go_groups_hyper( string &groups, string detected_s, string changed_s, string root_go = "GO:0003675", int cutoff_=1 ) ;
+		go_groups_conti( string &groups, istream *in=0, int co=1, string root = "GO:0003675" ) ;
 
 		/**********
 		 * calculates number of significant groups at different cutoffs
 		 * returns array with these numbers of groups
 		 * side effect: 1. saves the p-values to overall_significance
-		 *              2. saves pvalues to data_pvals_{l,r}
+		 *              2. saves pvalues to data_pvals_{1,2}
 		 ***********/
-		int *calculate_data( ostream *os=0 ) ;
+		int *calculate_data( string &data, ostream *os=0 ) ;
 
 		/**********
-		 * equal to calculate_data, except:
-		 *   data is a string with random data from randomset
-		 *   side effect 2:
+		 * equal to calculate_data, except side effect 2:
 		 *              2. saves smallest pvalue over all groups to 
-		 *					smallest_rand_p_{l,r}
+		 *					smallest_rand_p_{1,2}
 		 ***********/
 		int *calculate_rand( string &data, ostream *os=0 ) ;
 
 		/**********
 		 * prints statistics to os, uses nr_randsets to calculate
 		 * FWER. Runs overall_significance test and FDR estimate
-		 * using osig_l and osig_r.
+		 * using osig_1 and osig_2.
 		 ***********/
 		void print_pvals( int nr_randsets, ostream &os ) ;
 	private:
 		vector<string> names ; // GO ID
-		vector<int> detected ; // # annotated to node
-		vector<int> changed_data ; // # candidate annotated to node
-
-		// NEW: expected and real number of annotated genes
-		vector<double> n_anno_expected ;
+		vector<bool> check ; // whether #genes in group > cutoff
 
 		// pvalues for all groups in dataset
-		vector<double> data_pvals_l ;
-		vector<double> data_pvals_r ;
-
-		// smallest pvalue of each randomset
-		multiset<double> smallest_rand_p_l ;
-		multiset<double> smallest_rand_p_r ;
-
-		//overall_significance osig_l, osig_r ;
+		vector<double> data_pvals_1 ;
+		vector<double> data_pvals_2 ;
 
 		// index of root node
 		int root_idx ;
-		double cutoff ;
-	
+
+		// smallest pvalue of each randomset
+		multiset<double> smallest_rand_p_1, smallest_rand_p_2 ;
+
+		//overall_significance osig_1, osig_2 ;
+
 } ;
 
 #endif

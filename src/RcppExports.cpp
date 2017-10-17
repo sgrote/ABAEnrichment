@@ -5,38 +5,91 @@
 
 using namespace Rcpp;
 
-// hyper_category_test
-void hyper_category_test(std::string input, std::string output, int cutoff, std::string root, bool silent);
-RcppExport SEXP ABAEnrichment_hyper_category_test(SEXP inputSEXP, SEXP outputSEXP, SEXP cutoffSEXP, SEXP rootSEXP, SEXP silentSEXP) {
+// binom_category_test
+void binom_category_test(std::string directory, int cutoff, std::string root, bool silent);
+RcppExport SEXP _ABAEnrichment_binom_category_test(SEXP directorySEXP, SEXP cutoffSEXP, SEXP rootSEXP, SEXP silentSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type input(inputSEXP);
-    Rcpp::traits::input_parameter< std::string >::type output(outputSEXP);
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
     Rcpp::traits::input_parameter< int >::type cutoff(cutoffSEXP);
     Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
     Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
-    hyper_category_test(input, output, cutoff, root, silent);
+    binom_category_test(directory, cutoff, root, silent);
+    return R_NilValue;
+END_RCPP
+}
+// binom_randset
+void binom_randset(std::string nodes_per_gene, int number_of_randomsets, std::string directory, std::string root, bool silent);
+RcppExport SEXP _ABAEnrichment_binom_randset(SEXP nodes_per_geneSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP, SEXP silentSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type nodes_per_gene(nodes_per_geneSEXP);
+    Rcpp::traits::input_parameter< int >::type number_of_randomsets(number_of_randomsetsSEXP);
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
+    Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
+    Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
+    binom_randset(nodes_per_gene, number_of_randomsets, directory, root, silent);
+    return R_NilValue;
+END_RCPP
+}
+// conti_category_test
+void conti_category_test(std::string directory, int cutoff, std::string root, bool silent);
+RcppExport SEXP _ABAEnrichment_conti_category_test(SEXP directorySEXP, SEXP cutoffSEXP, SEXP rootSEXP, SEXP silentSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
+    Rcpp::traits::input_parameter< int >::type cutoff(cutoffSEXP);
+    Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
+    Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
+    conti_category_test(directory, cutoff, root, silent);
+    return R_NilValue;
+END_RCPP
+}
+// conti_randset
+void conti_randset(std::string nodes_per_gene, int number_of_randomsets, std::string directory, std::string root, bool silent);
+RcppExport SEXP _ABAEnrichment_conti_randset(SEXP nodes_per_geneSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP, SEXP silentSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type nodes_per_gene(nodes_per_geneSEXP);
+    Rcpp::traits::input_parameter< int >::type number_of_randomsets(number_of_randomsetsSEXP);
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
+    Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
+    Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
+    conti_randset(nodes_per_gene, number_of_randomsets, directory, root, silent);
+    return R_NilValue;
+END_RCPP
+}
+// hyper_category_test
+void hyper_category_test(std::string directory, int cutoff, std::string root, bool silent);
+RcppExport SEXP _ABAEnrichment_hyper_category_test(SEXP directorySEXP, SEXP cutoffSEXP, SEXP rootSEXP, SEXP silentSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
+    Rcpp::traits::input_parameter< int >::type cutoff(cutoffSEXP);
+    Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
+    Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
+    hyper_category_test(directory, cutoff, root, silent);
     return R_NilValue;
 END_RCPP
 }
 // hyper_randset
-void hyper_randset(std::string all_genes, int number_of_randomsets, std::string directory, std::string root, std::string mod, bool silent);
-RcppExport SEXP ABAEnrichment_hyper_randset(SEXP all_genesSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP, SEXP modSEXP, SEXP silentSEXP) {
+void hyper_randset(std::string nodes_per_gene, int number_of_randomsets, std::string directory, std::string root, std::string mod, bool silent);
+RcppExport SEXP _ABAEnrichment_hyper_randset(SEXP nodes_per_geneSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP, SEXP modSEXP, SEXP silentSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type all_genes(all_genesSEXP);
+    Rcpp::traits::input_parameter< std::string >::type nodes_per_gene(nodes_per_geneSEXP);
     Rcpp::traits::input_parameter< int >::type number_of_randomsets(number_of_randomsetsSEXP);
     Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
     Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
     Rcpp::traits::input_parameter< std::string >::type mod(modSEXP);
     Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
-    hyper_randset(all_genes, number_of_randomsets, directory, root, mod, silent);
+    hyper_randset(nodes_per_gene, number_of_randomsets, directory, root, mod, silent);
     return R_NilValue;
 END_RCPP
 }
 // unlock_environment
 bool unlock_environment(Environment env);
-RcppExport SEXP ABAEnrichment_unlock_environment(SEXP envSEXP) {
+RcppExport SEXP _ABAEnrichment_unlock_environment(SEXP envSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -46,22 +99,21 @@ BEGIN_RCPP
 END_RCPP
 }
 // wilcox_category_test
-void wilcox_category_test(std::string input, std::string output, int cut, std::string root, bool silent);
-RcppExport SEXP ABAEnrichment_wilcox_category_test(SEXP inputSEXP, SEXP outputSEXP, SEXP cutSEXP, SEXP rootSEXP, SEXP silentSEXP) {
+void wilcox_category_test(std::string directory, int cut, std::string root, bool silent);
+RcppExport SEXP _ABAEnrichment_wilcox_category_test(SEXP directorySEXP, SEXP cutSEXP, SEXP rootSEXP, SEXP silentSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type input(inputSEXP);
-    Rcpp::traits::input_parameter< std::string >::type output(outputSEXP);
+    Rcpp::traits::input_parameter< std::string >::type directory(directorySEXP);
     Rcpp::traits::input_parameter< int >::type cut(cutSEXP);
     Rcpp::traits::input_parameter< std::string >::type root(rootSEXP);
     Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
-    wilcox_category_test(input, output, cut, root, silent);
+    wilcox_category_test(directory, cut, root, silent);
     return R_NilValue;
 END_RCPP
 }
 // wilcox_randset
 void wilcox_randset(std::string nodes_per_gene, int number_of_randomsets, std::string directory, std::string root, bool silent);
-RcppExport SEXP ABAEnrichment_wilcox_randset(SEXP nodes_per_geneSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP, SEXP silentSEXP) {
+RcppExport SEXP _ABAEnrichment_wilcox_randset(SEXP nodes_per_geneSEXP, SEXP number_of_randomsetsSEXP, SEXP directorySEXP, SEXP rootSEXP, SEXP silentSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type nodes_per_gene(nodes_per_geneSEXP);
@@ -72,4 +124,22 @@ BEGIN_RCPP
     wilcox_randset(nodes_per_gene, number_of_randomsets, directory, root, silent);
     return R_NilValue;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_ABAEnrichment_binom_category_test", (DL_FUNC) &_ABAEnrichment_binom_category_test, 4},
+    {"_ABAEnrichment_binom_randset", (DL_FUNC) &_ABAEnrichment_binom_randset, 5},
+    {"_ABAEnrichment_conti_category_test", (DL_FUNC) &_ABAEnrichment_conti_category_test, 4},
+    {"_ABAEnrichment_conti_randset", (DL_FUNC) &_ABAEnrichment_conti_randset, 5},
+    {"_ABAEnrichment_hyper_category_test", (DL_FUNC) &_ABAEnrichment_hyper_category_test, 4},
+    {"_ABAEnrichment_hyper_randset", (DL_FUNC) &_ABAEnrichment_hyper_randset, 6},
+    {"_ABAEnrichment_unlock_environment", (DL_FUNC) &_ABAEnrichment_unlock_environment, 1},
+    {"_ABAEnrichment_wilcox_category_test", (DL_FUNC) &_ABAEnrichment_wilcox_category_test, 4},
+    {"_ABAEnrichment_wilcox_randset", (DL_FUNC) &_ABAEnrichment_wilcox_randset, 5},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_ABAEnrichment(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }
