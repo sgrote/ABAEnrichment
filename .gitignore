@@ -1,0 +1,4 @@
+vignettes/.Rhistory
+*.so
+*.o
+build/vignette.rds
