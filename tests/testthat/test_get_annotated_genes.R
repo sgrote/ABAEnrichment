@@ -13,7 +13,7 @@ bg_genes = c('NCAPG', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1', 'ANO1', 'B
 genes = c(rep(1,length(test_genes)), rep(0,length(bg_genes)))
 names(genes) = c(test_genes, bg_genes)
 set.seed(123)
-res_dev = aba_enrich(genes,n_randsets=100, dataset='5_stages', cutoff_quantiles=c(0.9,0.3,0.5,0.7,0.9999))
+res_dev = aba_enrich(genes,n_randsets=100, dataset='5_stages', cutoff_quantiles=c(0.9,0.3,0.5,0.7,0.9999), silent=TRUE)
 
 test_that("warning and return(NULL) when no node below fwer-threshold",{
     expect_that(get_annotated_genes(res_dev), gives_warning("No significantly enriched brain regions at FWER-threshold 0.05"))

@@ -66,12 +66,12 @@ plot_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALS
 		# define colors of sidebar (test/background, wilcox-scores or none (if no test performed))
 		if(test=="hyper"){
 			coly=c("black","red")
-			sidebar=coly[genes[match(colnames(expr),names(genes))]+1]
+			sidebar=coly[genes[match(colnames(expr),genes[,1]), 2] + 1]
 		} else if (test=="wilcoxon"){
 			coly=rev(rainbow(50,start=0,end=0.5))
-			genes=genes-min(genes)
-			genes=round(genes/ max(genes) * 49)	
-			sidebar=coly[genes[match(colnames(expr),names(genes))]+1]	
+			genes[,2]=genes[,2]-min(genes[,2])
+			genes[,2]=round(genes[,2]/ max(genes[,2]) * 49)	
+			sidebar=coly[genes[match(colnames(expr),genes[,1]), 2] + 1]	
 		} else { 
 			sidebar=rep("white",ncol(expr))
 		}

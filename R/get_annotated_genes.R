@@ -116,13 +116,13 @@ get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, struc
 	} else {
 		# restrict to (candidate) genes
 		genes = res[[2]]
-		if(!background && all(genes %in% c(0,1))){
-			genes = genes[genes==1]
+		if(!background && all(genes[,2] %in% c(0,1))){
+			genes = genes[genes[,2]==1,]
 		}
-		expr = expr[,c("age_category",detect_identifier(names(genes)[1]),"structure","signal")]
+		expr = expr[,c("age_category",detect_identifier(genes[1,1]),"structure","signal")]
 		# don't restrict when only candidate defined for aba_enrich, but background=TRUE
-		if(!(background && all(genes == 1))){
-			expr = expr[expr[,2] %in% names(genes),]
+		if(!(background && all(genes[,2] == 1))){
+			expr = expr[expr[,2] %in% genes[,1],]
 		}
 	}
 	if(nrow(expr)==0){
@@ -171,7 +171,7 @@ get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, struc
 	## given res as input:
 	if(!(missing(res))){
 		# add candiate-T/F or score
-		out$score = genes[as.character(out$anno_gene)]
+		out$score = genes[match(as.character(out$anno_gene), genes[,1]), 2]
 		# replace NA with 0 for background genes (needed when not in input)		
 		out$score[is.na(out$score)] = 0
 		out = out[,c(1:3,5,4,6)]

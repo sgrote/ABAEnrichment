@@ -1,23 +1,4 @@
 # run "FUNC" with gene expression data from Allen Brain Atlas 
-# over flexible expression cutoff
-# wilcoxon rank test or hypergeometric test
-# with adult microarray data, developmental RNA-seq (5 age categories) or derived developmental effect score
-
-
-###############
-# MAIN function
-###############
-
-### Arguments
-# genes: vector of 0/1 (hypergeometric) or float (wilcoxon) with gene identifiers as names (ensembl, entrez or hgnc), or chromosomal regions chr:start-stop (only for hypergeometric)
-# dataset: "adult", "5_stages" or "dev_effect"
-# test: "hyper" or "wilcoxon"
-# cutoff_quantiles: numeric values in ]0,1[
-# n_randsets: number of random-sets
-# gene_len: randomset is dependent on length of genes
-# circ_chrom: for regions input: random regions are on same chrom and allowed to overlap multiple bg-regions
-# ref_genome: "grch37" or "grch38" for region input and gen_len=T
-# silent: suppress output to screen except for errors and warnings
 
 #######################################################################################
 # 1. check arguments and define parameters
@@ -33,6 +14,16 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 
 
 	#####	1. Check arguments and define parameters
+	
+	## still allow vector as input for hyper and wilcox (like in older versions)
+    if (!((is.vector(genes) && !is.null(names(genes))) || is.data.frame(genes))){
+        stop("Please provide a data frame as 'genes' input (also named vector is still accepted for hypergeometric or wilcoxon rank-sum test).")
+    }
+    if (is.vector(genes)){
+        genes = data.frame(gene=names(genes), score=unname(genes), stringsAsFactors=FALSE)
+    } else {
+        genes[,1] = as.character(genes[,1])
+    }
 		
 	## Define dataset dependent parameters
 	if (dataset=="adult"){
@@ -49,14 +40,53 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	}
 	
 	## Check arguments
-	# general
 	if (!silent) message("Checking arguments...")
-	if (length(genes)==0){
-		stop("Please enter genes.")
-	}	
-	if (length(names(genes))==0){
-		stop("Please add gene identifiers as names to 'genes' vector.")
-	}
+	# genes
+    if (anyNA(genes)){
+        stop("NAs found in 'genes'-input. Please provide finite values only.")
+    }
+    if (test=="hyper"){
+        if (!(is.data.frame(genes) && ncol(genes)==2 && is.numeric(genes[,2]))){
+            stop("Please provide a data frame with 2 columns [gene, 0/1] as input for hypergeometric test.")
+        }
+        if (!(all(genes[,2] %in% c(1,0)))){
+            stop("Please provide only 1/0-values in 2nd column of 'genes'-input for hypergeometric test.")
+        }
+        if (sum(genes[,2])==0){
+            stop("Only background genes defined (only 0s in 'genes[,2]'). Please provide candidate genes denoted by 1.")
+        }
+    } else  if (test=="wilcoxon"){
+        if (!(is.data.frame(genes) && ncol(genes)==2  && is.numeric(genes[,2]))){
+            stop("Please provide a data frame with 2 columns [gene, score] as input for wilcoxon rank-sum test.")
+        }
+        if (nrow(genes) < 2){
+            stop("Only one gene provided as input.")
+        }
+    } else if (test=="binomial"){
+        if (!(is.data.frame(genes) && ncol(genes)==3 && all(sapply(genes,is.numeric) == c(0,1,1)))){
+            stop("Please provide a data frame with columns [gene, count1, count2] as input for binomial test.")
+        }
+        if (any(genes[,2:3] < 0) | any(genes[,2:3] != round(genes[,2:3]))){
+            stop("Please provide non-negative integers in columns 2-3.")
+        }
+    } else if (test=="contingency"){
+        if (!(is.data.frame(genes) && ncol(genes)==5 && all(sapply(genes,is.numeric) == c(0,1,1,1,1)))){
+            stop("Please provide a data frame with columns [gene, count1A, count2A, count1B, count2B] as input for contingency table test.")
+        }
+        if (any(genes[,2:5] < 0) | any(genes[,2:5] != round(genes[,2:5]))){
+            stop("Please provide non-negative integers in columns 2-5.")
+        }
+    } else {
+        stop("Not a valid test. Please use 'hyper', 'wilcoxon', 'binomial' or 'contingency'.")
+    }
+    # check for multiple assignment for one gene
+    genes = unique(genes) # allow for multiple assignment of same value
+    multi_genes = sort(unique(genes[,1][duplicated(genes[,1])]))
+    if (length(multi_genes) > 0){
+        stop(paste("Genes with multiple assignment in input:", paste(multi_genes,collapse=", ")))
+    }
+    
+	# other arguments
 	if (class(cutoff_quantiles)!="numeric"){
 		stop("Please enter numeric cutoff_quantiles.")
 	}	
@@ -67,41 +97,25 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	if (!(dataset %in% valid_datasets)){
 		stop("Not a valid dataset. Please use 'adult', '5_stages' or 'dev_effect'.")	
 	}
-	if (length(n_randsets)>1 || !is.numeric(n_randsets) || n_randsets<1){
-		stop("Please define 'n_randsets' as a positive integer.")
-	}
-	if (n_randsets != round(n_randsets)){
-		n_randsets = round(n_randsets)
-		warning(paste("'n_randsets' is expected to be an integer and was rounded to ",n_randsets,".",sep=""))
-	}
-	if (!is.logical(gene_len)){
-		stop("Please set gene_len to TRUE or FALSE.")
-	}
-	if (!is.logical(circ_chrom)){
-		stop("Please set circ_chrom to TRUE or FALSE.")
-	}
+    if (length(n_randsets)>1 || !is.numeric(n_randsets) || n_randsets<1){
+        stop("Please define 'n_randsets' as a positive integer.")
+    }
+    if (n_randsets != round(n_randsets)){
+        n_randsets = round(n_randsets)
+        warning(paste("'n_randsets' is expected to be an integer and was rounded to ",n_randsets,".",sep=""))
+    }
+    if (!is.logical(gene_len)){
+        stop("Please set gene_len to TRUE or FALSE.")
+    }
+    if (!is.logical(circ_chrom)){
+        stop("Please set circ_chrom to TRUE or FALSE.")
+    }
+    if (gene_len & !(test == "hyper")){
+        stop("Argument 'gene_len = TRUE' can only be used with 'test = 'hyper''.")
+    }
 	if (!(ref_genome %in% c("grch37", "grch38"))){
 		stop("Not a valid ref_genome. Please use 'grch37' or 'grch38'.")
 	}
-	# test-specific arguments
-	if (test=="hyper"){
-		if (!all(genes %in% c(0,1))){
-			stop("Not a valid 'genes' argument for hypergeometric test. Please use a vector of 0/1.")	
-		}	
-		if (sum(genes)==0){
-			stop("Only 0 in genes vector. Please enter test genes.")	
-		}
-	} else	if (test=="wilcoxon"){
-		if (!is.numeric(genes)){
-			stop("Not a valid 'genes' argument. Please use a numeric vector.")	
-		}
-		if (gene_len){
-			warning("Unused argument: 'gene_len = TRUE'.")
-		}
-		if(length(genes) < 2){
-			stop("Only one gene provided as input.")
-		}
-	} else (stop("Not a valid test. Please use 'hyper' or 'wilcoxon'."))
 	
 	# Create tempfile prefix (in contrast to tempdir() alone, this allows parallel processing)
 	directory = tempfile()
@@ -110,7 +124,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	# load gene_list and get gene identifier
 	gene_symbols = get(paste("gene_symbols",folder_ext,sep="_"))	
 	blocks = FALSE
-	identifier = detect_identifier(names(genes)[1])	
+	identifier = detect_identifier(genes[1,1])	
 	
 	# load gene_coords
 	gene_coords = get(paste("gene_coords_", ref_genome, sep=""))
@@ -119,7 +133,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 		identifier = "hgnc_symbol" # gene-name 
 		blocks = TRUE
 		# check that background region is specified
-		if (sum(genes) == length(genes)){
+		if (sum(genes[,2]) == nrow(genes)){
 			stop("All values of the 'genes' input are 1. Using chromosomal regions as input requires defining background regions with 0.")
 		}
 		# check that test is hyper
@@ -156,12 +170,6 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 			# warn if circ_chrom=TRUE, although individual genes are used
 			warning("Unused argument: 'circ_chrom = TRUE'.")
 		}
-		# NEW: check for multiple assignment for one gene (add to line 160)
-		genetab = unique(data.frame(genes, names(genes))) # allow for multiple assignment of the same value
-		multi_genes = sort(unique(genetab[,2][duplicated(genetab[,2])]))
-		if (length(multi_genes) > 0){
-			stop(paste("Genes with multiple assignment in input:", paste(multi_genes,collapse=", ")))
-		}
 	}
 	if (ref_genome == "grch38" & !(blocks | gene_len)){
 		# warn if ref-genome is switched to hg20 but not used
@@ -171,17 +179,18 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	gene_list = gene_symbols[,identifier]	
 
 	# restrict to genes that have expression data annotated and warn about the rest
-	remaining_genes = genes[names(genes) %in% gene_list] # restrict
-	not_in = unique(names(genes)[!(names(genes) %in% names(remaining_genes))]) # removed
+	remaining_genes = genes[genes[,1] %in% gene_list, ] # restrict
+	not_in = unique(genes[!genes[,1] %in% remaining_genes[,1], 1]) # removed
 	if (length(not_in) > 0 && !blocks){
 		not_in_string = paste(not_in,collapse=", ")
 		warning(paste("No expression data for genes: ",not_in_string,".\n  These genes were not included in the analysis.",sep=""))
 	}
 	# restrict to genes that have coordinates and warn about the rest
 	if (gene_len){
-		no_coords = unique(names(remaining_genes)[!(names(remaining_genes) %in% gene_coords[,identifier])]) # removed
+		# removed
+		no_coords = unique(remaining_genes[!(remaining_genes[,1] %in% gene_coords[,identifier]), 1]) 
 		if (length(no_coords) > 0){
-			remaining_genes = remaining_genes[!(names(remaining_genes) %in% no_coords)] # restrict
+			remaining_genes = remaining_genes[!(remaining_genes[,1] %in% no_coords), ] # restrict
 			no_coords_string = paste(no_coords,collapse=", ")
 			warning(paste("No coordinates available for genes: ",no_coords_string,".\n  These genes were not included in the analysis.",sep=""))
 			not_in = c(not_in, no_coords)
@@ -190,20 +199,20 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	# after removing genes without expression data or coordinates: are enough genes left?
 	if (length(not_in) > 0){
 		# is any gene in the data? if not, stop.
-		if (length(remaining_genes) == 0) {
+		if (nrow(remaining_genes)==0) {
 			stop("No requested genes in data.")
 		}
 		# for 0/1 data: are test genes and background genes in the data (background only if background specified)?
-		if (test=="hyper" & sum(remaining_genes)==0) {
+		if (test=="hyper" & sum(remaining_genes[,2])==0) {
 			stop("No requested test genes in data.")
 		}
-		if (test=="hyper" & sum(genes)!=length(genes) & sum(remaining_genes)==length(remaining_genes)) {
+		if (test=="hyper" & sum(genes[,2])!=nrow(genes) & sum(remaining_genes[,2])==nrow(remaining_genes)) {
 			stop("No requested background genes in data.")
 		}
 	}
 	# candidate genes	
 	if (test=="hyper"){					
-		interesting_genes = names(remaining_genes)[remaining_genes==1] 
+		interesting_genes = remaining_genes[remaining_genes[,2]==1, 1] 
 	}
 
 	#####	2. Load expression data
@@ -227,9 +236,9 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 
 	# restrain input to required genes (unless test=hypergeometric and background genes are not defined - all other genes are background in this case)
 	# else exlude NAs if entrez-ID, (hgnc and ensembl dont have NAs)
-	if (!(test=="hyper" & sum(genes) == length(genes))){		
+	if (!(test=="hyper" & sum(genes[,2]) == nrow(genes))){		
 		if (!silent) message("Select requested genes...")
-		pre_input = pre_input[gene_id %in% names(remaining_genes),]
+		pre_input = pre_input[gene_id %in% remaining_genes[,1],]
 	} else if (identifier == "entrezgene"){
 		if (!silent) message("Exclude NAs...")
 		pre_input = pre_input[!is.na(pre_input$gene_id),]
@@ -283,7 +292,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 					breaky = TRUE
 				} else {	
 					input$signal = 0
-					input[gene_id %in% interesting_genes,signal:=1]
+					input[gene_id %in% interesting_genes, signal:=1]
 					if (sum(input$signal)==0){
 						if (!silent) message(paste("  Warning: No statistics for cutoff >= ",cutoff_quantiles[i],". No test gene expression above cutoff.",sep=""))
 						breaky = TRUE
@@ -299,7 +308,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 					breaky = TRUE
 				}
 				if (!breaky){
-					score = genes[match(input$gene_id,names(genes))]
+					score = genes[match(input$gene_id, genes[,1]),2]
 					input[,signal:=score]
 				}		
 			}	
@@ -364,31 +373,16 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 				}	
 #				stop("only randomset")
 				# category test
-				hyper_category_test(paste(directory, "_randset_out",sep=""), paste(directory,"_category_test_out", sep=""), 1, root_node, silent)
+				hyper_category_test(directory, 1, root_node, silent)
 			} else if (test=="wilcoxon"){
 				wilcox_randset(paste(directory,"_",root_node,sep=""), n_randsets, directory, root_node, silent)
-				# category test
-				wilcox_category_test(paste(directory, "_randset_out",sep=""), paste(directory,"_category_test_out", sep=""), 1, root_node, silent)
+				wilcox_category_test(directory, 1, root_node, silent)
 			}
 		
 			## 3c) summarize func-output
 			groupy = read.table(paste(directory,"_category_test_out",sep=""))
 			# NEW remove expected and actual no. of candidate, ranksum (included in c++ files to be the same for go_enrich)
 			groupy = groupy[,1:5]
-			
-#			# check that FWER order follows p-value order
-#			colnames(groupy)=c("node_id","p_under","p_over","FWER_under","FWER_over")
-#			groupy_sorted = groupy[order(signif(groupy$p_over,12), -groupy$FWER_over),]
-#			if(any(groupy_sorted$FWER_over != cummax(groupy_sorted$FWER_over))){
-#				print(data.frame(groupy_sorted[,c(1,3,5)], FWER_check=groupy_sorted$FWER_over == cummax(groupy_sorted$FWER_over)))
-#				stop("FWER_over does not strictly follow p_over. This looks like a bug.\n  Please contact steffi_grote@eva.mpg.de.")
-#			}
-#			groupy_sorted = groupy[order(signif(groupy$p_under,12), -groupy$FWER_under),]
-#			if(any(groupy_sorted$FWER_under != cummax(groupy_sorted$FWER_under))){
-#				print(data.frame(groupy_sorted[,c(1,2,4)], FWER_check=groupy_sorted$FWER_under == cummax(groupy_sorted$FWER_under)))
-#				stop("FWER_under does not strictly follow p_under.")
-#			}
-			
 			age_category = rep(s,nrow(groupy))			
 			cutoff_quantile = rep(cutoff_quantiles[i],nrow(groupy))
 			cutoff_value = rep(cutoff[i],nrow(groupy))
@@ -414,7 +408,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	cutoffs = do.call(cbind.data.frame, cutoff_list)
 	colnames(cutoffs) = paste("age_category",colnames(cutoffs),sep="_")
 	# sort genes alphabetically (useful for regions input)
-	remaining_genes = remaining_genes[mixedorder(names(remaining_genes))]
+	remaining_genes = remaining_genes[mixedorder(remaining_genes[,1]),]
 	
 	# save in package environment: dataframes for test and background-gene expression, test, dataset	
 	# (to be returned with get_expression(structure_ids))	

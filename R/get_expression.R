@@ -32,7 +32,7 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
 		dataset=aba_env$remember$test[2]
 		# delete background genes if not wanted
 		if(aba_env$remember$test[1]=="hyper" & !background){
-			expr=expr[expr$gene_id %in% names(genes[genes==1]),]
+			expr=expr[expr$gene_id %in% genes[genes[,2]==1, 1] ,]
 		}
 	# B) take user defined genes and dataset and load 'raw' pre_input_data
 	} else {
@@ -73,16 +73,15 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
 		# cluster background and test genes / sort wilcox-scores (no sense for hyper test-genes-only)
 		if(!(aba_env$remember$test[1]=="hyper" & !background)){		
 			# exclude duplicates for sorting
-			genes=data.frame(genes,names(genes))
 			genes=unique(genes)		
 			# cant order with genes vector if only contains test-genes and bg is requested
-			if(aba_env$remember$test[1]=="hyper" & sum(genes[,1])==nrow(genes) & background){
-				expr_list=lapply(expr_list,function(x) { return(cbind(x[,colnames(x) %in% genes[,2]], x[,!(colnames(x) %in% genes[,2])]))})
+			if(aba_env$remember$test[1]=="hyper" & sum(genes[,2])==nrow(genes) & background){
+				expr_list=lapply(expr_list,function(x) { return(cbind(x[,colnames(x) %in% genes[,1]], x[,!(colnames(x) %in% genes[,1])]))})
 			} else {
 				# order with genes vector
-				genes=genes[genes[,2] %in% colnames(expr_list[[1]]),]
-				genes=genes[order(genes[,1],genes[,2]),]
-				expr_list=lapply(expr_list,function(x) return(x[,match(genes[,2],colnames(x)),drop=FALSE]))
+				genes=genes[genes[,1] %in% colnames(expr_list[[1]]),]
+				genes=genes[order(genes[,2],genes[,1]),]
+				expr_list=lapply(expr_list,function(x) return(x[,match(genes[,1],colnames(x)),drop=FALSE]))
 			}	
 		}
 	# B) user-defined genes and dataset	(sort according to order in which requested)
