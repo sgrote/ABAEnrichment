@@ -1,86 +1,37 @@
-CHANGES IN VERSION 1.7.2
+CHANGES IN VERSION 1.8.0
 ------------------------
+
+NEW FEATURES
+	  
+	o two new statistical tests are available
+	  (in addition to hypergeometric and Wilcoxon rank-sum test):
+	  1) binomial test when genes are associated with two counts
+	     (e.g. number of amino-acid changes in two species 
+	     since a common ancestor);
+	  2) 2x2 contingency table test when genes are associated with
+		 with four counts (e.g. number of non-synonymous or synonymous 
+		 variants that are fixed between or variable within species.)
+	o new 'silent' option represses all output to the screen
+	  except for warnings and error messages
+
+
+USER-LEVEL CHANGES
+
+	o default 'genes' input is now a dataframe with 
+	  gene-identifiers in column 1 and gene-associated variables,
+	  like scores or counts in the other columns
+	  (the old vector-input will still work
+	  for hypergeometric and Wilcxon rank-sum test)
+	o sort aba_enrich(...)[[1]] output also on structure-ID
+	  (after sorting on age category and FWER)
+	o sort genes in 'get_annotated_genes' output (mixedsort)
+
 
 IMPROVEMENTS
 	  
 	o performance improvements for aba_enrich and
 	  get_annotated_genes
-
-
-CHANGES IN VERSION 1.7.1
-------------------------
-
-NEW FEATURES
-
-	o new 'silent' option represses all output to the screen
-	  except for warnings and error messages
-
-IMPROVEMENTS
-	  
 	o modified generation of temporary files allows 
 	  parallel processing with mclapply
-	  
-USER-LEVEL CHANGES
-
-	o sort aba_enrich(...)[[1]] output also on structure-ID
-	  (after sorting on age category and FWER)
-	o sort genes in 'get_annotated_genes' output (mixedsort)
-	
-
-CHANGES IN VERSION 1.5.10
-------------------------
-
-NEW FEATURES
-
-	o added hg20 as reference genome for gene coordinates
-	  (used for genomic-regions-input and gene_len=TRUE)
-	  Previously only hg19 was available, which is still
-	  the default
 
 
-USER-LEVEL CHANGES
-
-	o hgnc-symbols for gene coordinates are replaced by 
-	  gene symbols which are available for a higher
-	  number of genes (in most cases they are identical)
-
-
-
-CHANGES IN VERSION 1.5.9
-------------------------
-
-NEW FEATURES
-
-	o New function get_annotated_genes returns genes annotated 
-	  to enriched or user-defined brain regions
-	  
-	o New function get_id returns the ID of a brain region 
-	  given its name
-
-
-USER-LEVEL CHANGES
-
-	o results from aba_enrich get sorted on 
-	  times_FWER_under_0.05 followed by min_FWER and mean_FWER
-	  (order of min and mean switched)
-	 
-	o genes in aba_enrich(...)[[2]] are sorted alphabetically
-
-	o when genomic regions are provided as input, candidate
-	  regions are implicitly also part of the background
-	  for the randomsets
-	  (like it is for single-genes-input)
-
-
-
-CHANGES IN VERSION 1.5.8
-------------------------
-
-IMPROVEMENTS
-
-	o Use dynamic tolerance for FWER calculation
-
-	o Added more tests and checks
-
-	o Improved checking of arguments when genomic regions are
-	  provided as input
