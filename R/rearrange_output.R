@@ -8,9 +8,9 @@
 rearrange_output=function(summary,cluster,term){
 
 	# add region name
-	summary$node_name=term[match(summary$node_id,term$acc),"name"]
+	summary$node_name=term[match(summary[,4],term$acc),"name"]
 	# add category 
-	summary$cate=cluster[match(summary$node_id, cluster$samples),"lables"]
+	summary$cate=cluster[match(summary[,4], cluster$samples),"lables"]
 	# confirm that inside clusters FWERs are the same
 	# xx=aggregate(summary[,8],by=list(summary$cate,summary$age_category,summary$cutoff_quantile), function(x) length(unique(x)))
 	# if(!all(xx$x==1)) stop("Brain regions grouped have different FWERs.")
@@ -39,10 +39,10 @@ rearrange_output=function(summary,cluster,term){
 	# TODO: p-vals can be quite long to be pasted in one column, maybe use signif(x, digits = 3) rounding to significant decimal places
 
 	## add flagship name
-	cluster$region=summary[match(cluster$flagship,summary$node_id),"node_name"]
+	cluster$region=summary[match(cluster$flagship,summary[,4]),"node_name"]
 	
 	# collapse structure_names for categories
-	#cluster$name=summary[match(cluster$samples,summary$node_id),"node_name"]
+	#cluster$name=summary[match(cluster$samples,summary[,4]),"node_name"]
 		
 	names_string=aggregate(1:nrow(cluster),by=list(cate=cluster$lables),function(x) paste(cluster[x,"samples"][order(cluster[x,"samples"],decreasing=TRUE)],collapse=";"))
 	

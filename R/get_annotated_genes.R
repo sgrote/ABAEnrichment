@@ -170,12 +170,11 @@ get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, struc
 	out = out[mixedorder(out$anno_gene),] # NEW: mixedorder genes instead of normal order
 	## given res as input:
 	if(!(missing(res))){
-		# add candiate-T/F or score
-		out$score = genes[match(as.character(out$anno_gene), genes[,1]), 2]
-		# replace NA with 0 for background genes (needed when not in input)		
-		out$score[is.na(out$score)] = 0
-		out = out[,c(1:3,5,4,6)]
-		out = out[order(out$FWER, out$age_category, out$cutoff, out$structure_id, out$score),]
+		# add gene-associated variables
+		out = data.frame(out, genes[match(as.character(out$anno_gene), genes[,1]), 2:ncol(genes)])
+		# replace NA with 0 for background genes (needed for hyper and default background)		
+		out[is.na(out[,6]), 6] = 0
+		out = out[order(out$FWER, out$age_category, out$cutoff, out$structure_id, out[,6]),]
 	} else {
 		out = out[order(out$cutoff, out$age_category, out$structure_id),]
 		if(!allen){
