@@ -14,7 +14,7 @@ get_expression(structure_ids, gene_ids = NA, dataset = NA, background = FALSE)
 vector of brain structure IDs, e.g. 'Allen:10208'.
 }
   \item{gene_ids}{
-vector of gene identifiers, either Entrez-ID, Ensembl-ID or HGNC-symbol. If not defined, genes from previous enrichment analysis with \code{\link{aba_enrich}} are used.
+vector of gene identifiers, either Entrez-ID, Ensembl-ID or gene-symbol. If not defined, genes from previous enrichment analysis with \code{\link{aba_enrich}} are used.
 }
   \item{dataset}{
 'adult' for the microarray dataset of adult human brains; '5_stages' for RNA-seq expression data of the developing human brain, grouped into 5 developmental stages;
@@ -50,8 +50,8 @@ Steffi Grote
 
 
 \seealso{
-\code{vignette("ABAEnrichment",package="ABAEnrichment")}\cr
-\code{vignette("ABAData",package="ABAData")}\cr
+\code{browseVignettes("ABAEnrichment")}\cr
+\code{browseVignettes("ABAData")}\cr
 \code{\link{plot_expression}}\cr
 \code{\link{aba_enrich}}\cr
 \code{\link{get_name}}\cr

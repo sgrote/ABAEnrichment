@@ -33,8 +33,8 @@ Steffi Grote
 
 
 \seealso{
-\code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
-\code{vignette("ABAData",package="ABAData")}\cr
+\code{browseVignettes("ABAEnrichment")}\cr
+\code{browseVignettes("ABAData")}\cr
 \code{\link{aba_enrich}}\cr
 \code{\link{get_name}}\cr
 \code{\link{get_superstructures}}\cr

@@ -17,7 +17,7 @@ Date: \tab 2017-06-25\cr
 License: \tab GPL (>= 2)\cr
 }
 
-For details see \code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
+For details see \code{browseVignettes("ABAEnrichment")}\cr
 
 }
 
@@ -38,8 +38,8 @@ sets and ontological annotations, BMC Bioinformatics 8: 41. \doi{10.1186/1471-21
 \keyword{ package }
 \keyword{ htest }
 \seealso{
-\code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
-\code{vignette("ABAData", package="ABAData")}\cr
+\code{browseVignettes("ABAEnrichment")}\cr
+\code{browseVignettes("ABAData")}\cr
 \code{\link{aba_enrich}}\cr
 \code{\link{get_expression}}\cr 
 \code{\link{plot_expression}}\cr

@@ -34,7 +34,7 @@ Steffi Grote
 \code{\link{get_name}}\cr
 \code{\link{get_sampled_substructures}}\cr
 \code{\link{get_superstructures}}\cr
-\code{vignette("ABAData", package="ABAData")}\cr
+\code{browseVignettes("ABAData")}\cr
 
 }
 \examples{

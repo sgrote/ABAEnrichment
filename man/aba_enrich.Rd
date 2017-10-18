@@ -9,7 +9,7 @@ Tests for enrichment of user defined candidate genes in the set of expressed pro
 \usage{
 aba_enrich(genes, dataset = 'adult', test = 'hyper', 
   cutoff_quantiles = seq(0.1, 0.9, 0.1), n_randsets = 1000, 
-  gene_len = FALSE, circ_chrom = FALSE, ref_genome = 'grch37', silent=FALSE)
+  gene_len = FALSE, circ_chrom = FALSE, ref_genome = 'grch37', silent = FALSE)
 }
 \arguments{
   \item{genes}{
@@ -21,7 +21,7 @@ For \code{test='hyper'} the names of the vector can also describe chromosomal re
 }
   \item{dataset}{
 'adult' for the microarray dataset of adult human brains; '5_stages' for RNA-seq expression data for different stages of the developing human brain, grouped into 5 developmental stages;
-'dev_effect' for a developmental effect score. For details see \code{vignette("ABAData", package="ABAData")}.
+'dev_effect' for a developmental effect score. For details see \code{browseVignettes("ABAData")}.
 }
   \item{test}{
 'hyper' (default) for the hypergeometric test or 'wilcoxon' for the Wilcoxon rank test.
@@ -47,7 +47,7 @@ logical. If TRUE all output to the screen except for warnings and errors is supp
 
 }
 \details{
-For details please refer to \code{vignette("ABAEnrichment", package="ABAEnrichment")}.
+For details please refer to \code{browseVignettes("ABAEnrichment")}.
 }
 \value{
 A list with components
@@ -74,8 +74,8 @@ Steffi Grote
 }
 
 \seealso{
-\code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
-\code{vignette("ABAData", package="ABAData")}\cr
+\code{browseVignettes("ABAEnrichment")}\cr
+\code{browseVignettes("ABAData")}\cr
 \code{\link{get_expression}}\cr
 \code{\link{plot_expression}}\cr
 \code{\link{get_name}}\cr

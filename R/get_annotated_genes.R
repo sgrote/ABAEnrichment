@@ -172,8 +172,12 @@ get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, struc
 	if(!(missing(res))){
 		# add gene-associated variables
 		out = data.frame(out, genes[match(as.character(out$anno_gene), genes[,1]), 2:ncol(genes)])
-		# replace NA with 0 for background genes (needed for hyper and default background)		
-		out[is.na(out[,6]), 6] = 0
+		if(ncol(out) == 6){ # hyper or wilcox
+			# fix colname (lost through subset to one column)
+			colnames(out)[6] = "score"
+			# replace NA with 0 for background genes (needed for hyper and default background)
+			out[is.na(out[,6]), 6] = 0
+		}
 		out = out[order(out$FWER, out$age_category, out$cutoff, out$structure_id, out[,6]),]
 	} else {
 		out = out[order(out$cutoff, out$age_category, out$structure_id),]

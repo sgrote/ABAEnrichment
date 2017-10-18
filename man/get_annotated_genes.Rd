@@ -34,7 +34,7 @@ vector of numeric values between 0 and 1. They define the expression quantiles (
 Only used when \code{res} is not defined.
 }
   \item{genes}{
-optional vector of gene identifiers, either Entrez-ID, Ensembl-ID or HGNC-symbol. If defined, only annotations of those genes are returned. If not defined, all expressed genes from Allen Brain Atlas are returned. Only used when \code{res} is not defined.
+optional vector of gene identifiers, either Entrez-ID, Ensembl-ID or gene-symbol. If defined, only annotations of those genes are returned. If not defined, all expressed genes from Allen Brain Atlas are returned. Only used when \code{res} is not defined.
 }
 }
 
@@ -63,8 +63,8 @@ Steffi Grote
 
 
 \seealso{
-\code{vignette("ABAEnrichment", package="ABAEnrichment")}\cr
-\code{vignette("ABAData", package="ABAData")}\cr
+\code{browseVignettes("ABAEnrichment")}\cr
+\code{browseVignettes("ABAData")}\cr
 \code{\link{aba_enrich}}\cr
 \code{\link{get_name}}\cr
 \code{\link{get_id}}\cr

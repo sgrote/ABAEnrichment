@@ -395,19 +395,6 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	#####. 4 rearrange output
 	if (!silent) message("Creating output...")
 	
-	print(head(out))
-	
-#	if (test == "hyper"){
-#		colnames(out)[4:8] = c("node_id","raw_p_underrep","raw_p_overrep","FWER_underrep","FWER_overrep")
-#	} else if (test  == "wilcoxon"){
-#		colnames(out)[4:8] = c("node_id","raw_p_low_rank","raw_p_high_rank","FWER_low_rank","FWER_high_rank")
-#	} else if (test == "binomial"){
-#        colnames(out)[4:8]=c("node_id","raw_p_high_B","raw_p_high_A","FWER_high_B","FWER_high_A")
-#    } else if (test == "contingency"){
-#        colnames(out)[4:8]=c("node_id","raw_p_high_CD","raw_p_high_AB","FWER_high_CD","FWER_high_AB")
-#    }
-#    colnames(out)[4] = "node_id"
-	
 	# remove redundant rows (nodes with no data and only one child)
 	cluster = get(paste("node_clusters",folder_ext,sep="_"))
 	results = rearrange_output(out,cluster,term)
@@ -416,6 +403,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 	colnames(cutoffs) = paste("age_category",colnames(cutoffs),sep="_")
 	# sort genes alphabetically (useful for regions input)
 	gene_values = gene_values[mixedorder(gene_values[,1]),]
+	rownames(gene_values) = 1:nrow(gene_values)
 	
 	# save in package environment: dataframes for test and background-gene expression, test, dataset	
 	# (to be returned with get_expression(structure_ids))	
