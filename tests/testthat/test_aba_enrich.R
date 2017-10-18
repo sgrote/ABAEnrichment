@@ -2,6 +2,9 @@
 # context("main function aba_enrich")
 #aba_enrich=function(genes,dataset="adult",test="hyper",cutoff_quantiles=seq(0.1,0.9,0.1),n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE, ref_genome="grch37")
 
+## TODO:
+	## maybe check that some brain regions are in the top-ten (actual FWER migth be different)
+	## check for messages and hyper has a) no candidate and b) no background at a given threshold
 
 ## genes input
 ##############
@@ -42,6 +45,39 @@ test_that("genes that are not in data are not returned in the genes object",{
     expect_that(nrow(res3$genes), equals(6))
 })
 
+# binomial test
+set.seed(123)
+high_genes= c("RFFL", "NTS", "LIPE", "GALNT6", "GSN", "BTBD16", "SOX8", "CERS2")
+low_genes= c("GDA", "ENC1", "FOXG1", "EGR4", "NPTX1", "VIPR1", "DOC2A", "OASL", "FRY", "NAV3")
+count_A = c(sample(20:30, length(high_genes)), sample(5:15, length(low_genes)))
+count_B = c(sample(5:15, length(high_genes)), sample(20:30, length(low_genes)))
+genes = data.frame(gene=c(high_genes, low_genes), count_A, count_B)
+binom = aba_enrich(genes, n_randsets=5, cutoff_quantiles=c(0.2,0.9), test='binomial', silent=TRUE)
+
+test_that("binomial also works",{
+	expect_that(class(binom), equals("list"))
+	expect_that(length(binom), equals(3))
+	expect_that(colnames(binom$genes), equals(c("gene", "count_A", "count_B")))
+	expect_that(nrow(binom$cutoffs), equals(2))
+})
+
+# contingency test
+set.seed(123)
+high_substi_genes = c("RFFL", "NTS", "LIPE", "GALNT6", "GSN", "BTBD16", "SOX8", "CERS2")
+low_substi_genes = c("GDA", "ENC1", "FOXG1", "EGR4", "NPTX1", "VIPR1", "DOC2A", "OASL", "FRY", "NAV3")
+subs_syn = sample(45:55, length(c(high_substi_genes, low_substi_genes)), replace=T)
+subs_non_syn = c(sample(15:25, length(high_substi_genes), replace=T), sample(0:10, length(low_substi_genes)))
+vari_syn = sample(25:35, length(c(high_substi_genes, low_substi_genes)), replace=T)
+vari_non_syn = c(sample(0:10, length(high_substi_genes), replace=T), sample(10:20, length(low_substi_genes)))
+genes = data.frame(genes=c(high_substi_genes, low_substi_genes), vari_syn, vari_non_syn, subs_syn, subs_non_syn)
+conti = aba_enrich(genes, test='contingency', n_randset=5, cutoff_quantiles=c(0.7,0.8,0.9), silent=TRUE)
+
+test_that("contingency also works",{
+	expect_that(class(conti), equals("list"))
+	expect_that(length(conti), equals(3))
+	expect_that(colnames(conti$genes), equals(c("genes", "vari_syn","vari_non_syn","subs_syn","subs_non_syn")))
+	expect_that(nrow(conti$cutoffs), equals(3))
+})
 
 # test warnings and more on handling of no coords and data
 
@@ -59,6 +95,8 @@ test_that("One candidate or background gene without expression data stops.",{
     expect_that(aba_enrich(genes[8:length(genes)],cutoff_quantiles=c(0.7,0.8),n_randsets=5), throws_error("No requested test genes in data."))    
     expect_that(aba_enrich(genes[c(1:8,length(genes))],cutoff_quantiles=c(0.7,0.8),n_randsets=5), throws_error("No requested background genes in data."))    
 })
+
+## TODO: here check warning error for certain cutoff (a: first cutoff fails, no candidate; b: another cutoff fails, background)
 
 # "LINC00239", "MIRLET7BHG" -> no coordinates
 test_that("Warning about test and background genes with no coordinates.",{
@@ -83,7 +121,7 @@ test_that("genes that are not in data or coordinates are not returned in the gen
 
 })
 
-# NEW: grch38
+# grch38
 set.seed(123)
 res4b = aba_enrich(genes,n_randsets=5,gene_len=TRUE,ref_genome="grch38",silent=TRUE)
 test_that("genes that are not in data or coordinates are not returned in the genes object",{
@@ -96,7 +134,7 @@ test_that("genes that are not in data or coordinates are not returned in the gen
 	expect_that("MIRLET7BHG" %in% res4b$genes[,1], is_true())# not in hg19
 })
 
-## NEW test unused arguments
+## test unused arguments
 test_that("Warning about unused arguments.",{
     expect_that(aba_enrich(genes,test="wilcoxon",cutoff_quantiles=c(0.7,0.8),n_randsets=5,gene_len=TRUE), throws_error("Argument 'gene_len = TRUE' can only be used with 'test = 'hyper''."))    
     expect_that(aba_enrich(genes,cutoff_quantiles=c(0.7,0.8),n_randsets=5,ref_genome="grch38",silent=TRUE), gives_warning("Unused argument: 'ref_genome = grch38'."))    

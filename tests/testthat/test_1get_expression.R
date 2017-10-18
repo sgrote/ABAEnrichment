@@ -1,6 +1,9 @@
 
 # context("get expression")
 
+## TODO: check actual values
+## TODO: check get_expression after aba_enrich? (no actual values due to random-numbers)
+
 test_that("normal input results in dataframe (adult, dev_effect) or list( 5_stages)",{
 #	expect_that(dim(get_expression(structure_ids=c('Allen:4010'),gene_ids=c(324,8312,673,1029,64764,1499),dataset='adult')), equals(c(8,6)))
 	expect_that(dim(get_expression(structure_ids=c('Allen:13322'),gene_ids=c('ENSG00000168036', 'ENSG00000157764', 'ENSG00000163041'),dataset='dev_effect')),equals(c(2,3)))
