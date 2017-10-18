@@ -13,18 +13,20 @@ aba_enrich(genes, dataset = 'adult', test = 'hyper',
 }
 \arguments{
   \item{genes}{
-If \code{test='wilcoxon'} a numeric vector of scores.
-If \code{test='hyper'} (default) a binary vector with 1 for candidate genes and 0 for background
-genes. If no background genes are defined, all remaining protein-coding genes are used as background.
-The names of the vector are the gene identifiers: either Entrez-ID, Ensembl-ID or gene-symbol. 
-For \code{test='hyper'} the names of the vector can also describe chromosomal regions ('chr:start-stop').
+A dataframe with gene-identifiers (Entrez-ID, Ensembl-ID or gene-symbol) in the first column and test-dependent additional columns:\cr
+If \code{test='hyper'} (default) a second column with 1 for candidate genes and 0 for background
+genes. If no background genes are defined, all remaining protein coding genes are used as background.\cr
+If \code{test='wilcoxon'} a second column with the score that is associated with each gene.\cr
+If \code{test='binomial'} two additional columns with two gene-associated integers.\cr
+If \code{test='contingency'} four additional columns with four gene-associated integers.\cr
+For \code{test='hyper'} the first column can also describe chromosomal regions ('chr:start-stop', e.g. '9:0-39200000').
 }
   \item{dataset}{
 'adult' for the microarray dataset of adult human brains; '5_stages' for RNA-seq expression data for different stages of the developing human brain, grouped into 5 developmental stages;
 'dev_effect' for a developmental effect score. For details see \code{browseVignettes("ABAData")}.
 }
   \item{test}{
-'hyper' (default) for the hypergeometric test or 'wilcoxon' for the Wilcoxon rank test.
+'hyper' (default) for the hypergeometric test, 'wilcoxon' for the Wilcoxon rank test, 'binomial' for the binomial test and 'contingency' for the 2x2-contingency table test (fisher's exact test or chi-square).
 }
   \item{cutoff_quantiles}{
 the FUNC enrichment analyses will be performed for the sets of expressed genes at given expression quantiles defined in this vector [0,1].
@@ -54,7 +56,7 @@ A list with components
 \item{results}{
 a dataframe with the FWERs from the enrichment analyses per brain region and age category, ordered by 'age_category', 'times_FWER_under_0.05','min_FWER' and 'mean_FWER'; with 'min_FWER' for example denoting the minimum FWER for expression enrichment of the candidate genes in this brain region across all expression cutoffs. 'FWERs' is a semicolon separated string with the single FWERs for all cutoffs. 'equivalent_structures' is a semicolon separated string that lists structures with identical expression data due to lack of independent expression measurements in all regions.}
 \item{genes}{
-a vector of the requested genes, excluding those genes for which no expression data is available and which therefore were not included in the enrichment analysis.}    
+a dataframe of the input genes, excluding those genes for which no expression data is available and which therefore were not included in the enrichment analysis.}    
 \item{cutoffs}{
 a dataframe with the expression values that correspond to the requested cutoff quantiles.}   
 }
@@ -94,15 +96,16 @@ Steffi Grote
 #### Perform an enrichment analysis for the developing brain
 #### with defined background genes
 #### and with random sets dependent on gene length
-genes = rep(c(1,0),each=7)
-names(genes) = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
+gene_ids = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
   'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
+is_candidate = rep(c(1,0),each=7)
+genes = data.frame(gene_ids, is_candidate)
 res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.5,0.9), 
   n_randsets=100, gene_len=TRUE)
 ## see results for the brain regions with highest enrichment for children (age_category 3)
 fwers = res[[1]]
 head(fwers[fwers$age_category==3,])
-## see the input genes vector (only genes with expression data available) 
+## see the input genes dataframe (only genes with expression data available) 
 res[2]
 ## see the expression values that correspond to the requested cutoff quantiles
 res[3]

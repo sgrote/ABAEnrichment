@@ -77,9 +77,10 @@ Steffi Grote
 ## perform an enrichment analysis for expression of 7 candidate and 7 background genes
 ## and get candidate genes annotated to brain regions that have a FWER < 0.05
 set.seed(123)
-genes = rep(c(1,0), each=7)
-names(genes) = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
+gene_ids = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
   'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
+is_candidate = rep(c(1,0), each=7)
+genes = data.frame(gene_ids, is_candidate)
 res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.3,0.5,0.7,0.9), n_randset=100)
 anno = get_annotated_genes(res, fwer_threshold=0.05)
 head(anno)
@@ -88,6 +89,6 @@ head(anno)
 ## the 50% and 70% expression-cutoff, respectively,
 ## in the Cerebellar Cortex of the developing human brain (Allen:10657)
 get_annotated_genes(structure_ids="Allen:10657", dataset="5_stages",
-  cutoff_quantiles=c(0.5,0.7), genes=names(genes))
+  cutoff_quantiles=c(0.5,0.7), genes=gene_ids)
 }
 
