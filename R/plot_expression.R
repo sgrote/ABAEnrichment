@@ -17,7 +17,7 @@ plot_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALS
 		genes=aba_env$remember$genes
 	} else {
 		dataset_type=dataset
-		test=""
+		test=NULL
 	}	
 	
 	# check that at least 2 genes are requested (one structure is ok, it may have several sampled substructures)
@@ -63,17 +63,23 @@ plot_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALS
 	if (dendro==TRUE){
 		gplots::heatmap.2(expr,scale="none",col=colramp,margins=c(13.5,15), main=paste(test,dataset_type,main_append,sep=" "),density.info="none",trace="none",keysize=1.2,cexRow=cexRow,cexCol=cexCol)
 	} else {			
-		# define colors of sidebar (test/background, wilcox-scores or none (if no test performed))
-		if(test=="hyper"){
+		## define colors of sidebar
+		if (is.null(test)){
+			sidebar=rep("white",ncol(expr)) # none for no enrichment-test input
+		} else if (test=="hyper"){
 			coly=c("black","red")
 			sidebar=coly[genes[match(colnames(expr),genes[,1]), 2] + 1]
-		} else if (test=="wilcoxon"){
+		} else { # binom, conti, wilcox
+			# for wilcox plot scores, for the others combined value
+			if (test == "binomial"){ # A/(A+B) for binomial
+				genes[,2] = genes[,2] / (genes[,2] + genes[,3])
+			} else if (test == "contingency"){ # (A/B)/(C/D) for binomial, (add 1 to prevent division by 0)
+				genes[,2] = (genes[,2]+1 / genes[,3]+1) / (genes[,4]+1 / genes[,5]+1)
+			}
 			coly=rev(rainbow(50,start=0,end=0.5))
 			genes[,2]=genes[,2]-min(genes[,2])
 			genes[,2]=round(genes[,2]/ max(genes[,2]) * 49)	
 			sidebar=coly[genes[match(colnames(expr),genes[,1]), 2] + 1]	
-		} else { 
-			sidebar=rep("white",ncol(expr))
 		}
 		gplots::heatmap.2(expr,scale="none",col=colramp,margins=c(13.5,15),Colv=NA,Rowv=NA,dendrogram="none",ColSideColors=sidebar, main=paste(test,dataset_type,main_append,sep=" "),density.info="none",trace="none",keysize=1.2,cexRow=cexRow,cexCol=cexCol)
 	}

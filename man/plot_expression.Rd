@@ -25,7 +25,9 @@ vector of gene identifiers, either Entrez-ID, Ensembl-ID or gene-symbol. If not 
 logical indicating whether expression from background genes should be included. Only used when \code{gene_ids} and \code{dataset} are \code{NA} so that genes from the last enrichment analysis with \code{\link{aba_enrich}} are used and when this analysis was performed using the hypergeometric test.  
 }
   \item{dendro}{
-logical indicating whether rows and columns should be rearranged with a dendrodram based on row/column means (using \code{\link{hclust}}). If \code{FALSE} and if \code{gene_ids} and \code{dataset} are \code{NA} so that genes from the last enrichment analysis with \code{\link{aba_enrich}} are used, the genes are arranged according to the last \code{\link{aba_enrich}} execution: for a hypergeometric test the genes are grouped into candidate and background genes (indicated by a coloured side-bar with red and black, respectively) and for a Wilcoxon rank test the genes are ordered by the scores which they were given for the Wilcoxon rank test, which are also indicated by a side-bar.
+logical indicating whether rows and columns should be rearranged with a dendrodram based on row/column means (using \code{\link{hclust}}). If \code{FALSE} and if \code{gene_ids} and \code{dataset} are \code{NA} so that genes from the last enrichment analysis with \code{\link{aba_enrich}} are used, a side bar indicates the gene-associated variables from the enrichment analysis:
+for a hypergeometric test the genes are grouped into candidate (red) and background genes (black);
+for the Wilcoxon rank-sum test, the side bar indicates the user-defined scores; for the binomial test the side bar shows *A/(A+B)* and for the 2x2 contingency table test *((A+1)/(B+1)) / ((C+1)/(D+1))* (+1 added to prevent division by 0, this is just a visual indication of the proportion of the ratios and not the real odds ratio from the 2x2 contingency table test)
 }
   \item{age_category}{
 an integer between 1 and 5 indicating the age category if \code{dataset='5_stages'}.
@@ -43,7 +45,7 @@ Invisibly, a list with components
 \item{breaks}{values used for color break points}
 \item{col}{colors used}
 \item{colorTable}{A three-column data frame providing the lower and upper bound and color for each bin}
-	
+
 
 
 }

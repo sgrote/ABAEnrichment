@@ -4,7 +4,7 @@
 
 # remember$rge: expression data in long format
 # remember$test: the test and dataset used 
-# remember$genes
+# remember$genes: input genes and associated variables (2-5 columns in total)
 
 # change from long to wide format
 to_wide=function(suby){
@@ -29,9 +29,10 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
 		}
 		expr=aba_env$remember$rge
 		genes=aba_env$remember$genes
+		test=aba_env$remember$test[1]
 		dataset=aba_env$remember$test[2]
 		# delete background genes if not wanted
-		if(aba_env$remember$test[1]=="hyper" & !background){
+		if(test=="hyper" & !background){
 			expr=expr[expr$gene_id %in% genes[genes[,2]==1, 1] ,]
 		}
 	# B) take user defined genes and dataset and load 'raw' pre_input_data
@@ -69,19 +70,27 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
 	
 	# SORT GENES
 	# A) data from aba_enrich()
-	if(!(new_data)){
-		# cluster background and test genes / sort wilcox-scores (no sense for hyper test-genes-only)
-		if(!(aba_env$remember$test[1]=="hyper" & !background)){		
+	if (!(new_data)){
+		# cluster background and test genes (hyper) / sort scores (wilcox) or combined scores (binom+conti)
+		if (!(test == "hyper" & !background)){	# (no sense for hyper test-genes-only)
 			# exclude duplicates for sorting
-			genes=unique(genes)		
+			genes=unique(genes)
+			# combine score for binomial and conti
+			if (test == "binomial"){ # A/B for binomial
+				genes[,2] = genes[,2] / genes[,3]
+			} else if (test == "contingency"){ # (A/B)/(C/D) for binomial (add 1 to prevent division by 0)
+				genes[,2] = (genes[,2]+1 / genes[,3]+1) / (genes[,4]+1 / genes[,5]+1)
+			}
 			# cant order with genes vector if only contains test-genes and bg is requested
-			if(aba_env$remember$test[1]=="hyper" & sum(genes[,2])==nrow(genes) & background){
-				expr_list=lapply(expr_list,function(x) { return(cbind(x[,colnames(x) %in% genes[,1]], x[,!(colnames(x) %in% genes[,1])]))})
+			if (test=="hyper" & sum(genes[,2])==nrow(genes) & background){
+				expr_list=lapply(expr_list, function(x){
+					return(cbind(x[,colnames(x) %in% genes[,1]], x[,!(colnames(x) %in% genes[,1])]))})
 			} else {
 				# order with genes vector
 				genes=genes[genes[,1] %in% colnames(expr_list[[1]]),]
 				genes=genes[order(genes[,2],genes[,1]),]
-				expr_list=lapply(expr_list,function(x) return(x[,match(genes[,1],colnames(x)),drop=FALSE]))
+				expr_list=lapply(expr_list,function(x){
+					return(x[,match(genes[,1],colnames(x)),drop=FALSE])})
 			}	
 		}
 	# B) user-defined genes and dataset	(sort according to order in which requested)
