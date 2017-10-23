@@ -1,4 +1,17 @@
 
+---
+title: "ABAEnrichment: Gene Expression Enrichment in Human Brain Regions"
+author: "Steffi Grote"
+date: "October 23, 2017"
+output:
+    BiocStyle::html_document:
+    toc: true
+vignette: >
+    %\VignetteIndexEntry{Introduction to ABAEnrichment}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
 ```{r style, echo = FALSE, results = 'asis'}
 BiocStyle::markdown()
 ```
@@ -8,25 +21,13 @@ options(width=110)
 set.seed(123)
 ```
 
-<!--
-%\VignetteIndexEntry{ABAEnrichment: gene expression enrichment in human brain regions}
-%\VignetteEngine{knitr::knitr}
--->
-
-# ABAEnrichment: Gene Expression Enrichment in Human Brain Regions
-
-Package: ABAEnrichment  
-Author: Steffi Grote  
-Date: October 18, 2017  
-
-
-## Overview
+# Overview
 `r Biocpkg('ABAEnrichment')` is designed to test user-defined genes for expression enrichment in different human brain regions.
 The package integrates the expression of the input gene set and the structural information of the brain using an ontology, both provided by the Allen Brain Atlas project [1-4].
 The statistical analysis is performed by the core function `aba_enrich` which interfaces with the ontology enrichment software FUNC [5].
 Additional functions provided in this package are `get_expression`, `plot_expression`, `get_name`, `get_id`, `get_sampled_substructures`, `get_superstructures` and `get_annotated_genes` supporting the exploration and visualization of the expression data.
 
-#### Expression data
+## Expression data
 The package incorporates three different brain expression datasets:
 
 1. microarray data from six adult individuals
@@ -37,13 +38,13 @@ All three datasets are filtered for protein-coding genes and gene expression is 
 Although the third dataset does not contain expression data, but a derived score, for simplicity we only refer to 'expression' in this documentation.
 For details on the datasets see the `r Biocexptpkg('ABAData')` vignette.
 
-#### Annotation of genes to brain regions
+## Annotation of genes to brain regions
 Using the ontology that describes the hierarchical organization of the brain, brain regions get annotated all genes that are expressed in the brain region itself or in any of its substructures.
 The boundary between 'expressed' and 'not expressed' is defined by different expression quantiles (e.g. using a quantile of 0.4, the lowest 40% of gene expression in the brain are considered 'not expressed' and the upper 60% are considered 'expressed').
 These cutoffs are set with the parameter `cutoff_quantiles` and an analysis is run for every cutoff separately.
 The default cutoffs are 10% to 90% in steps of 10%.
 
-#### Enrichment analysis
+## Enrichment analysis
 The enrichment analysis is performed by using either the hypergeometric test, the Wilcoxon rank-sum test, the binomial test or the 2x2 contingency table test implemented in the ontology enrichment software FUNC [5].
 The **hypergeometric test** evaluates the enrichment of annotated (expressed) candidate genes compared to annotated background genes for each brain region.
 The background genes can be defined explicitly like the candidate genes or, by default, consist of all protein-coding genes from the dataset that are not contained in the set of candidate genes.
@@ -62,10 +63,10 @@ Furthermore, instead of defining genes explicitly, whole genomic regions can be 
 The randomsets then also consist of randomly chosen candidate regions inside the background regions, either as a whole block in one background region (default), or on the same chromosome allowing to overlap multiple background regions on that chromosome (option `circ_chrom`, see [Schematic 2](#block_scheme) below).
 
 
-#### Functions included in ABAEnrichment:
+## Functions included in ABAEnrichment:
 
 function | description
--------- | ----------
+----------- | ------------------------------------------------------------------------
 [aba_enrich](#aba_enrich) | core function for performing enrichment analyses given a candidate gene set
 [get_expression](#get_expression) | returns expression data for a given set of genes and brain regions
 [plot_expression](#plot_expression) | plots a heatmap with expression data for a given set of genes and brain regions
@@ -78,9 +79,11 @@ function | description
 
 
 
-## Examples   
+# Examples   
 
-### <a name='aba_enrich'></a>Test gene expression enrichment using the hypergeometric test
+<a name='aba_enrich'></a>
+
+## Test gene expression enrichment using the hypergeometric test
 For a random set of 13 candidate genes, two analyses to identify human brain regions with enriched expression of the candidate genes are performed: one using data from adult donors (from *Allen Human Brain Atlas* [3]) and one using data from five developmental stages (from *BrainSpan Atlas of the Developing Human Brain* [4]).
 The hypergeometric test evaluates the over-representation of a set of expressed candidate genes in brain regions, compared to a set of expressed background genes (see [Schematic 1](#hyper_scheme) below).
 The input for the hypergeometric test is a dataframe with two columns: (1) a column with gene identifiers (*Entrez-ID*, *Ensembl-ID* or *gene-symbol*) and (2) a binary column with `1` for a candidate gene and `0` for a background gene.
@@ -138,7 +141,7 @@ res_devel[2:3]
 ```
 For example, in the enrichment analysis of age category 2 (infant) with an expression cutoff of 0.7 (70%), genes are considered 'expressed' in a particular brain region when their expression value in that region is at least 7.017616.
 
-#### Choose random candidate regions dependent on gene length
+### Choose random candidate regions dependent on gene length
 The default behavior of `aba_enrich` is to permute candidate and background genes randomly to compute the FWER.
 With the option `gene_len=TRUE`, random selection of background genes as candidate genes is dependent on the gene length, i.e. a gene twice as long as another gene also is twice as likely selected as a candidate gene in a randomset.
 This is useful when the procedure that led to the identification of the candidate gene set is also more likely to discover longer genes.
@@ -153,7 +156,7 @@ res_len_grch38 = aba_enrich(input_hyper, gene_len=TRUE, ref_genome='grch38')
 ```
 
 
-### Test gene expression enrichment using the Wilcoxon rank-sum test
+## Test gene expression enrichment using the Wilcoxon rank-sum test
 When the genes are not divided into candidate and background genes, but are ranked by scores, a Wilcoxon rank-sum test can be performed to find brain regions with a high proportion of genes with high scores in the set of expressed genes.
 The second column of the `genes` input dataframe then contains the scores assigned to the genes.
 The output is identical to the one produced with the hypergeometric test.
@@ -173,7 +176,7 @@ head(res_wilcox[[1]])
 ```
 
 
-### NEW: Test for gene expression enrichment using the binomial test
+## NEW: Test for gene expression enrichment using the binomial test
 When genes are associated with two counts *A* and *B*, e.g. amino-acid changes since a common ancestor in two species, a binomial test can be used to identify brain regions with an enrichment of expressed genes with a high fraction *A/(A+B)* compared to the fraction of *A* in the brain in general (the root node). To perform the binomial test the input dataframe needs a column with the gene symbols and two additional columns with the corresponding counts:
 
 ```{r}
@@ -195,7 +198,7 @@ head(res_binom[[1]])
 ```
 
 
-### NEW: Test for gene expression enrichment using the 2x2 contingency table test
+## NEW: Test for gene expression enrichment using the 2x2 contingency table test
 When genes are associated with four counts (*A*-*D*), e.g. non-synonymous or synonymous variants that are fixed between or variable within species, like for a McDonald-Kreitman test [6], the 2x2 contingency table test can be used. It can identify brain regions which have a high ratio of *A/B* compared to *C/D*, which in this example would correspond to a high ratio of *non-synonymous substitutions / synonymous substitutions* compared to *non-synonymous variable / synonymous variable*:
 
 ```{r}
@@ -230,7 +233,7 @@ Note that this is the only test that is not dependent on the distribution of the
 
 
 
-### Test gene expression enrichment for genomic regions
+## Test gene expression enrichment for genomic regions
 Instead of defining candidate and background genes explicitly in the `genes` input dataframe, it is also possible to define entire chromosomal regions as candidate and background regions.
 The expression enrichment is then tested for all protein-coding genes located in, or overlapping the candidate regions on the plus or the minus strand.
 The gene coordinates used to identify those genes were obtained from http://grch37.ensembl.org/biomart/martview/ (*GRCh37.p13*).
@@ -273,9 +276,11 @@ And in contrast to the default `circ_chrom=FALSE`, randomly chosen blocks do not
 This means that a randomly chosen block can start at the end of the last background region and continue at the beginning of the first background region on a given chromosome.
 
 
-### Explore expression data
+## Explore expression data
 
-#### <a name='get_expression'></a>get_expression
+<a name='get_expression'></a>
+
+### get_expression
 
 The function `get_expression` enables the output of gene and brain region-specific expression data averaged across donors.
 By only setting the parameter `structure_ids` that defines the brain regions, the `gene_ids` and `dataset` are automatically set to the genes and dataset used in the last enrichment analysis.
@@ -309,7 +314,9 @@ This is due to the fact that not all brain regions were measured independently.
 In case a brain region was not measured directly, all available expression data from its substructures are returned.
 The function [get_sampled_substructures](#onto) can be used to identify substructures with expression data. 
 
-#### <a name='plot_expression'></a>plot_expression
+<a name='plot_expression'></a>
+
+### plot_expression
 
 The function `plot_expression` enables the visualization of expression data.
 The usage of `plot_expression` is similar to that of `get_expression`.
@@ -346,7 +353,9 @@ plot_expression('Allen:10161', gene_ids=gene_ids, dataset='5_stages', age_catego
 In this example the *frontal neocortex* (Allen:10161) was not sampled directly for expression measurements, but some of its substructures have expression data annotated.
 Instead of pooling the data of the substructures, they are plotted separately.
 
-#### <a name='onto'></a>get_name, get_sampled_substructures and get_superstructures
+<a name='onto'></a>
+
+### get_name, get_sampled_substructures and get_superstructures
 
 As illustrated in the previous example, some brain regions like *frontal neocortex* (Allen:10161) do not have gene expression data available in the data set, but some of their substructures do have.
 Plotting or requesting expression data for such brain regions automatically obtains the data for all its sampled substructures.
@@ -371,8 +380,9 @@ get_name(supers)
 Note that the ontologies and the IDs for brain regions differ between the adult and the developing brain.
 However, the ontology functions `get_name`, `get_sampled_substructures` and `get_superstructures` work with valid brain regions IDs from both ontologies.
 
+<a name='getid'></a>
 
-#### <a name='getid'></a>get_id
+### get_id
 The function `get_id` searches the ontologies of the adult and developing brain for the structure ID that belongs to a given brain region name:
 ```{r}
 ## get structure IDs of brain regions that contain 'accumbens' in their names
@@ -389,7 +399,9 @@ all_regions = get_id('')
 head(all_regions)
 ```
 
-#### <a name='anno'></a>get_annotated_genes
+<a name='anno'></a>
+
+### get_annotated_genes
 Often it is useful to see which genes are annotated to a brain region, i.e. count as 'expressed', given an expression cutoff.
 While this can be accomplished using the expression cutoffs from `aba_enrich(...)[[3]]` and the expression values from `get_expression`, *ABAEnrichment* now also offers the convenient function `get_annotated_genes`.
 This function takes the output from `aba_enrich` and a FWER-threshold (`fwer_threshold`, default=0.05) as input and returns all brain-region/expression-cutoff combinations with a FWER below the FWER-threshold together with the corresponding annotated genes, the FWER and the score (1 for candidate and 0 for background genes or the scores from the Wilcoxon rank-sum test).
@@ -422,7 +434,9 @@ anno2 = get_annotated_genes(structure_ids='Allen:4276', dataset='adult',
 anno2
 ```
 
-### <a name='dev_score'></a>Developmental effect score
+<a name='dev_score'></a>
+
+## Developmental effect score
 In the previous examples genes got annotated to brain regions based on their expression.
 Besides the two gene expression datasets `adult` and `5_stages`, the dataset `dev_effect` can be used, which provides scores for an age effect for genes based on their expression change during development.
 Using this dataset, the same analyses as above are performed, except that a gene is annotated to a brain region when its developmental effect score in that region is a above the `cutoff_quantiles`.  
@@ -450,15 +464,19 @@ plot_expression(top_regions[ ,'structure_id'])
 ```
 
 
-## Schematics
+# Schematics
 
-#### <a name='hyper_scheme'></a>Schematic 1: Hypergeometric test and FWER calculation
+<a name='hyper_scheme'></a>
+
+## Schematic 1: Hypergeometric test and FWER calculation
 
 ![FWER calculation](./Skizze_Fig1.png 'hypergeometric test and FWER')
 
 The FWER for the Wilcoxon rank-sum test is computed in a similar way, with random permutations of the scores that are assigned to genes.
 
-#### <a name='block_scheme'></a>Schematic 2: `circ_chrom` option for genomic regions input
+<a name='block_scheme'></a>
+
+## Schematic 2: `circ_chrom` option for genomic regions input
 
 ![genomic regions](./Skizze_Fig2.png 'options for genomic regions input')
 
@@ -468,12 +486,12 @@ When `circ_chrom=FALSE` (default), candidate regions can be moved to any backgro
 When `circ_chrom=TRUE`, candidate regions are only moved on the same chromosome and are allowed to overlap multiple background regions.
 The chromosome is 'circularized' which means that a randomly placed candidate region may start at the end of the chromosome and continue at the beginning.
 
-## Session Info
+# Session Info
 ```{r}
 sessionInfo()
 ```
 
-## References
+# References
 
 [1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. [doi:10.1038/nature11405]
 
