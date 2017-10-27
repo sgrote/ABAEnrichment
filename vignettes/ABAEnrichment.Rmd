@@ -133,7 +133,8 @@ fwers_3 = fwers_devel[fwers_devel[,1]==3, ]
 head(fwers_3)
 ```
 
-The rows in the output data frame are ordered by `age_category`, `times_FWER_under_0.05`, `min_FWER` and `mean_FWER`; with e.g. `min_FWER` denoting the minimum FWER for enrichment of expressed candidate genes in that brain region across all expression cutoffs.
+The rows in the output data frame are ordered by `age_category`, `n_significant`, `min_FWER` and `mean_FWER`; with e.g. `min_FWER` denoting the minimum FWER for enrichment of expressed candidate genes in that brain region across all expression cutoffs.
+'n_significant' reports the number of cutoffs at which the FWER was below 0.05.
 The column `FWERs` lists the individual FWERs for each cutoff.  
 The column `equivalent_structures` lists brain regions with identical expression data due to lack of independent expression measurements in all regions.
 Nodes (brain regions) in the ontology inherit data from their children (substructures), and in the case of only one child node with expression data, the parent node inherits the child's data leading to identical enrichment statistics.

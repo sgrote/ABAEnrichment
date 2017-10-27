@@ -67,6 +67,7 @@ Steffi Grote
 get_expression(structure_ids=c('Allen:10657','Allen:10208'),
     gene_ids=c('ENSG00000168036','ENSG00000157764','ENSG00000182158',
     'ENSG00000147889'), dataset='5_stages')
+
+## see the package vignette for more examples
 }
 
-## see the package vingnette for more examples

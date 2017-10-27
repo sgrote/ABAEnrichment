@@ -54,7 +54,11 @@ For details please refer to \code{browseVignettes("ABAEnrichment")}.
 \value{
 A list with components
 \item{results}{
-a dataframe with the FWERs from the enrichment analyses per brain region and age category, ordered by 'age_category', 'times_FWER_under_0.05','min_FWER' and 'mean_FWER'; with 'min_FWER' for example denoting the minimum FWER for expression enrichment of the candidate genes in this brain region across all expression cutoffs. 'FWERs' is a semicolon separated string with the single FWERs for all cutoffs. 'equivalent_structures' is a semicolon separated string that lists structures with identical expression data due to lack of independent expression measurements in all regions.}
+a dataframe with the FWERs from the enrichment analyses per brain region and age category, ordered by 'age_category', 'n_significant','min_FWER' and 'mean_FWER'.
+'min_FWER' for example denotes the minimum FWER for expression enrichment of the candidate genes in this brain region across all expression cutoffs.
+'n_significant' reports the number of cutoffs at which the FWER was below 0.05.
+'FWERs' is a semicolon separated string with the single FWERs for all cutoffs.
+'equivalent_structures' is a semicolon separated string that lists structures with identical expression data due to lack of independent expression measurements in all regions.}
 \item{genes}{
 a dataframe of the input genes, excluding those genes for which no expression data is available and which therefore were not included in the enrichment analysis.}    
 \item{cutoffs}{

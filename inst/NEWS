@@ -25,7 +25,7 @@ USER-LEVEL CHANGES
 	o sort aba_enrich(...)[[1]] output also on structure-ID
 	  (after sorting on age category and FWER)
 	o sort genes in 'get_annotated_genes' output (mixedsort)
-
+    o rename aba_enrich() column 'times_FWER_under_0.05' to 'n_significant'
 
 IMPROVEMENTS
 	  

@@ -21,7 +21,7 @@ rearrange_output=function(summary,cluster,term){
 	pure$age_category=as.factor(pure$age_category)
 	pure$cate=as.factor(pure$cate)
 	freqs=as.data.frame(table(pure[pure[,5] < 0.05,c("age_category","cate")]))
-	colnames(freqs)[3]="times_FWER_under_0.05"
+	colnames(freqs)[3]="n_significant"
 	# lowest FWER
 	lowest=aggregate(pure[,5], by=list(age_category=pure$age_category,cate=pure$cate),min)
 	colnames(lowest)[3]="min_FWER"
@@ -59,7 +59,7 @@ rearrange_output=function(summary,cluster,term){
 #	# preorder with mixedorder on structure name first (mixedorder does not take multiple columns)
 #	preout=preout[mixedorder(preout$structure),]
 	# order
-	out=preout[order(preout$age_category, -1*(preout$times_FWER_under_0.05),preout$min_FWER,preout$mean_FWER,preout$structure_id),-1] # NEW; also sort on structure_id (more stable than on name)
+	out=preout[order(preout$age_category, -1*(preout$n_significant),preout$min_FWER,preout$mean_FWER,preout$structure_id),-1] # NEW; also sort on structure_id (more stable than on name)
 	# order rownames 
 	rownames(out)=1:nrow(out)
 	             	
