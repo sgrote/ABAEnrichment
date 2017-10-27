@@ -97,12 +97,13 @@ Steffi Grote
 #### with defined background genes
 #### and with random sets dependent on gene length
 gene_ids = c('PENK', 'COCH', 'PDYN', 'CA12', 'SYNDIG1L', 'MME', 
-  'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
+    'ANO3', 'KCNJ6', 'ELAVL4', 'BEAN1', 'PVALB', 'EPN3', 'PAX2', 'FAB12')
 is_candidate = rep(c(1,0),each=7)
 genes = data.frame(gene_ids, is_candidate)
 res = aba_enrich(genes, dataset='5_stages', cutoff_quantiles=c(0.5,0.9), 
-  n_randsets=100, gene_len=TRUE)
-## see results for the brain regions with highest enrichment for children (age_category 3)
+    n_randsets=100, gene_len=TRUE)
+## see results for the brain regions with highest enrichment
+## for children (age_category 3)
 fwers = res[[1]]
 head(fwers[fwers$age_category==3,])
 ## see the input genes dataframe (only genes with expression data available) 

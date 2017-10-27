@@ -61,9 +61,12 @@ Steffi Grote
 }
 
 \examples{ 
-## get expression data of six genes in two brain regions from developing human brain, 
+## get expression data of six genes in two brain regions 
+## from the developing human brain, 
 ## each of the five list elements corresponds to an age category 
-get_expression(structure_ids=c('Allen:10657','Allen:10208'), gene_ids=c('ENSG00000168036', 
-  'ENSG00000157764','ENSG00000182158','ENSG00000147889'), dataset='5_stages')
+get_expression(structure_ids=c('Allen:10657','Allen:10208'),
+    gene_ids=c('ENSG00000168036','ENSG00000157764','ENSG00000182158',
+    'ENSG00000147889'), dataset='5_stages')
 }
 
+## see the package vingnette for more examples

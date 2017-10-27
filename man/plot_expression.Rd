@@ -76,10 +76,12 @@ Steffi Grote
 }
 
 \examples{
-## plot expression data of six genes in two brain regions from children (age_category 3) 
-## without dendrogram
+## plot expression data of six genes in two brain regions
+## from children (age_category 3) without dendrogram
 plot_expression(structure_ids=c("Allen:10657","Allen:10208"), 
-  gene_ids=c("ENSG00000168036","ENSG00000157764","ENSG00000182158","ENSG00000147889"),
-  dataset="5_stages", dendro=FALSE, age_category=3)
+    gene_ids=c("ENSG00000168036","ENSG00000157764","ENSG00000182158",
+    "ENSG00000147889"), dataset="5_stages", dendro=FALSE, age_category=3)
+
+## see the package vignette for more examples
 }
 

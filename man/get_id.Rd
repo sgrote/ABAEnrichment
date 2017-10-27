@@ -40,9 +40,9 @@ Steffi Grote
 \examples{
 ## get structure IDs of brain regions that contain 'accumbens' in their names
 get_id('accumbens')
-## get structure IDs of brain regions that contain 'telencephalon' in their names
+## get structure IDs of brain regions that contain 'telencephalon' in their name
 get_id('telencephalon')
-## get all brain regions that have direct or indirect expression data together with thier IDs
+## get all brain regions that have direct or indirect expression data
 all_regions = get_id('')
 head(all_regions)
 }

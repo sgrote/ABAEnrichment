@@ -40,8 +40,8 @@ Steffi Grote
 \code{\link{get_superstructures}}\cr
 }
 \examples{
-## get the brain structures from which the brain structures 'Allen:4010' and 'Allen:10208' 
-## inherit their expression data
+## get the brain structures from which the brain structures
+## 'Allen:4010' and 'Allen:10208' inherit their expression data
 get_sampled_substructures('Allen:4010')
 get_sampled_substructures('Allen:10208')
 
