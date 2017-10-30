@@ -9,10 +9,16 @@ Additional functions provided in this package are `get_expression`, `plot_expres
 #### Installation
 A stable release version can be obtained from [_Bioconductor_](https://www.bioconductor.org/packages/release/bioc/html/ABAEnrichment.html).
 
-The developmental (this) version can be obtained from the ['devel' version of Bioconductor](https://bioconductor.org/developers/how-to/useDevel/) or directly from
-GitHub.
++ Installation from Bioconductor
+```r
+source("https://bioconductor.org/biocLite.R")
+biocLite("ABAEnrichment")
+```
 
-+ Installation without vignette
+The developmental (this) version can be obtained from the ['devel' version of Bioconductor](https://bioconductor.org/developers/how-to/useDevel/) or directly from
+GitHub:
+
++ Installation from GitHub without vignette
 ```r
 ## install data package
 source("https://bioconductor.org/biocLite.R")
@@ -23,7 +29,7 @@ library(devtools)
 install_github("sgrote/ABAEnrichment")
 ```
 
-+ Installation with vignette
++ Installation from GitHub with vignette
 ```r
 ## install packages needed for vignette generation
 source("https://bioconductor.org/biocLite.R")
