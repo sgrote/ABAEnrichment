@@ -14,6 +14,9 @@ GitHub.
 
 + Installation without vignette
 ```r
+## install data package
+source("https://bioconductor.org/biocLite.R")
+biocLite("ABAData")
 ## install from GitHub in R:
 install.packages("devtools")
 library(devtools)
@@ -24,7 +27,7 @@ install_github("sgrote/ABAEnrichment")
 ```r
 ## install packages needed for vignette generation
 source("https://bioconductor.org/biocLite.R")
-biocLite("BiocStyle")
+biocLite(c("BiocStyle","ABAData"))
 ## install from GitHub in R:
 install.packages("devtools")
 library(devtools)
