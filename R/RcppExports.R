@@ -2,38 +2,38 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 binom_category_test <- function(directory, cutoff, root, silent) {
-    invisible(.Call('_ABAEnrichment_binom_category_test', PACKAGE = 'ABAEnrichment', directory, cutoff, root, silent))
+    invisible(.Call(`_ABAEnrichment_binom_category_test`, directory, cutoff, root, silent))
 }
 
 binom_randset <- function(nodes_per_gene, number_of_randomsets, directory, root, silent) {
-    invisible(.Call('_ABAEnrichment_binom_randset', PACKAGE = 'ABAEnrichment', nodes_per_gene, number_of_randomsets, directory, root, silent))
+    invisible(.Call(`_ABAEnrichment_binom_randset`, nodes_per_gene, number_of_randomsets, directory, root, silent))
 }
 
 conti_category_test <- function(directory, cutoff, root, silent) {
-    invisible(.Call('_ABAEnrichment_conti_category_test', PACKAGE = 'ABAEnrichment', directory, cutoff, root, silent))
+    invisible(.Call(`_ABAEnrichment_conti_category_test`, directory, cutoff, root, silent))
 }
 
 conti_randset <- function(nodes_per_gene, number_of_randomsets, directory, root, silent) {
-    invisible(.Call('_ABAEnrichment_conti_randset', PACKAGE = 'ABAEnrichment', nodes_per_gene, number_of_randomsets, directory, root, silent))
+    invisible(.Call(`_ABAEnrichment_conti_randset`, nodes_per_gene, number_of_randomsets, directory, root, silent))
 }
 
 hyper_category_test <- function(directory, cutoff, root, silent) {
-    invisible(.Call('_ABAEnrichment_hyper_category_test', PACKAGE = 'ABAEnrichment', directory, cutoff, root, silent))
+    invisible(.Call(`_ABAEnrichment_hyper_category_test`, directory, cutoff, root, silent))
 }
 
 hyper_randset <- function(nodes_per_gene, number_of_randomsets, directory, root, mod, silent) {
-    invisible(.Call('_ABAEnrichment_hyper_randset', PACKAGE = 'ABAEnrichment', nodes_per_gene, number_of_randomsets, directory, root, mod, silent))
+    invisible(.Call(`_ABAEnrichment_hyper_randset`, nodes_per_gene, number_of_randomsets, directory, root, mod, silent))
 }
 
 unlock_environment <- function(env) {
-    .Call('_ABAEnrichment_unlock_environment', PACKAGE = 'ABAEnrichment', env)
+    .Call(`_ABAEnrichment_unlock_environment`, env)
 }
 
 wilcox_category_test <- function(directory, cut, root, silent) {
-    invisible(.Call('_ABAEnrichment_wilcox_category_test', PACKAGE = 'ABAEnrichment', directory, cut, root, silent))
+    invisible(.Call(`_ABAEnrichment_wilcox_category_test`, directory, cut, root, silent))
 }
 
 wilcox_randset <- function(nodes_per_gene, number_of_randomsets, directory, root, silent) {
-    invisible(.Call('_ABAEnrichment_wilcox_randset', PACKAGE = 'ABAEnrichment', nodes_per_gene, number_of_randomsets, directory, root, silent))
+    invisible(.Call(`_ABAEnrichment_wilcox_randset`, nodes_per_gene, number_of_randomsets, directory, root, silent))
 }
 

@@ -125,21 +125,3 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-
-static const R_CallMethodDef CallEntries[] = {
-    {"_ABAEnrichment_binom_category_test", (DL_FUNC) &_ABAEnrichment_binom_category_test, 4},
-    {"_ABAEnrichment_binom_randset", (DL_FUNC) &_ABAEnrichment_binom_randset, 5},
-    {"_ABAEnrichment_conti_category_test", (DL_FUNC) &_ABAEnrichment_conti_category_test, 4},
-    {"_ABAEnrichment_conti_randset", (DL_FUNC) &_ABAEnrichment_conti_randset, 5},
-    {"_ABAEnrichment_hyper_category_test", (DL_FUNC) &_ABAEnrichment_hyper_category_test, 4},
-    {"_ABAEnrichment_hyper_randset", (DL_FUNC) &_ABAEnrichment_hyper_randset, 6},
-    {"_ABAEnrichment_unlock_environment", (DL_FUNC) &_ABAEnrichment_unlock_environment, 1},
-    {"_ABAEnrichment_wilcox_category_test", (DL_FUNC) &_ABAEnrichment_wilcox_category_test, 4},
-    {"_ABAEnrichment_wilcox_randset", (DL_FUNC) &_ABAEnrichment_wilcox_randset, 5},
-    {NULL, NULL, 0}
-};
-
-RcppExport void R_init_ABAEnrichment(DllInfo *dll) {
-    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
-}
