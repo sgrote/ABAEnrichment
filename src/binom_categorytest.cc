@@ -1,10 +1,13 @@
 
+/*
+ * code modified from:
+ * FUNC - Functional Analysis of Gene Expression Data
+ * Copyright (C) 2002  Bjoern Muetzel, Kay Pruefer
+ */
+
 #include <vector>
 #include <string>
 #include <fstream>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
 #include "go_groups_binom.h"
 
 #include <Rcpp.h>
@@ -89,7 +92,7 @@ void binom_category_test(std::string directory, int cutoff, std::string root, bo
 		delete[] randdata ;
 		num_randdata++ ;
 	}
-	gos.print_pvals( num_randdata, out ) ; //TODO: muesste da kein if(!silent) funktioniert die Option?
+	gos.print_pvals( num_randdata, out ) ;
 	
 	// write summary to console
 	if (!silent){
