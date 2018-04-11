@@ -53,13 +53,13 @@ plot_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALS
     }
     acronyms=sapply(strsplit(full_names,"_"),"[[",1)
     rownames(expr)=paste(rownames(expr), " (",acronyms,")",sep="")  
-            
+    
     # create plot   
     cexRow = min(1.5,0.2 + 1/log10(nrow(expr)))
     cexCol = min(1.5,0.2 + 1/log10(ncol(expr)))
 #   colramp=colorRamps::matlab.like(100)
     colramp=rev(heat.colors(100))
-  
+    
     if (dendro==TRUE){
         gplots::heatmap.2(expr,scale="none",col=colramp,margins=c(13.5,15), main=paste(test,dataset_type,main_append,sep=" "),density.info="none",trace="none",keysize=1.2,cexRow=cexRow,cexCol=cexCol)
     } else {            
@@ -85,8 +85,5 @@ plot_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALS
     }
 }
 
-        
-           
-           
-           
-           
+
+

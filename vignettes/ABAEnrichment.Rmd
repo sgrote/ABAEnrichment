@@ -434,7 +434,7 @@ Note that a brain region gets all genes annotated that are expressed in the brai
 ## run an enrichment analysis with 7 candidate and 7 background genes
 ## for the developing brain
 gene_ids = c('FOXJ1', 'NTS', 'LTBP1', 'STON2', 'KCNJ6', 'AGT', 
-  'ANO3', 'TTR', 'ELAVL4', 'BEAN1', 'TOX', 'EPN3', 'PAX2', 'KLHL1')
+    'ANO3', 'TTR', 'ELAVL4', 'BEAN1', 'TOX', 'EPN3', 'PAX2', 'KLHL1')
 is_candidate = rep(c(1,0), each=7)
 input_hyper = data.frame(gene_ids, is_candidate)
 res = aba_enrich(input_hyper, dataset='5_stages',
@@ -456,7 +456,7 @@ If `genes` are defined, the output is reduced to this set of genes; if not, all 
 ## above the 70% and 90% expression-cutoff
 ## in the basal ganglia of the adult human brain (Allen:4276)
 anno2 = get_annotated_genes(structure_ids='Allen:4276', dataset='adult', 
-  cutoff_quantiles=c(0.7,0.9), genes=gene_ids)
+    cutoff_quantiles=c(0.7,0.9), genes=gene_ids)
 anno2
 ```
 

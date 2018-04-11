@@ -80,7 +80,7 @@ get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, struc
     
     # load expression dataset
     expr = load_by_name(paste("dataset",dataset,sep="_"))
-         
+    
     ## else given alternative input, make 'combis' dataframe like for standard input (but without FWER) 
     if(missing(res)){
         age_category = rep(unique(expr$age_category), length(structure_ids))
