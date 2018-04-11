@@ -30,7 +30,7 @@
     The developmental effect score is based on expression data of the developing human brain.
     If \code{gene_ids} and \code{dataset} are not specified, the genes and dataset from the last enrichment analysis with \code{\link{aba_enrich}} are used, since it may be a common case to first run the enrichment analysis and then look at the expression data.
     If a requested brain region has no expression data annotated, data from sampled substructures of this region is returned.\cr 
-    Please refer to the \code{\link[ABAData]{ABAData}} package vignette for details on the datasets.\cr
+    Please refer to the \code{ABAData} package vignette for details on the datasets.\cr
 }
 
 \value{
