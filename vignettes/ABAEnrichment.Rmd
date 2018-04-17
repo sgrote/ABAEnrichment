@@ -2,7 +2,7 @@
 ---
 title: "ABAEnrichment: Gene Expression Enrichment in Human Brain Regions"
 author: "Steffi Grote"
-date: "April 12, 2018"
+date: "April 17, 2018"
 output:
     BiocStyle::html_document:
     toc: true
@@ -46,7 +46,7 @@ The default cutoffs are 10% to 90% in steps of 10%.
 
 ## Enrichment analysis
 The enrichment analysis is performed by using either the hypergeometric test, the Wilcoxon rank-sum test, the binomial test or the 2x2 contingency table test implemented in the ontology enrichment software FUNC [5].
-The **hypergeometric test** evaluates the enrichment of annotated (expressed) candidate genes compared to annotated background genes for each brain region.
+The **hypergeometric test** evaluates the enrichment of annotated (expressed) candidate genes compared to annotated background genes for each brain region (see [Schematic 1](#hyper_scheme) below).
 The background genes can be defined explicitly like the candidate genes or, by default, consist of all protein-coding genes from the dataset that are not contained in the set of candidate genes.
 In contrast to this binary distinction between candidate and background genes, the **Wilcoxon rank-sum test** uses user-defined scores that are assigned to the input genes.
 It then tests every brain region for an enrichment of genes with high scores in the set of expressed input genes.
@@ -501,7 +501,8 @@ plot_expression(top_regions[ ,'structure_id'])
 
 ![FWER calculation](./Skizze_Fig1.png 'hypergeometric test and FWER')
 
-The FWER for the Wilcoxon rank-sum test is computed in a similar way, with random permutations of the scores that are assigned to genes.
+The FWERs for the other three tests are computed analogously: first, for every brain region a statistical test is performed to get an enrichment p-value, then the scores or counts that are assigned to the genes in the input data are permuted and p-values are recomputed, and finally the original p-values are compared to the minimum p-values from the randomsets. 
+
 
 <a name='block_scheme'></a>
 
