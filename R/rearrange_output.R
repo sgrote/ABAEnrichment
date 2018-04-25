@@ -59,7 +59,7 @@ rearrange_output=function(summary,cluster,term){
 #   # preorder with mixedorder on structure name first (mixedorder does not take multiple columns)
 #   preout=preout[mixedorder(preout$structure),]
     # order
-    out=preout[order(preout$age_category, -1*(preout$n_significant),preout$min_FWER,preout$mean_FWER,preout$structure_id),-1] # NEW; also sort on structure_id (more stable than on name)
+    out=preout[order(preout$age_category, -1*(preout$n_significant),preout$min_FWER,preout$mean_FWER,preout$structure_id),-1]
     # order rownames 
     rownames(out)=1:nrow(out)
                     

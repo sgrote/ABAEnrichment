@@ -167,7 +167,7 @@ get_annotated_genes = function(res, fwer_threshold=0.05, background=FALSE, struc
         return(out)
     }
 
-    out = out[mixedorder(out$anno_gene),] # NEW: mixedorder genes instead of normal order
+    out = out[mixedorder(out$anno_gene),]
     ## given res as input:
     if(!(missing(res))){
         # add gene-associated variables
@@ -203,7 +203,8 @@ get_signi_combis = function(res, fwer_threshold){
         return(NULL)
     }
     # split FWERs
-    # NEW erkenntnis: some structures have no expression at high cutoffs and are therefor missing in Func-output. LOESUNG: fill with FWER=1 -> will be below no cutoff 
+    # some structures have no expression at high cutoffs and are therefor missing in Func-output. 
+    # LOESUNG: fill with FWER=1 -> will be below no cutoff 
     single_fwers = strsplit(fwers$FWERs, ";")
     # fill up rows with 1 that dont have the maximum number of FWERs (due to no expression at high cutoff)
     n_fwers = max(sapply(single_fwers, length))

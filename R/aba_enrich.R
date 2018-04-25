@@ -376,11 +376,11 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
 
             ## 3c) summarize func-output
             groupy = read.table(paste(directory,"_category_test_out",sep=""))
-            # NEW: switch columns for binomial test high B - then high A to be more consistent
+            # switch columns for binomial test high B - then high A to be more consistent
             if (test == "binomial"){
                 groupy[,2:5] = groupy[,c(3,2,5,4)]
             }
-            # NEW remove expected and actual no. of candidate, ranksum (included in c++ files to be the same for go_enrich)
+            # remove expected and actual no. of candidate, ranksum (included in c++ files to be the same for go_enrich)
             groupy = groupy[,1:5]
             age_category = rep(s,nrow(groupy))          
             cutoff_quantile = rep(cutoff_quantiles[i],nrow(groupy))

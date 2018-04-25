@@ -1,5 +1,5 @@
 # detect gene identifier given a gene_id of type either entrez, ensembl or hgnc-symbol  
-# new: or genomic regions given as chr:from-to
+# or genomic regions given as chr:from-to
 
 detect_identifier=function(gene_id){
     # de-factor

@@ -102,7 +102,7 @@ get_genes_from_regions = function(genes, gene_pos, circ_chrom){
     genes = data.frame(gene=unique(c(test_genes, bg_genes)), score=0, stringsAsFactors=FALSE)
     genes[genes[,1] %in% test_genes, 2] = 1
 
-    # NEW: merge candidate into background regions (single-genes-FUNC also implicitly integrates candidate into background genes to choose from in randomsets)
+    # merge candidate into background regions (single-genes-FUNC also implicitly integrates candidate into background genes to choose from in randomsets)
     bg_reg = merge_bed(rbind(bg_reg,test_reg))
     
     return(list(test_reg, bg_reg, genes))   
