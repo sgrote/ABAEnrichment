@@ -83,7 +83,15 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
     genes = unique(genes) # allow for multiple assignment of same value
     multi_genes = sort(unique(genes[,1][duplicated(genes[,1])]))
     if (length(multi_genes) > 0){
-        stop(paste("Genes with multiple assignment in input:", paste(multi_genes,collapse=", ")))
+        if (test == "hyper"){
+            # allow but remove background definition of candidate genes
+            # (FUNC just takes one value per gene, candidate genes are implicitly part of background)
+            candi_genes = genes[genes[,2]==1, 1]
+            genes = genes[!(genes[,1] %in% candi_genes & genes[,2] == 0),]
+        } else {
+            stop("Genes with multiple assignment in input: ", paste(multi_genes,collapse=", "))
+        }
+    
     }
     
     # other arguments

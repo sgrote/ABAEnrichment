@@ -9,8 +9,9 @@
 ## genes input
 ##############
 
-genes=rep(0:1,4)
-names(genes)=c(324,8312,673,1029,64764,1499,"abc",000)
+# NEW: also check that 8312 as candi and bg genes does not throw "Multiple assignment" error
+genes=c(rep(0:1,4),0)
+names(genes)=c(324,8312,673,1029,64764,1499,"abc",000,8312)
 
 set.seed(123)
 res1=aba_enrich(genes,dataset="5_stages",cutoff_quantiles=c(0.2,0.7),n_randsets=5,silent=TRUE)
@@ -29,8 +30,8 @@ test_that("cutoffs get sorted, output for successful cutoffs is returned",{
 	expect_that(rownames(res2[[3]]), equals(c("20%","99.9%")))
 })
 
-willi = as.integer(runif(length(genes),1,30))
-names(willi) = names(genes)
+willi = as.integer(runif(8,1,30))
+names(willi) = c(324,8312,673,1029,64764,1499,"abc",000)
 
 set.seed(123)
 res3=aba_enrich(willi,dataset="5_stages",test="wilcoxon",cutoff_quantiles=c(0.4),n_randsets=5,silent=TRUE)
@@ -140,12 +141,9 @@ test_that("Warning about unused arguments.",{
     expect_that(aba_enrich(genes,cutoff_quantiles=c(0.7,0.8),n_randsets=5,ref_genome="grch38",silent=TRUE), gives_warning("Unused argument: 'ref_genome = grch38'."))    
 })
 
-genes = c(rep(1,6),rep(0,4))
 genes_willi = 1:10
-names(genes) = c("NCAPG", "APOL4", "NGFR", "NXPH4", "C21orf59", "CACNG2", "AGTR1", "ANO1","APOL4", "NXPH4")
 names(genes_willi) = c("NCAPG", "APOL4", "NGFR", "NGFR", "NXPH4", "C21orf59", "AGTR1", "CACNG2", "AGTR1", "ANO1")
 test_that("multiple assignment of scores to genes throws error",{
-    expect_that(aba_enrich(genes), throws_error("Genes with multiple assignment in input: APOL4, NXPH4"))
     expect_that(aba_enrich(genes_willi, test="wilcoxon"), throws_error("Genes with multiple assignment in input: AGTR1, NGFR"))
 })
 
