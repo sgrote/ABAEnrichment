@@ -65,7 +65,7 @@ Furthermore, instead of defining genes explicitly, whole genomic regions can be 
 The randomsets then also consist of randomly chosen candidate regions inside the background regions, either as a whole block in one background region (default), or on the same chromosome allowing to overlap multiple background regions on that chromosome (option `circ_chrom`, see [Schematic 2](#block_scheme) below).
 
 
-## Functions included in ABAEnrichment:
+## Functions included in ABAEnrichment
 
 function | description
 ----------- | ------------------------------------------------------------------------
@@ -85,7 +85,7 @@ function | description
 
 <a name='aba_enrich'></a>
 
-## Test gene expression enrichment using the hypergeometric test
+## Test for gene expression enrichment using the hypergeometric test
 For a random set of 13 candidate genes, two analyses to identify human brain regions with enriched expression of the candidate genes are performed: one using data from adult donors (from *Allen Human Brain Atlas* [3]) and one using data from five developmental stages (from *BrainSpan Atlas of the Developing Human Brain* [4]).
 The hypergeometric test evaluates the over-representation of a set of expressed candidate genes in brain regions, compared to a set of expressed background genes (see [Schematic 1](#hyper_scheme) below).
 The input for the hypergeometric test is a dataframe with two columns: (1) a column with gene identifiers (*Entrez-ID*, *Ensembl-ID* or *gene-symbol*) and (2) a binary column with `1` for a candidate gene and `0` for a background gene.
@@ -148,7 +148,8 @@ res_devel[2:3]
 ```
 For example, in the enrichment analysis of age category 2 (infant) with an expression cutoff of 0.7 (70%), genes are considered 'expressed' in a particular brain region when their expression value in that region is at least 7.017616.
 
-### Choose random candidate regions dependent on gene length
+
+### Correct for gene length
 The default behavior of `aba_enrich` is to permute candidate and background genes randomly to compute the FWER.
 With the option `gene_len=TRUE`, random selection of background genes as candidate genes is dependent on the gene length, i.e. a gene twice as long as another gene also is twice as likely selected as a candidate gene in a randomset.
 This is useful when the procedure that led to the identification of the candidate gene set is also more likely to discover longer genes.
@@ -164,7 +165,7 @@ res_len_grch38 = aba_enrich(input_hyper, gene_len=TRUE, ref_genome='grch38')
 ```
 
 
-## Test gene expression enrichment using the Wilcoxon rank-sum test
+## Test for gene expression enrichment using the Wilcoxon rank-sum test
 When the genes are not divided into candidate and background genes, but are ranked by scores, a Wilcoxon rank-sum test can be performed to find brain regions with a high proportion of genes with high scores in the set of expressed genes.
 The second column of the `genes` input dataframe then contains the scores assigned to the genes.
 The output is identical to the one produced with the hypergeometric test.
@@ -250,7 +251,7 @@ Note that this is the only test that is not dependent on the distribution of the
 
 
 
-## Test gene expression enrichment for genomic regions
+## Test for gene expression enrichment for genomic regions
 Instead of defining candidate and background genes explicitly in the `genes` input dataframe, it is also possible to define entire chromosomal regions as candidate and background regions.
 The expression enrichment is then tested for all protein-coding genes located in, or overlapping the candidate regions on the plus or the minus strand.
 The gene coordinates used to identify those genes were obtained from http://grch37.ensembl.org/biomart/martview/ (*GRCh37.p13*).
