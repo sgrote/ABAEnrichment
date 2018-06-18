@@ -16,7 +16,7 @@ detect_identifier=function(gene_id){
         return("ensembl_gene_id")
     }
     # c) genomic region is chr:from-to
-    if (grepl("^[0-9XY]*:[0-9]*-[0-9]*$", gene_id)){
+    if (grepl("^.*:[0-9]*-[0-9]*$", gene_id)){
         return("blocks")
     }
     # d) neither of the above cases in present in HGNC-symbols

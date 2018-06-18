@@ -1,3 +1,16 @@
+
+
+CHANGES IN VERSION 1.11.1
+--------------------------
+
+NEW FEATURES
+
+    o allow for custom gene coordinates
+      (alternative to integrated coordinates;
+      coordinates are used when the familiy-wise error rate is
+      corrected for gene length or spatial clustering of genes)
+
+
 CHANGES IN VERSION 1.8.0
 ------------------------
 

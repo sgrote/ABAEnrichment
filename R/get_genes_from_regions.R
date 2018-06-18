@@ -23,7 +23,15 @@ get_genes_from_regions = function(genes, gene_pos, circ_chrom){
         reverse = paste(genes[reverse_indi,1], collapse=", ")
         stop(paste("Invalid regions: ", reverse, ".\n  In 'chr:start-stop' start < stop is required.", sep=""))
     }
-        
+    
+    # add 'chr' if missing (coord_db has it too, maybe change to bioconductor annotation packages one day)
+    if (!startsWith(bed[1,1], "chr")){
+        bed[,1] = paste0("chr", bed[,1])
+    }
+    if (!startsWith(gene_pos[1,1], "chr")){
+        gene_pos[,1] = paste0("chr", gene_pos[,1])
+    }
+    
     # split in test and background
     test_reg = bed[genes[,2]==1,]
     bg_reg = bed[genes[,2]==0,] 

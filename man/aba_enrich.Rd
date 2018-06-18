@@ -9,8 +9,8 @@
 }
 \usage{
     aba_enrich(genes, dataset = 'adult', test = 'hyper', 
-        cutoff_quantiles = seq(0.1, 0.9, 0.1), n_randsets = 1000, 
-        gene_len = FALSE, circ_chrom = FALSE, ref_genome = 'grch37', silent = FALSE)
+        cutoff_quantiles = seq(0.1, 0.9, 0.1), n_randsets = 1000, gene_len = FALSE,
+        circ_chrom = FALSE, ref_genome = 'grch37', gene_coords = NULL, silent = FALSE)
 }
 \arguments{
     \item{genes}{
@@ -46,6 +46,11 @@
     \item{ref_genome}{
         'grch37' (default) or 'grch38'.
         Defines the reference genome used when genomic regions are provided as input or when \code{gene_len=TRUE}.
+    }
+    \item{gene_coords}{
+        optional data.frame() for custom gene coordinates, with four columns:
+        gene-symbols (character), chromosome (character), start (integer), end (integer).
+        When genomic regions are provided as input or when \code{gene_len=TRUE}, these custom gene coordinates are used instead of the integrated ones.
     }
     \item{silent}{
         logical. If TRUE all output to the screen except for warnings and errors is suppressed.

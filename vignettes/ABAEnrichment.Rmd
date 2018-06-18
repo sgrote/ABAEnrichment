@@ -153,16 +153,90 @@ For example, in the enrichment analysis of age category 2 (infant) with an expre
 The default behavior of `aba_enrich` is to permute candidate and background genes randomly to compute the FWER.
 With the option `gene_len=TRUE`, random selection of background genes as candidate genes is dependent on the gene length, i.e. a gene twice as long as another gene also is twice as likely selected as a candidate gene in a randomset.
 This is useful when the procedure that led to the identification of the candidate gene set is also more likely to discover longer genes.
-Gene coordinates were obtained from http://grch37.ensembl.org/biomart/martview/ (GRCh37.p13).
-The option `ref_genome='grch38'` uses gene coordinates from the GRCh38 genome (GRCh38.p10) obtained from http://ensembl.org/biomart/martview/.
+Gene-coordinates were obtained from http://grch37.ensembl.org/biomart/martview/ (GRCh37.p13).
+The option `ref_genome='grch38'` uses gene-coordinates from the GRCh38 genome (GRCh38.p10) obtained from http://ensembl.org/biomart/martview/.
+Alternatively also [custom gene-coordinates](#cu_coord) can be provided in a dataframe.
 
 ```{r,eval=FALSE} 
 ## run enrichment analysis, with randomsets dependent on gene length
 res_len = aba_enrich(input_hyper, gene_len=TRUE)
-## run the same analysis using gene coordinates
+## run the same analysis using gene-coordinates
 ## from GRCh38 instead of the default GRCh37
 res_len_grch38 = aba_enrich(input_hyper, gene_len=TRUE, ref_genome='grch38')
 ```
+
+
+### Test for gene expression enrichment for genomic regions
+Instead of defining candidate and background genes explicitly in the `genes` input dataframe, it is also possible to define entire chromosomal regions as candidate and background regions.
+The expression enrichment is then tested for all protein-coding genes located in, or overlapping the candidate regions on the plus or the minus strand.
+The gene-coordinates used to identify those genes were obtained from http://grch37.ensembl.org/biomart/martview/ (*GRCh37.p13*).
+The option `ref_genome='grch38'` uses gene-coordinates from the *GRCh38.p10* genome version obtained from http://ensembl.org/biomart/martview/.
+Alternatively also [custom gene-coordinates](#cu_coord) can be provided in a dataframe.
+
+In comparison to defining candidate and background genes explicitly, this option has the advantage that the FWER accounts for spatial clustering of genes.
+For the random permutations used to compute the FWER, blocks as long as candidate regions are chosen from the merged candidate and background regions and genes contained in these blocks are considered candidate genes ([Schematic 2](#block_scheme)).
+
+To define chromosomal regions in the input dataframe, the first column has to be of the form `chr:start-stop`, where `start` always has to be smaller than `stop`.
+Note that this option requires the input of background regions.
+If multiple candidate regions are provided, in the randomsets they are placed randomly (but without overlap) into the merged candidate and background regions.
+The output of `aba_enrich` is identical to the one that is produced for single genes.
+The second element of the output list contains the candidate and background genes located in the user-defined regions:
+
+```{r} 
+## create input vector with a candidate region on chromosome 8
+## and background regions on chromosome 7, 8 and 9
+regions = c('8:82000000-83000000', '7:1300000-56800000',
+    '7:74900000-148700000', '8:7400000-44300000', '8:47600000-146300000',
+    '9:0-39200000', '9:69700000-140200000')
+is_candidate = c(1, rep(0,6))
+input_region = data.frame(regions, is_candidate)
+```
+```{r,results='hide'} 
+## run enrichment analysis for the adult human brain
+res_region = aba_enrich(input_region, dataset='adult',
+    cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
+```
+```{r}
+## look at the results from the enrichment analysis
+fwers_region = res_region[[1]]
+head(fwers_region)
+## see which genes are located in the candidate region
+input_genes = res_region[[2]]
+candidate_genes = input_genes[input_genes[,2]==1,]
+candidate_genes
+```
+
+An alternative method to choose random blocks from the background regions can be used with the option `circ_chrom=TRUE`.
+Every candidate region is then compared to background regions on the same chromosome ([Schematic 2](#block_scheme)).
+And in contrast to the default `circ_chrom=FALSE`, randomly chosen blocks do not have to be located inside a single background region, but are allowed to overlap multiple background regions.
+This means that a randomly chosen block can start at the end of the last background region and continue at the beginning of the first background region on a given chromosome.
+
+
+<a name='cu_coord'></a>
+
+### Custom gene-coordinates
+
+Gene-coordinates are used when the FWER is corrected for gene length (`gene_len=TRUE`) or for spatial clustering of genes (genomic regions as input).
+Instead of using the integrated gene-coordinates, one can also provide custom gene-coordinates directly as a dataframe with four columns: gene, chromosome, start, end (parameter `gene_coords`).
+
+```{r,echo=FALSE}
+gene = c('NCAPG','APOL4','NGFR','NXPH4','C21orf59','CACNG2')
+chr = c('chr4', 'chr22', 'chr17', 'chr12', 'chr21', 'chr22')
+start = c(17812436, 36585176, 47572655, 57610578, 33954510, 36956916)
+end = c(17846487, 36600879, 47592382, 57620232, 33984918, 37098690)
+custom_coords = data.frame(gene, chr, start, end, stringsAsFactors=FALSE)
+```
+```{r}
+## example for a dataframe with custom gene-coordinates
+head(custom_coords)
+```
+```{r,eval=FALSE}
+## use correction for gene-length based on custom gene-coordinates
+res_len_cc = aba_enrich(input_hyper, gene_len=TRUE, gene_coords=custom_coords)
+```
+
+Note that this allows to use `gene_len=TRUE` to correct the FWER for any user-defined gene 'weight', since the correction for gene length just weights each gene with its length (`end - start`).
+A gene with a higher weight has a bigger chance of becoming a candidate gene in the randomsets.
 
 
 ## Test for gene expression enrichment using the Wilcoxon rank-sum test
@@ -248,52 +322,6 @@ head(res_conti[[1]])
 ```
 Depending on the counts for each GO-category a Chi-square or Fisher's exact test is performed.
 Note that this is the only test that is not dependent on the distribution of the gene-associated variables in the root nodes.
-
-
-
-## Test for gene expression enrichment for genomic regions
-Instead of defining candidate and background genes explicitly in the `genes` input dataframe, it is also possible to define entire chromosomal regions as candidate and background regions.
-The expression enrichment is then tested for all protein-coding genes located in, or overlapping the candidate regions on the plus or the minus strand.
-The gene coordinates used to identify those genes were obtained from http://grch37.ensembl.org/biomart/martview/ (*GRCh37.p13*).
-The option `ref_genome='grch38'` uses gene coordinates from the *GRCh38.p10* genome version obtained from http://ensembl.org/biomart/martview/.
-
-In comparison to defining candidate and background genes explicitly, this option has the advantage that the FWER accounts for spatial clustering of genes.
-For the random permutations used to compute the FWER, blocks as long as candidate regions are chosen from the merged candidate and background regions and genes contained in these blocks are considered candidate genes ([Schematic 2](#block_scheme)).
-
-To define chromosomal regions in the input dataframe, the first column has to be of the form `chr:start-stop`, where `start` always has to be smaller than `stop`.
-Note that this option requires the input of background regions.
-If multiple candidate regions are provided, in the randomsets they are placed randomly (but without overlap) into the merged candidate and background regions.
-The output of `aba_enrich` is identical to the one that is produced for single genes.
-The second element of the output list contains the candidate and background genes located in the user-defined regions:
-
-```{r} 
-## create input vector with a candidate region on chromosome 8
-## and background regions on chromosome 7, 8 and 9
-regions = c('8:82000000-83000000', '7:1300000-56800000',
-    '7:74900000-148700000', '8:7400000-44300000', '8:47600000-146300000',
-    '9:0-39200000', '9:69700000-140200000')
-is_candidate = c(1, rep(0,6))
-input_region = data.frame(regions, is_candidate)
-```
-```{r,results='hide'} 
-## run enrichment analysis for the adult human brain
-res_region = aba_enrich(input_region, dataset='adult',
-    cutoff_quantiles=c(0.5,0.7,0.9), n_randsets=100)
-```
-```{r}
-## look at the results from the enrichment analysis
-fwers_region = res_region[[1]]
-head(fwers_region)
-## see which genes are located in the candidate region
-input_genes = res_region[[2]]
-candidate_genes = input_genes[input_genes[,2]==1,]
-candidate_genes
-```
-
-An alternative method to choose random blocks from the background regions can be used with the option `circ_chrom=TRUE`.
-Every candidate region is then compared to background regions on the same chromosome ([Schematic 2](#block_scheme)).
-And in contrast to the default `circ_chrom=FALSE`, randomly chosen blocks do not have to be located inside a single background region, but are allowed to overlap multiple background regions.
-This means that a randomly chosen block can start at the end of the last background region and continue at the beginning of the first background region on a given chromosome.
 
 
 ## Explore expression data

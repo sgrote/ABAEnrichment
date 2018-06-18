@@ -10,7 +10,7 @@
 # 4. create output
 #######################################################################################
 
-aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0.1,0.9,0.1), n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE, ref_genome="grch37", silent=FALSE){
+aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0.1,0.9,0.1), n_randsets=1000, gene_len=FALSE, circ_chrom=FALSE, ref_genome="grch37", gene_coords=NULL, silent=FALSE){
 
 
     #####   1. Check arguments and define parameters
@@ -131,15 +131,24 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
     
     # load gene_list and get gene identifier
     gene_symbols = get(paste("gene_symbols",folder_ext,sep="_"))    
-    blocks = FALSE
-    identifier = detect_identifier(genes[1,1])  
+    regions = FALSE
+    identifier = detect_identifier(genes[1,1])
     
     # load gene_coords
-    gene_coords = get(paste("gene_coords_", ref_genome, sep=""))
+    custom_coords = !is.null(gene_coords)
+    if (gene_len || identifier == "blocks"){
+        if (custom_coords){
+            # internal gene_coords has chr,start,stop,hgnc,ensembl,entrez
+            # get_genes_from regions just takes gene_coords[,4] - identifier doesnt matter
+            gene_coords = gene_coords[,c(2:4,1)]
+            colnames(gene_coords)[4] = detect_identifier(gene_coords[1,4])
+        } else {
+            gene_coords = get(paste("gene_coords_", ref_genome, sep=""))
+        }
+    }
     
     if (identifier == "blocks"){
-        identifier = "hgnc_symbol" # gene-name 
-        blocks = TRUE
+        regions = TRUE
         # check that background region is specified
         if (sum(genes[,2]) == nrow(genes)){
             stop("All values of the 'genes' input are 1. Using chromosomal regions as input requires defining background regions with 0.")
@@ -154,10 +163,13 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
         }   
         
         # convert coords from genes-vector to bed format, SORT, and extract genes overlapping test regions
-        regions = get_genes_from_regions(genes, gene_coords, circ_chrom) # gene_coords from sysdata.rda HGNC
-        test_regions = regions[[1]]     
-        bg_regions = regions[[2]]
-        genes = regions[[3]]
+        bed = get_genes_from_regions(genes, gene_coords, circ_chrom) # gene_coords from sysdata.rda HGNC
+        test_regions = bed[[1]]
+        bg_regions = bed[[2]]
+        genes = bed[[3]]
+        
+        # since custom gene_coords are allowed this can be any of the 3
+        identifier = detect_identifier(genes[1,1])
 
         # avoid scientific notation in regions (read in c++)
         test_regions = format(test_regions, scientific=FALSE, trim=TRUE)
@@ -179,7 +191,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
             warning("Unused argument: 'circ_chrom = TRUE'.")
         }
     }
-    if (ref_genome == "grch38" & !(blocks | gene_len)){
+    if (ref_genome == "grch38" & (!(regions | gene_len) | custom_coords)){
         # warn if ref-genome is switched to hg20 but not used
         warning("Unused argument: 'ref_genome = grch38'.")
     }
@@ -189,12 +201,16 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
     # restrict to genes that have expression data annotated and warn about the rest
     gene_values = genes[genes[,1] %in% gene_list, ] # restrict
     not_in = unique(genes[!genes[,1] %in% gene_values[,1], 1]) # removed
-    if (length(not_in) > 0 && !blocks){
+    if (length(not_in) > 0 && !regions){
         not_in_string = paste(not_in,collapse=", ")
         warning(paste("No expression data for genes: ",not_in_string,".\n  These genes were not included in the analysis.",sep=""))
     }
     # restrict to genes that have coordinates and warn about the rest
     if (gene_len){
+        # check that custom coords and gene input match
+        if (!is.null(gene_coords) && identifier != colnames(gene_coords)[4]){
+            stop("Gene identifiers in 'genes' and 'gene_coords' arguments do not match.")
+        }
         # removed
         no_coords = unique(gene_values[!(gene_values[,1] %in% gene_coords[,identifier]), 1]) 
         if (length(no_coords) > 0){
@@ -338,7 +354,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
             # gene | (chrom | start | end) | Allen:1 Allen:2 Allen:3
             anno = tapply(expressed_genes[,2], expressed_genes[,1], function(x) {paste(x,collapse=" ")})
             gene = as.character(names(anno))
-            if (blocks || gene_len){
+            if (regions || gene_len){
                 # add coordinates
                 gene_position = gene_coords[match(gene, gene_coords[,identifier]),1:3]
                 root = data.frame(genes=gene, gene_position, nodes=as.character(anno))
@@ -360,9 +376,9 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
             if (!silent) message("Run Func...\n")
             if (test == "hyper"){
                 # randomset
-                if (blocks & circ_chrom){
+                if (regions & circ_chrom){
                     hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, "roll" , silent)
-                } else if (blocks){
+                } else if (regions){
                     hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, "block", silent)
                 } else if (gene_len){
                     hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, "gene_len", silent)
