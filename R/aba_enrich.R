@@ -131,24 +131,37 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
     
     # load gene_list and get gene identifier
     gene_symbols = get(paste("gene_symbols",folder_ext,sep="_"))    
-    regions = FALSE
     identifier = detect_identifier(genes[1,1])
+    if (identifier == "blocks"){
+        regions = TRUE
+    } else {
+        regions = FALSE
+    }
     
     # load gene_coords
     custom_coords = !is.null(gene_coords)
-    if (gene_len || identifier == "blocks"){
+    if (gene_len || regions){
         if (custom_coords){
             # internal gene_coords has chr,start,stop,hgnc,ensembl,entrez
             # get_genes_from regions just takes gene_coords[,4] - identifier doesnt matter
             gene_coords = gene_coords[,c(2:4,1)]
-            colnames(gene_coords)[4] = detect_identifier(gene_coords[1,4])
+            identifier = detect_identifier(gene_coords[1,4])
+            colnames(gene_coords)[4] = identifier
         } else {
             gene_coords = get(paste("gene_coords_", ref_genome, sep=""))
+            # only for gene-len + default coords initial identifier stays
+            if (regions){
+                identifier = detect_identifier(gene_coords[1,4])
+            }
         }
+        # remove genes with multiple coords
+        gene_coords = gene_coords[,c(1:3, which(colnames(gene_coords) == identifier))]
+        gene_coords = unique(gene_coords)
+        multi_coords = sort(unique(gene_coords[,4][duplicated(gene_coords[,4])]))
+        gene_coords = gene_coords[! gene_coords[,4] %in% multi_coords,]
     }
     
-    if (identifier == "blocks"){
-        regions = TRUE
+    if (regions){
         # check that background region is specified
         if (sum(genes[,2]) == nrow(genes)){
             stop("All values of the 'genes' input are 1. Using chromosomal regions as input requires defining background regions with 0.")
