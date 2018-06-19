@@ -297,9 +297,10 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
     term = get(paste("term",folder_ext,sep="_"))
     term2term = get(paste("term2term",folder_ext,sep="_"))
     graph_path = get(paste("graph_path",folder_ext,sep="_"))
-    write.table(term,file=paste(directory, "_term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
-    write.table(term2term,file=paste(directory, "_term2term.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
-    write.table(graph_path,file=paste(directory, "_graph_path.txt",sep=""),col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+    go_paths = paste0(directory, c("_term.txt", "_term2term.txt", "_graph_path.txt"))
+    write.table(term,file=go_paths[1],col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+    write.table(term2term,file=go_paths[2],col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+    write.table(graph_path,file=go_paths[3],col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
 
     #####   3. loop over age categories and cutoffs
     # initialize output
@@ -390,25 +391,29 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
             if (test == "hyper"){
                 # randomset
                 if (regions & circ_chrom){
-                    hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, "roll" , silent)
+                    GOfuncR:::hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory,
+                        go_paths[1], go_paths[2], go_paths[3], root_id, "roll" , silent)
                 } else if (regions){
-                    hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, "block", silent)
+                    GOfuncR:::hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory,
+                        go_paths[1], go_paths[2], go_paths[3], root_id, "block", silent)
                 } else if (gene_len){
-                    hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, "gene_len", silent)
+                    GOfuncR:::hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory,
+                        go_paths[1], go_paths[2], go_paths[3], root_id, "gene_len", silent)
                 } else {
-                    hyper_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, "classic", silent)
+                    GOfuncR:::hyper_randset(paste0(directory,"_",root_id), n_randsets, directory,
+                        go_paths[1], go_paths[2], go_paths[3], root_id, "classic", silent)
                 }
                 # category test
-                hyper_category_test(directory, 1, root_id, silent)
+                GOfuncR:::hyper_category_test(directory, 1, root_id, silent)
             } else if (test == "wilcoxon"){
-                wilcox_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, silent)
-                wilcox_category_test(directory, 1, root_id, silent)
+                GOfuncR:::wilcox_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, go_paths[1], go_paths[2], go_paths[3], root_id, silent)
+                GOfuncR:::wilcox_category_test(directory, 1, root_id, silent)
             } else if (test == "binomial"){
-                binom_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, silent)
-                binom_category_test(directory, 1, root_id, silent)          
+                GOfuncR:::binom_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, go_paths[1], go_paths[2], go_paths[3], root_id, silent)
+                GOfuncR:::binom_category_test(directory, 1, root_id, silent)
             } else if (test == "contingency"){
-                conti_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, root_id, silent)
-                conti_category_test(directory, 1, root_id, silent)
+                GOfuncR:::conti_randset(paste(directory,"_",root_id,sep=""), n_randsets, directory, go_paths[1], go_paths[2], go_paths[3], root_id, silent)
+                GOfuncR:::conti_category_test(directory, 1, root_id, silent)
             }
 
             ## 3c) summarize func-output
