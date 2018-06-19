@@ -1,4 +1,11 @@
 
+CHANGES IN VERSION 1.11.3
+--------------------------
+
+    o remove all C++ code and depend on package
+      GOfuncR instead
+
+
 CHANGES IN VERSION 1.11.2
 --------------------------
 
