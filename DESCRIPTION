@@ -1,7 +1,7 @@
 Package: ABAEnrichment
 Type: Package
 Title: Gene expression enrichment in human brain regions
-Version: 1.11.2
+Version: 1.11.3
 Date: 2018-06-18
 Author: Steffi Grote
 Maintainer: Steffi Grote <steffi_grote@eva.mpg.de>
@@ -26,6 +26,7 @@ Imports:
     gtools (>= 3.5.0),
     ABAData (>= 0.99.2),
     data.table (>= 1.10.4),
+    GOfuncR (>= 1.1.2),
     grDevices,
     stats,
     utils
