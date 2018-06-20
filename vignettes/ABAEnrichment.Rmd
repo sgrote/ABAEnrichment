@@ -552,9 +552,9 @@ sessionInfo()
 
 # References
 
-[1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. [doi:10.1038/nature11405]
+[1] Hawrylycz, M.J. et al. (2012) An anatomically comprehensive atlas of the adult human brain transcriptome, Nature 489: 391-399. [https://doi.org/10.1038/nature11405]
 
-[2] Miller, J.A. et al. (2014) Transcriptional landscape of the prenatal human brain, Nature 508: 199-206. [doi:10.1038/nature13185]
+[2] Miller, J.A. et al. (2014) Transcriptional landscape of the prenatal human brain, Nature 508: 199-206. [https://doi.org/10.1038/nature13185]
 
 [3] Allen Institute for Brain Science. Allen Human Brain Atlas (Internet). Available from:
 [http://human.brain-map.org/]
@@ -563,6 +563,7 @@ sessionInfo()
 (Internet). Available from: [http://brainspan.org/]
 
 [5] Pruefer, K. et al. (2007) FUNC: A package for detecting significant associations between gene
-sets and ontological annotations, BMC Bioinformatics 8: 41. [doi:10.1186/1471-2105-8-41]
+sets and ontological annotations, BMC Bioinformatics 8: 41. \doi{10.1186/1471-2105-8-41} haha 
+[https://doi.org/10.1186/1471-2105-8-41]
 
-[6] McDonald, J. H. Kreitman, M. (1991). Adaptive protein evolution at the Adh locus in Drosophila, Nature 351: 652-654. [doi:10.1038/351652a0]
+[6] McDonald, J. H. Kreitman, M. (1991). Adaptive protein evolution at the Adh locus in Drosophila, Nature 351: 652-654. [https://doi.org/10.1038/351652a0]
