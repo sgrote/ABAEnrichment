@@ -2,8 +2,8 @@
 CHANGES IN VERSION 1.11.3
 --------------------------
 
-    o remove all C++ code and depend on package
-      GOfuncR instead
+	o remove all C++ code and depend on package
+	  GOfuncR instead
 
 
 CHANGES IN VERSION 1.11.2
@@ -11,21 +11,21 @@ CHANGES IN VERSION 1.11.2
 
 USER-LEVEL CHANGES
 
-    o when coordinates are used,
-      remove genes with multiple gene-coordinates
-      (coordinates are used when the familiy-wise error rate is
-      corrected for gene length or spatial clustering of genes)
-      
-      
+	o when coordinates are used,
+	  remove genes with multiple gene-coordinates
+	  (coordinates are used when the familiy-wise error rate is
+	  corrected for gene length or spatial clustering of genes)
+	  
+	  
 CHANGES IN VERSION 1.11.1
 --------------------------
 
 NEW FEATURES
 
-    o allow for custom gene-coordinates
-      (alternative to integrated coordinates;
-      coordinates are used when the familiy-wise error rate is
-      corrected for gene length or spatial clustering of genes)
+	o allow for custom gene-coordinates
+	  (alternative to integrated coordinates;
+	  coordinates are used when the familiy-wise error rate is
+	  corrected for gene length or spatial clustering of genes)
 
 
 CHANGES IN VERSION 1.8.0
@@ -36,8 +36,8 @@ NEW FEATURES
 	o two new statistical tests are available
 	  (in addition to hypergeometric and Wilcoxon rank-sum test):
 	  1) binomial test when genes are associated with two counts
-	     (e.g. number of amino-acid changes in two species 
-	     since a common ancestor);
+		 (e.g. number of amino-acid changes in two species 
+		 since a common ancestor);
 	  2) 2x2 contingency table test when genes are associated with
 		 with four counts (e.g. number of non-synonymous or synonymous 
 		 variants that are fixed between or variable within species.)
@@ -55,7 +55,7 @@ USER-LEVEL CHANGES
 	o sort aba_enrich(...)[[1]] output also on structure-ID
 	  (after sorting on age category and FWER)
 	o sort genes in 'get_annotated_genes' output (mixedsort)
-    o rename aba_enrich() column 'times_FWER_under_0.05' to 'n_significant'
+	o rename aba_enrich() column 'times_FWER_under_0.05' to 'n_significant'
 
 IMPROVEMENTS
 	  
