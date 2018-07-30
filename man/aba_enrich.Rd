@@ -63,7 +63,7 @@
 \value{
     A list with components
     \item{results}{
-        a dataframe with the FWERs from the enrichment analyses per brain region and age category, ordered by 'age_category', 'n_significant','min_FWER' and 'mean_FWER'.
+        a dataframe with the FWERs from the enrichment analyses per brain region and age category, ordered by 'n_significant','min_FWER' and 'mean_FWER', 'age_category' and 'structure_id'.
         'min_FWER' for example denotes the minimum FWER for expression enrichment of the candidate genes in this brain region across all expression cutoffs.
         'n_significant' reports the number of cutoffs at which the FWER was below 0.05.
         'FWERs' is a semicolon separated string with the single FWERs for all cutoffs.
