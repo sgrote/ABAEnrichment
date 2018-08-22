@@ -11,8 +11,9 @@ A stable release version can be obtained from [_Bioconductor_](https://www.bioco
 
 + Installation from Bioconductor
 ```r
-source("https://bioconductor.org/biocLite.R")
-biocLite("ABAEnrichment")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("ABAEnrichment")
 ```
 
 The developmental (this) version can be obtained from the ['devel' version of Bioconductor](https://bioconductor.org/developers/how-to/useDevel/) or directly from
@@ -21,8 +22,9 @@ GitHub:
 + Installation from GitHub without vignette
 ```r
 ## install data package
-source("https://bioconductor.org/biocLite.R")
-biocLite("ABAData")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("ABAData")
 ## install from GitHub in R:
 install.packages("devtools")
 library(devtools)
@@ -32,8 +34,9 @@ install_github("sgrote/ABAEnrichment")
 + Installation from GitHub with vignette
 ```r
 ## install packages needed for vignette generation
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("BiocStyle","ABAData"))
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install(c("BiocStyle","ABAData"))
 ## install from GitHub in R:
 install.packages("devtools")
 library(devtools)
