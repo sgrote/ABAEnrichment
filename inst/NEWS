@@ -1,4 +1,15 @@
 
+
+CHANGES IN VERSION 1.11.4
+--------------------------
+
+USER-LEVEL CHANGES
+
+	o sort output aba_enrich()[[1]] by FWER first and then by age category
+	  (previously it was sorted by age category first)
+	  
+
+
 CHANGES IN VERSION 1.11.3
 --------------------------
 
