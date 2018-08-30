@@ -19,34 +19,29 @@ BiocManager::install("ABAEnrichment")
 The developmental (this) version can be obtained from the ['devel' version of Bioconductor](https://bioconductor.org/developers/how-to/useDevel/) or directly from
 GitHub:
 
-+ Installation from GitHub without vignette
++ Installation from GitHub
 ```r
 ## install data package
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 BiocManager::install("ABAData")
-## install from GitHub in R:
+## devtools to install from GitHub in R:
 install.packages("devtools")
 library(devtools)
+## install dependency GOfuncR and ABAEnrichment
+install_github("sgrote/GOfuncR")
 install_github("sgrote/ABAEnrichment")
 ```
 
-+ Installation from GitHub with vignette
-```r
-## install packages needed for vignette generation
-if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
-BiocManager::install(c("BiocStyle","ABAData"))
-## install from GitHub in R:
-install.packages("devtools")
-library(devtools)
-install_github("sgrote/ABAEnrichment", build_vignettes=TRUE)
-```
 
 #### Usage  
 See the package's [vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/ABAEnrichment/inst/doc/ABAEnrichment.html) for a tutorial.  
-Once installed with vignette, the tutorial can also be opened in R:
+Also refer to the man-pages for single functions, e.g.
+
 ```r
-## open tutorial in R
-browseVignettes("ABAEnrichment")
+library(ABAEnrichment)
+?aba_enrich
+?get_expression
 ```
+
+
