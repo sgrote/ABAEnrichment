@@ -7,28 +7,24 @@
     Expression data obtained from the Allen Brain Atlas project [1-4].   
 }
 \usage{
-    get_expression(structure_ids, gene_ids = NA, dataset = NA, background = FALSE)
+    get_expression(structure_ids, gene_ids, dataset = "adult")
 }
 \arguments{
     \item{structure_ids}{
         vector of brain structure IDs, e.g. 'Allen:10208'.
     }
     \item{gene_ids}{
-        vector of gene identifiers, either Entrez-ID, Ensembl-ID or gene-symbol. If not defined, genes from previous enrichment analysis with \code{\link{aba_enrich}} are used.
+        vector of gene identifiers, either Entrez-ID, Ensembl-ID or gene-symbol.
     }
     \item{dataset}{
-        'adult' for the microarray dataset of adult human brains; '5_stages' for RNA-seq expression data of the developing human brain, grouped into 5 developmental stages;
-        'dev_effect' for a developmental effect score. If not defined, dataset from last enrichment analysis with \code{\link{aba_enrich}} are used.
-    }
-    \item{background}{
-        logical indicating whether expression from background genes should be included. Only used when \code{gene_ids} and \code{dataset} are \code{NA} and \code{test} from preceding \code{\link{aba_enrich}} call is 'hyper'.  
+        'adult' (default) for the microarray dataset of adult human brains; '5_stages' for RNA-seq expression data of the developing human brain, grouped into 5 developmental stages;
+        'dev_effect' for a developmental effect score.
     }
 }
 \details{
     Get gene expression in defined brain regions from adult or developing humans, or a developmental effect score for the developing human brain.
     Expression data is obtained from the Allen Brain Atlas project [1-4], averaged across donors, and for the developing human brain divided into five major age categories.
     The developmental effect score is based on expression data of the developing human brain.
-    If \code{gene_ids} and \code{dataset} are not specified, the genes and dataset from the last enrichment analysis with \code{\link{aba_enrich}} are used, since it may be a common case to first run the enrichment analysis and then look at the expression data.
     If a requested brain region has no expression data annotated, data from sampled substructures of this region is returned.\cr 
     Please refer to the \code{ABAData} package vignette for details on the datasets.\cr
 }

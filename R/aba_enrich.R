@@ -446,22 +446,6 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
     # sort genes alphabetically (useful for regions input)
     gene_values = gene_values[mixedorder(gene_values[,1]),]
     rownames(gene_values) = 1:nrow(gene_values)
-    
-    # save in package environment: dataframes for test and background-gene expression, test, dataset    
-    # (to be returned with get_expression(structure_ids))   
-    requested_gene_expression = as.data.frame(gene_expr_ag)
-    rownames(requested_gene_expression) = NULL
-    colnames(requested_gene_expression)[3] = "structure_id"
-#   requested_gene_expression[,3] = paste("Allen:",requested_gene_expression[,3],sep="")
-    remember = list(rge=requested_gene_expression, test=c(test,dataset), genes=gene_values)
-    # save to package environment
-    aba_env = as.environment("package:ABAEnrichment")
-    unlock_environment(aba_env)
-    if (exists("remember",where=aba_env)){
-        unlockBinding("remember",aba_env)
-    }   
-    aba_env$remember = remember
-    lockEnvironment(aba_env, bindings=TRUE)
 
     final_output = list(results=results, genes=gene_values, cutoffs=cutoffs)
     

@@ -1,4 +1,16 @@
 
+CHANGES IN VERSION 1.11.7
+--------------------------
+
+USER-LEVEL CHANGES
+
+	o simplify functions 'get_expression' and 'plot_expression'
+	  (remove option to automatically use data from last aba_enrich-call)
+	o 'plot_expression' now takes matrix from 'get_expression' as input,
+	  instead of calling 'get_expression' internally
+	o add color key to 'plot_expression' heatmap when gene-associated
+	  variables are shown in a colored side bar
+
 
 CHANGES IN VERSION 1.11.6
 --------------------------

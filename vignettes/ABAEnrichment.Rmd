@@ -2,7 +2,7 @@
 ---
 title: "ABAEnrichment: Gene Expression Enrichment in Human Brain Regions"
 author: "Steffi Grote"
-date: "April 17, 2018"
+date: "October 17, 2018"
 output:
     BiocStyle::html_document:
     toc: true
@@ -71,7 +71,7 @@ function | description
 ----------- | ------------------------------------------------------------------------
 [aba_enrich](#aba_enrich) | core function for performing enrichment analyses given a candidate gene set
 [get_expression](#get_expression) | returns expression data for a given set of genes and brain regions
-[plot_expression](#plot_expression) | plots a heatmap with expression data for a given set of genes and brain regions
+[plot_expression](#plot_expression) | plots a heatmap given a matrix of expression data
 [get_name](#onto) | returns the full name of a brain region given a structure ID
 [get_sampled_substructures](#onto) | returns the substructures of a given brain region that have expression data available
 [get_superstructures](#onto) | returns the superstructures of a given brain region
@@ -94,11 +94,10 @@ In this example no background genes are defined, so all remaining protein-coding
 ```{r} 
 ## load ABAEnrichment package
 library(ABAEnrichment)
-## create input vector with candidate genes
+## create input data.frame with candidate genes
 gene_ids = c('NCAPG', 'APOL4', 'NGFR', 'NXPH4', 'C21orf59', 'CACNG2', 'AGTR1',
     'ANO1', 'BTBD3', 'MTUS1', 'CALB1', 'GYG1', 'PAX2')
-is_candidate = rep(1, length(gene_ids))
-input_hyper = data.frame(gene_ids, is_candidate)
+input_hyper = data.frame(gene_ids, is_candidate=1)
 head(input_hyper)
 ```
 
@@ -331,33 +330,25 @@ Note that this is the only test that is not dependent on the distribution of the
 ### get_expression
 
 The function `get_expression` enables the output of gene and brain region-specific expression data averaged across donors.
-By only setting the parameter `structure_ids` that defines the brain regions, the `gene_ids` and `dataset` are automatically set to the genes and dataset used in the last enrichment analysis.
-In comparison to defining genes and brain regions explicitly this saves some time since some pre-computations on the original dataset, e.g. aggregation of expression per gene, do not have to be redone.
-Using the default options (`background=FALSE`), `get_expression` returns expression data for the candidate genes.
-If `background=TRUE`, the gene expression data for both, candidate genes and background genes, are returned.
-
+Like in all functions of the *ABAEnrichment* package `gene_ids` can be *Entrez-ID*, *Ensembl-ID* or *gene-symbol*.
 
 ```{r}
-## get expression data for the first 5 brain regions
-## from the last aba_enrich-analysis
-top_regions = fwers_region[1:5, 'structure_id']
-top_regions
-expr = get_expression(top_regions, background=FALSE)
-head(expr)
+## get expression data for the top 5 regions
+## and all input genes
+## of the last aba_enrich analysis (res_conti)
+top_regions = res_conti[[1]][1:5, 'structure_id']
+gene_ids = res_conti[[2]][,1]
+expr = get_expression(structure_ids=top_regions, gene_ids=gene_ids,
+    dataset='adult')
+expr[1:6,1:6]
 ```
 
-The same output would be created independently of an `aba_enrich` analysis by, in addition to `structure_ids`, setting `gene_ids` and `dataset` manually.
-Like in all functions of the *ABAEnrichment* package `gene_ids` can be *Entrez-ID*, *Ensembl-ID* or *gene-symbol*.
-```{r, eval=FALSE}
-## get expression data independent from previous aba_enrich analysis
-regions = c('Allen:12926', 'Allen:4738', 'Allen:4671', 'Allen:12909')
-gene_ids = c('CHMP4C', 'FABP12', 'FABP4', 'FABP5', 'FABP9', 'IMPA1',
-    'PAG1', 'PMP2', 'SLC10A5', 'SNX16', 'ZFAND1') 
-expr2 = get_expression(regions, gene_ids=gene_ids, dataset='adult',
-    background=FALSE)
-```
+For the `5_stages` dataset the output of `get_expression` is a list with a data frame for each developmental stage:
 
-For the `5_stages` dataset the output of `get_expression` is a list with a data frame for each developmental stage, where the first element corresponds to the first developmental stage, the second element to the second developmental stage, and so on.
+```{r}
+get_expression(structure_ids=c('Allen:10657','Allen:10208'),
+    gene_ids=c('RFFL', 'NTS', 'LIPE'), dataset='5_stages')
+```
 
 Note that the brain regions passed to `get_expression` do not have to match the brain regions returned in the output.
 This is due to the fact that not all brain regions were measured independently.
@@ -369,42 +360,70 @@ The function [get_sampled_substructures](#onto) can be used to identify substruc
 ### plot_expression
 
 The function `plot_expression` enables the visualization of expression data.
-The usage of `plot_expression` is similar to that of `get_expression`.
-Providing only brain regions as input, it plots the expression data for the genes and dataset used in the last `aba_enrich` call.
+It needs a matrix of expression data as input, like the one returned by [get_expression](#get_expression):
 
 ```{r}
-## get expression data for the first 5 brain regions
-## from the last aba_enrich-analysis
-top_regions = fwers_region[1:5, 'structure_id']
-plot_expression(top_regions, background=FALSE)
+## plot the expression data from above
+plot_expression(expr, main="microarray expression data for adult brain")
 ```
 
-The optional argument `dendro` determines whether or not a dendrogram should be added to the heatplot.
-The colored side bar in the plot without dendrogram indicates candidate genes (red) and background genes (black).
-In this case only candidate gene expression was plotted (with the default option `background=FALSE`):
+For `dataset='5_stages'`, `get_expression` returns a list of matrices; single elements of this list can be passed to `plot_expression`.
+In the following example `res_devel`, the enrichment analysis from above for 5 developmental stages, is used, and we want to visualize the expression of the candidate genes for the 5 brain regions with the lowest FWER for age category 2.
+We first extract the top 5 brain regions for age category 2 and the candidate genes used in that analysis.
+Then we obtain the expression of those genes in the 5 brain regions using `get_expression`, subset to age category 2 and pass the data to `plot_expression`:
 
 ```{r}
-## plot the same expression data without dendrogram
-plot_expression(top_regions, dendro=FALSE, background=FALSE)
+## plot expression data for the top 5 regions
+## of age-category 2 and all input genes
+## of the developmental stage aba_enrich analysis above (res_devel)
+
+## extract brain regions
+devel_stats = res_devel[[1]]
+devel_stats_2 = devel_stats[devel_stats$age_category==2,]
+top_regions_2 = devel_stats_2[1:5,'structure_id']
+## extract genes
+genes = res_devel[[2]][,1]
+## get expression for all 5 age categories
+expr_all = get_expression(top_regions_2, genes, "5_stages")
+## subset to age-cateogry 2
+expr_2 = expr_all[["age_category_2"]]
+## plot heatmap
+plot_expression(expr_2, main="RPKM from RNA-seq for age_category_2")
 ```
 
-When plotting expression data following an enrichment analysis with the Wilcoxon rank-sum test, the option `dendro=FALSE` results in a side bar that indicates the scores that were used for the enrichment analysis. For the binomial test the side bar shows *A/(A+B)* and for the 2x2 contingency table test *((A+1)/(B+1)) / ((C+1)/(D+1))* (+1 added to prevent division by 0, this is just a visual indication of the proportion of the ratios and not the real odds ratio from the 2x2 contingency table test).
+Note that there are more than 5 brain regions in the plot, because for regions that were not sampled directly, the expression of all their sampled substructures is plotted.  
 
-Like `get_expression`, `plot_expression` can also be used independently of an enrichment analysis.
-In that case the arguments `gene_ids` and `dataset` have to be defined.
-If the `5_stages` dataset is used, the additional argument `age_category` selects the developmental stage for which the expression data should be plotted:
+Optionally also gene-associated variables (`gene_vars`) can be provided to create a colored side bar.
+This is useful to visualize the scores of genes used in an `aba_enrich` analysis, and `gene_vars` should be `aba_enrich()[[2]]`, i.e. a data frame with all valid genes from that enrichment analysis together with their input scores.  
+For the *hypergeometric test* the colored side bar indicates candidate genes (red) and background genes (black) and for the *Wilcoxon rank-sum test* it indicates the scores that were used for the enrichment analysis.
+For the *binomial test* the side bar shows *A/(A+B)* and for the *2x2 contingency table test* *((A+1)/(B+1)) / ((C+1)/(D+1))* (+1 added to prevent division by 0, this is just a visual indication of the proportion of the ratios and not the real odds ratio from the 2x2 contingency table test).    
+In the following example we will plot the expression data for the top 5 brain regions from the 2x2 contingency table test above (`res_conti`), by first extracting the brain regions and genes, then getting the expression data, and finally plotting it together with the gene-associated variables from the 2x2 contingency table test as sidebar (*((A+1)/(B+1)) / ((C+1)/(D+1))*):
 
 ```{r}
-## plot expression of some genes for the frontal neocortex (Allen:10161)
-## in age category 3 (children, 3-11 yrs)
-gene_ids = c('ENSG00000157764', 'ENSG00000163041', 'ENSG00000182158',
-    'ENSG00000147889', 'ENSG00000103126', 'ENSG00000184634')
-plot_expression('Allen:10161', gene_ids=gene_ids, dataset='5_stages',
-    age_category=3)
+## plot expression data for the top 5 regions
+## and all input genes
+## from the 2x2-contingency table analysis (res_conti)
+
+## extract brain regions
+top_regions = res_conti[[1]][1:5, 'structure_id']
+## extract genes
+gene_ids = res_conti[[2]][,1]
+## get expression 
+expr = get_expression(structure_ids=top_regions, gene_ids=gene_ids, dataset='adult')
+## plot expression with sidebar
+plot_expression(expr, gene_vars=res_conti[[2]], main="heatmap with sidebar")
 ```
 
-In this example the *frontal neocortex* (Allen:10161) was not sampled directly for expression measurements, but some of its substructures have expression data annotated.
-Instead of pooling the data of the substructures, they are plotted separately.
+The `plot_expression` function is thought to give a quick overview of the expression pattern, optionally together with gene-associated variables. For more flexible heatmaps, e.g. `heatmap.2` from the package `gplots` can be used (`heatmap.2` is also used inside `plot_expression`):
+
+```{r}
+## use heatmap.2 to allow adjusting other parameters like color
+gplots::heatmap.2(expr, scale="none", col=gplots::greenred(100),
+    main="custom heatmap", trace="none",
+    keysize=1.4, key.xlab="expression",
+    dendrogram="row", margins=c(6, 8))
+```
+
 
 <a name='onto'></a>
 
@@ -516,7 +535,7 @@ top_regions
 ```
 
 As for the expression datasets, the developmental effect scores can be retrieved with the functions `get_expression` and plotted with `plot_expression`:
-```{r}
+```{r, eval=F}
 ## plot developmental effect score of the 5 brain regions with the lowest FWERs
 plot_expression(top_regions[ ,'structure_id'])
 ```

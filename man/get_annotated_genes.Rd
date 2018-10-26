@@ -4,7 +4,7 @@
     Get genes that are expressed in enriched or user-defined brain regions
 }
 \description{
-    Uses an object returned from \code{\link{aba_enrich}} as input and returns the brain regions that are significantly (given a FWER-threshold) enriched in expressed candidate genes (or genes with high scores if \code{test='wilcoxon'} in \code{\link{aba_enrich}}) together with the genes that are expressed in those brain regions (i.e. are 'annotated' to the brain regions).
+    Uses an object returned from \code{\link{aba_enrich}} as input and returns the brain regions that are significantly (given a FWER-threshold) enriched, together with the genes that are expressed in those brain regions (i.e. are 'annotated' to the brain regions).
     Alternatively, also user-defined brain regions, dataset and expression cutoffs can be used as input.
 }
 
