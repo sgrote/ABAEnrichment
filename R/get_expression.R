@@ -1,10 +1,7 @@
-# reads list with expression info from last aba_enrich run, mostly to avoid recomputing of aggregate() which can be time consuming, i.e. for a large set of background genes
-# alternatively genes and dataset can be specified and data are loaded (if necessary) and processed again
-# returns a list with a data_frame for each age category that is ready to heatmap()-plot
+# get matrix of expression data
+# given structures, genes and dataset
+# returns a data_frame for each age category that is ready to heatmap()-plot
 
-# remember$rge: expression data in long format
-# remember$test: the test and dataset used 
-# remember$genes: input genes and associated variables (2-5 columns in total)
 
 # change from long to wide format
 to_wide=function(suby){
@@ -16,47 +13,26 @@ to_wide=function(suby){
     return(tab)
 }   
 
-get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE)
+get_expression=function(structure_ids, gene_ids, dataset="adult")
 {   
-    if(xor(is.na(gene_ids)[1], is.na(dataset))) stop("Please specifiy gene_ids and dataset. Alternatively specify none of them which will use data from last aba_enrich() execution.")
-    
-    # A) use precomputed data from last FUNC run
-    if(is.na(dataset)){
-        new_data=FALSE
-        aba_env=as.environment("package:ABAEnrichment")
-        if(!exists("remember",where=aba_env)) {
-            stop("This function requires previous execution of aba_enrich(). Alternatively specify gene_ids and dataset")
-        }
-        expr=aba_env$remember$rge
-        genes=aba_env$remember$genes
-        test=aba_env$remember$test[1]
-        dataset=aba_env$remember$test[2]
-        # delete background genes if not wanted
-        if(test=="hyper" & !background){
-            expr=expr[expr$gene_id %in% genes[genes[,2]==1, 1] ,]
-        }
-    # B) take user defined genes and dataset and load 'raw' pre_input_data
-    } else {
-        new_data=TRUE
-        valid_datasets=c("adult","5_stages","dev_effect")
-        if(!(dataset %in% valid_datasets)){
-            stop("Not a valid dataset. Please use 'adult', '5_stages' or 'dev_effect'.")    
-        }
-        expr=load_by_name(paste("dataset",dataset,sep="_"))
-        expr=expr[,c("age_category",detect_identifier(gene_ids[1]),"structure","signal")]
-        # warn if any genes do not have data        
-        not_in=gene_ids[!(gene_ids %in% expr[,2])]
-        if(length(not_in)>0){
-            not_in_string=paste(not_in,collapse=", ")
-            warning(paste("No expression data for genes: ",not_in_string,".",sep=""))
-        }
-        # restrict to required genes and aggregate
-        expr=expr[expr[,2] %in% gene_ids,]
-        expr=aggregate(expr$signal,by=list("age_category"=expr[,1],"gene_id"=expr[,2],"structure_id"=expr[,3]),mean)
-        colnames(expr)[4]="signal"
-        expr$structure_id=paste("Allen:",expr$structure_id,sep="")
-    }   
-        
+    valid_datasets=c("adult","5_stages","dev_effect")
+    if(!(dataset %in% valid_datasets)){
+        stop("Not a valid dataset. Please use 'adult', '5_stages' or 'dev_effect'.")    
+    }
+    expr=load_by_name(paste("dataset",dataset,sep="_"))
+    expr=expr[,c("age_category",detect_identifier(gene_ids[1]),"structure","signal")]
+    # warn if any genes do not have data        
+    not_in=gene_ids[!(gene_ids %in% expr[,2])]
+    if(length(not_in)>0){
+        not_in_string=paste(not_in,collapse=", ")
+        warning(paste("No expression data for genes: ",not_in_string,".",sep=""))
+    }
+    # restrict to required genes and aggregate
+    expr=expr[expr[,2] %in% gene_ids,]
+    expr=aggregate(expr$signal,by=list("age_category"=expr[,1],"gene_id"=expr[,2],"structure_id"=expr[,3]),mean)
+    colnames(expr)[4]="signal"
+    expr$structure_id=paste("Allen:",expr$structure_id,sep="")
+
     # get all structures that provide data to the structures
     daty_children=c()
     structure_ids = as.character(structure_ids)
@@ -69,36 +45,10 @@ get_expression=function(structure_ids, gene_ids=NA, dataset=NA, background=FALSE
     expr_list=by(expr, expr$age_category, to_wide, simplify=FALSE)  
     
     # SORT GENES
-    # A) data from aba_enrich()
-    if (!(new_data)){
-        # cluster background and test genes (hyper) / sort scores (wilcox) or combined scores (binom+conti)
-        if (!(test == "hyper" & !background)){  # (no sense for hyper test-genes-only)
-            # exclude duplicates for sorting
-            genes=unique(genes)
-            # combine score for binomial and conti
-            if (test == "binomial"){ # A/B for binomial
-                genes[,2] = genes[,2] / genes[,3]
-            } else if (test == "contingency"){ # (A/B)/(C/D) for binomial (add 1 to prevent division by 0)
-                genes[,2] = (genes[,2]+1 / genes[,3]+1) / (genes[,4]+1 / genes[,5]+1)
-            }
-            # cant order with genes vector if only contains test-genes and bg is requested
-            if (test=="hyper" & sum(genes[,2])==nrow(genes) & background){
-                expr_list=lapply(expr_list, function(x){
-                    return(cbind(x[,colnames(x) %in% genes[,1]], x[,!(colnames(x) %in% genes[,1])]))})
-            } else {
-                # order with genes vector
-                genes=genes[genes[,1] %in% colnames(expr_list[[1]]),]
-                genes=genes[order(genes[,2],genes[,1]),]
-                expr_list=lapply(expr_list,function(x){
-                    return(x[,match(genes[,1],colnames(x)),drop=FALSE])})
-            }   
-        }
-    # B) user-defined genes and dataset (sort according to order in which requested)
-    } else {
-        gene_ids=unique(gene_ids)
-        gene_ids=gene_ids[gene_ids %in% colnames(expr_list[[1]])]
-        expr_list=lapply(expr_list,function(x) return(x[,match(gene_ids,colnames(x)),drop=FALSE]))
-    }
+    # sort according to order in which requested
+    gene_ids=unique(gene_ids)
+    gene_ids=gene_ids[gene_ids %in% colnames(expr_list[[1]])]
+    expr_list=lapply(expr_list,function(x) return(x[,match(gene_ids,colnames(x)),drop=FALSE]))
         
     # SORT REGIONS according to how they were requested
     daty_children=unique(daty_children)
