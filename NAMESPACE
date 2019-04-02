@@ -4,5 +4,6 @@ importFrom("Rcpp", "evalCpp")
 importFrom("grDevices", "heat.colors", "rainbow")
 importFrom("stats", "aggregate", "quantile")
 importFrom("utils", "data", "read.table", "write.table")
+importFrom("graphics", "legend")
 
 import(gplots, gtools, ABAData, data.table)
