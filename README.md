@@ -20,18 +20,13 @@ The developmental (this) version can be obtained from the ['devel' version of Bi
 GitHub:
 
 + Installation from GitHub
+
 ```r
-## install data package
-if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
-BiocManager::install("ABAData")
-## devtools to install from GitHub in R:
-install.packages("devtools")
-library(devtools)
-## install dependency GOfuncR and ABAEnrichment
-install_github("sgrote/GOfuncR")
-install_github("sgrote/ABAEnrichment")
+if (!requireNamespace("devtools", quietly=TRUE))
+    install.packages("devtools")
+devtools::install_github("sgrote/ABAEnrichment")
 ```
+
 
 
 #### Usage  
