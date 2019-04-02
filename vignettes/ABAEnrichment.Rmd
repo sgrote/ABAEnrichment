@@ -2,7 +2,7 @@
 ---
 title: "ABAEnrichment: Gene Expression Enrichment in Human Brain Regions"
 author: "Steffi Grote"
-date: "October 17, 2018"
+date: "April 2, 2019"
 output:
     BiocStyle::html_document:
     toc: true
@@ -340,7 +340,7 @@ top_regions = res_conti[[1]][1:5, 'structure_id']
 gene_ids = res_conti[[2]][,1]
 expr = get_expression(structure_ids=top_regions, gene_ids=gene_ids,
     dataset='adult')
-expr[1:6,1:6]
+expr[,1:6]
 ```
 
 For the `5_stages` dataset the output of `get_expression` is a list with a data frame for each developmental stage:
