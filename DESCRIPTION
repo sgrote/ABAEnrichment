@@ -29,6 +29,7 @@ Imports:
     GOfuncR (>= 1.1.2),
     grDevices,
     stats,
+    graphics,
     utils
 Depends: R (>= 3.4)
 LinkingTo: Rcpp
