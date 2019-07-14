@@ -127,8 +127,7 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
     
     # Create tempfile prefix (in contrast to tempdir() alone, this allows parallel processing)
     directory = tempfile()
-#   dir.create("tempdir"); directory = paste("./tempdir/tempfile",Sys.info()["nodename"],sep="_")
-    
+    # dir.create("tempdir"); directory = paste("./tempdir/tempfile",Sys.info()["nodename"],sep="_")
     # load gene_list and get gene identifier
     gene_symbols = get(paste("gene_symbols",folder_ext,sep="_"))    
     identifier = detect_identifier(genes[1,1])
@@ -159,6 +158,10 @@ aba_enrich=function(genes, dataset="adult", test="hyper", cutoff_quantiles=seq(0
         gene_coords = unique(gene_coords)
         multi_coords = sort(unique(gene_coords[,4][duplicated(gene_coords[,4])]))
         gene_coords = gene_coords[! gene_coords[,4] %in% multi_coords,]
+        # add 'chr' if missing (coord_db has it too)
+        if (!startsWith(as.character(gene_coords[1,1]), "chr")){ 
+            gene_coords[,1] = paste0("chr", gene_coords[,1])
+        }
     }
     
     if (regions){

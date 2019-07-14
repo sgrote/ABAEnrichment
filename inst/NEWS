@@ -1,4 +1,14 @@
 
+CHANGES IN VERSION 1.13.3
+--------------------------
+
+BUG-FIX
+
+	o fix genomic regions option which had wrongly yielded FWER=0 for all
+	  brain regions when coordinates were provided without "chr"-prefix.
+	  The bug was probably introduced in version 1.11.3.
+
+
 CHANGES IN VERSION 1.11.7
 --------------------------
 
